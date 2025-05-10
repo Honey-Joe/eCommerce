@@ -1,0 +1,88 @@
+
+eCommerce Website Research Document
+===================================
+
+1. Overall Flow of the eCommerce Website
+----------------------------------------
+
+1. User Journey (Client-Side)
+-----------------------------
+- Registration / Login:
+  - Fields: name, email, phone, password (hashed)
+  - JWT-based login authentication (token stored in localStorage or cookies)
+
+- Browsing & Searching:
+  - Search by product title or description
+  - Filters: category, price range, location
+  - Sorting: name (A–Z, Z–A), price (low–high, high–low), rating (optional)
+
+- Product Details:
+  - Title, description, images (carousel), price, stock, category
+  - Seller info: store name, location, verified badge
+  - Actions: "Buy Now" / "Add to Cart" 
+  - Product Reviews & Ratings
+
+2. Seller Journey (Dashboard-Side)
+----------------------------------
+- Registration / Login:
+  - Separate schema or role: 'seller'
+  - JWT-based authentication and protected routes
+
+- Product Management:
+  - Add Product: title, description, price, category, stock, image upload
+  - View Own Products: filter by Sold / Unsold
+  - Update / Delete product
+
+3. Admin Journey (Admin Panel)
+------------------------------
+- Dashboard:
+  - KPIs: total sellers, users, products (sold/unsold)
+  - Optional graphs: sales trends, new user registrations
+
+- Site Settings:
+  - SMTP settings, branding (site name, logo, favicon)
+  - Contact details (address, phone, support email)
+  - Toggle maintenance mode and currency
+
+- User Management:
+  - View all users: paginated, searchable, sortable
+  - View user details: name, email, phone, reg. date, role, status, order count (optional)
+  - Manage user status: active / banned
+  - Delete user
+
+- Seller Management:
+  - View all sellers: store name, email, status, joined date, product count
+  - Approve/block sellers, view their products
+  - Delete abusive or inactive sellers
+
+- Product Management:
+  - View all products: paginated, filters (sold/unsold, category, seller, price)
+  - Moderate: verify/unverified, block/delete
+  - View product stats: sold count, stock, views (optional)
+  - Edit product details
+  - View full product details
+
+4. Auth & Route Protection
+--------------------------
+- JWT-based authentication
+- Middleware protects role-specific routes:
+  - /user/* for users
+  - /seller/* for sellers
+  - /admin/* for admins
+
+5. Data Flow Overview
+---------------------
+[ User/Seller ] --> [ Auth API (JWT) ] --> [ Protected Routes ]
+                   ↓                                ↓
+           [ Browse Products ]           [ Seller Adds Product ]
+                   ↓                                ↓
+          [ View Product Details ]       [ Admin Verifies Product ]
+                   ↓                                ↓
+        [ (Future) Add to Cart ]         [ Monitor Product Sales ]
+
+6. Future Suggestions (Optional)
+--------------------------------
+- Cart & Order Management
+- Payment Integration (Stripe, Razor pay)
+- Notification System (Email / In-App)
+- Analytics for Admin & Sellers

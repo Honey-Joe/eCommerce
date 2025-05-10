@@ -1,0 +1,67 @@
+Redux Toolkit
+
+Multiple components data share pandrathiku use pandra library redu toolkit
+
+Redux is Global State connected to react to share state to different components
+
+Install -@reduxjs/toolkit - redux library
+
+	- react-redux - connect between react and redux
+
+
+first - react router dom 
+
+1.create a form
+
+2. Set Redux
+
+	1.store - app folder
+	2.slice - slice folder
+
+	store: Store all the state data
+	slice : Reducers , Action 
+
+	control each store have slice-reducer and action
+
+	Reducer - is a function to update a state
+
+	Action - to trigger the reducer function (dispatch(action)) - Dispatch the action to call the particular reducer
+
+1. slice
+
+	userSlice.js 
+		1. const intial state
+
+		2. ecport  const userSLice = ()=>{
+				name: user,
+				intialstate
+				reducersL{
+					setUsers: (state,action)=>{
+						state.user = action.payload
+					}
+				}}
+						
+
+	export const  {setUsers} = userSLice.action;
+
+	export default authSlice.reducer
+
+Reducer function la 2 parameters = state-dispatch(name) , action (data)
+
+2.store
+
+<Provider store={store} /> warp it in app
+
+store.js
+import {configureStore} from "react-redux"
+
+const store = configureStore({
+	reducer:{
+		auht:authReducer
+	}
+})
+		
+
+
+ 
+

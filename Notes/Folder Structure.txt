@@ -1,0 +1,10 @@
+Folder Structure
+
+1. Backend 
+	
+2. Admin
+
+3. Users/Seller
+
+
+	

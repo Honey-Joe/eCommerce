@@ -1,0 +1,201 @@
+Ecommerce Website Research 
+
+1. Admin Module 
+
+	1. Dashboard
+
+	Components:
+
+		Total number of sellers
+
+		Total number of clients (users)
+
+		Number of products (sold, unsold)
+
+		Graphs (optional: sales trends, new user registrations)
+
+	2.Site Settings
+	
+		Set up or update SMTP email settings (for sending transactional emails)
+
+		Manage platform branding (site name, logo, favicon)
+
+		Store contact details (address, phone, support email)
+
+		Toggle site-wide options (maintenance mode, currency)
+	
+	3.User Management
+	
+		1. View All Users
+			Paginated list of registered users
+
+			Search by name, email, or ID
+
+			Sort by registration date or status
+
+		2. User Info
+			Full name, email, phone number
+
+			Registration date
+
+			Status: active, banned
+
+			Role: user, seller, admin
+
+			Orders count (optional)
+
+		3. Manage User Status
+			Toggle account status: Active / Banned
+
+			Block abusive users from logging in
+
+		4. Delete User 
+
+	4.Seller Management
+
+		1. View All Sellers
+			List of all users with the role seller
+
+			View store name, email, status (Pending / Verified / Blocked)
+
+			Joined date, number of products listed
+
+		2. Verify / Block Sellers
+			Approve or reject seller applications
+
+			Temporarily block a seller account if suspicious
+
+		3. View Seller's Products
+			Button to list all products uploaded by a seller
+
+			Useful for checking quality or violations
+
+		4. Delete Seller
+			Only if the seller is abusive or inactive for long
+
+	5. Product Management
+
+		1. View All Products
+			See all listed products (paginated)
+
+			Filter by:
+
+				Sold / Unsold
+
+				Verified / Unverified
+
+				Category / Seller / Price Range
+
+		2. Moderate Products
+			Verify / Unverified products before they go live
+
+			Block / Delete products that violate policies
+
+		3. Product Stats
+			Sold count
+
+			Stock level
+
+			Views (if tracking)
+
+		4. Edit Product
+			Change title, price, stock, or visibility manually
+
+		5. View Product Details
+			Full description, images, seller info, pricing
+2.User Module :
+
+	1.Login / Register
+
+		User Registration
+			Fields: name, email, phone, password
+			Password should be hashed (e.g., bcrypt)
+
+		User Login
+			Fields: email, password
+			On success: Return JWT for authentication
+
+		Token-based Auth
+
+			Protect user-specific endpoints with JWT
+
+			Use cookies or localStorage to store token (on frontend)
+
+	2.Products – Filter, Search, Sort
+
+		Search by keyword (product title / description)
+
+			Filters:
+
+				Category
+
+				Price Range (min to max)
+
+				Location (based on seller or product)
+
+			Sorting:
+
+				By Name (A–Z, Z–A)
+
+				By Price (low to high, high to low)
+
+				By Rating (if implemented)
+	
+	3. Product Details Page
+
+		Product Title
+
+		Images (carousel)
+
+		Full Description
+
+		Price, Stock
+
+		Category
+
+		Seller Info: Store name, location, verified badge
+
+		“Buy Now” / “Add to Cart” (if implemented later)
+
+3. Seller Module
+
+	1. Seller Registration / Login
+		
+		Separate seller schema or user role field (role: 'seller')
+
+		Register/login using email/password
+
+		JWT-based authentication
+
+		Protect seller-specific routes
+
+	2. Add Products / Show Products
+
+		Add Product Form:
+
+			title, description, price, category
+
+			images (upload)
+
+			stock
+
+		My Products page:
+
+			list all products created by this seller
+
+	3.  Sold / Unsold Filter
+
+		Show total sold count per product
+
+		Add filter options:
+
+			Sold (soldCount > 0)
+
+			Unsold (soldCount = 0)
+
+	4. Update / Delete Product
+
+		Update product details (title, price, stock, etc.)
+
+		Delete product (soft delete or full removal)
+

@@ -1,0 +1,28 @@
+Ecommerce 
+
+3 Modules - user , seller , admin
+
+admin - important dates , logo , name , update, 
+
+1. Dashboard - no of seller , client 
+2. site settings smpt-mail
+3. user - user information 
+4. seller - seller info
+5. product - sold-unsold
+
+user module
+
+1. login/register
+2.products - filter , search bar , sorting - name , location, price range
+3.product details- description , seller 
+
+
+seller 
+
+1.register login
+
+2.add products / show product 
+
+3. sold un sold - filter 
+
+4.updated  delete 
