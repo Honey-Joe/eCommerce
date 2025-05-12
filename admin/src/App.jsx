@@ -10,6 +10,10 @@ import { loginSuccess, logout } from "./features/auth/authSlice";
 import axiosInstance from "./axios";
 import Unauthorized from "./components/Unauthourized";
 import ProtectedRoute from "./components/ProtectedRoute";
+import UserManagement from "./pages/admin/UserManagement";
+import AllSellers from "./pages/admin/SellerManagement";
+import UsersManagement from "./pages/admin/UserManagement";
+import SellersManagement from "./pages/admin/SellerManagement";
 
 function App() {
   const dispatch = useDispatch();
@@ -31,14 +35,18 @@ function App() {
   return (
     <>
       <ToastContainer />
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/unauthorized" element={<Unauthorized></Unauthorized>} />
-        <Route path="/" element={<Home />} />
-        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        </Route>{" "}
-      </Routes>
+       <Routes>
+      <Route path="/admin" element={<AdminDashboard />}>
+        <Route path="dashboard" element={<AdminDashboard />} />
+        
+        <Route path="users" element={<UsersManagement />} />
+        <Route path="sellers" element={<SellersManagement />} />
+
+        {/* Add other routes as necessary */}
+      </Route>
+        <Route path="login" element={<Login></Login>}></Route>
+        <Route path="/" element={<Home></Home>}></Route>
+    </Routes>
     </>
   );
 }

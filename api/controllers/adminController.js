@@ -96,6 +96,34 @@ const getAllSellers = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch sellers', error: err.message });
   }
 };
+const updateSellerApproval = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const seller = await Seller.findById(id);
+    if (!seller) return res.status(404).json({ message: "Seller not found" });
+
+    seller.status = "approved";
+    await seller.save();
+
+    res.status(200).json({ message: "Seller approved successfully", seller });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const deleteSeller = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const seller = await Seller.findById(id);
+    if (!seller) return res.status(404).json({ message: "Seller not found" });
+
+    await seller.deleteOne();
+    res.status(200).json({ message: "Seller deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 
 
 
@@ -105,6 +133,8 @@ const getAllSellers = async (req, res) => {
     adminLogout,
     getAdminProfile,
     getAllUsers,
-    getAllSellers
+    getAllSellers,
+    updateSellerApproval,
+    deleteSeller
   };
   
