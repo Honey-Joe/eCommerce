@@ -17,7 +17,6 @@ const SellerRegister = () => {
   const dispatch = useDispatch();
   const { loading, error, success, user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
-  const [files, setFiles] = useState([]);
 
   const {
     register,
@@ -31,6 +30,7 @@ const SellerRegister = () => {
     try {
       dispatch(registerStart());
 
+      // Prepare form data for the registration request
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("email", data.email);
@@ -38,15 +38,15 @@ const SellerRegister = () => {
       formData.append("businessName", data.businessName);
       formData.append("storeLocation", data.storeLocation);
 
-      files.forEach((file) => formData.append("documents", file));
-
+      // Send the registration request
       const res = await axiosInstance.post("/auth/register/seller", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          'Content-Type': 'application/json',
         },
         withCredentials: true, // Important!
       });
 
+      // Dispatch success action and navigate to login
       dispatch(registerSuccess({ user: res.data.user, role: "seller" }));
       toast.success("Seller registered successfully!");
       navigate("/login");
@@ -55,11 +55,8 @@ const SellerRegister = () => {
         registerFailure(err.response?.data?.message || "Registration failed")
       );
       toast.error(err.response?.data?.message || "Registration failed");
+      console.log(err)
     }
-  };
-
-  const handleFileChange = (e) => {
-    setFiles(Array.from(e.target.files));
   };
 
   return (
@@ -73,6 +70,7 @@ const SellerRegister = () => {
           Seller Registration
         </h2>
 
+        {/* Name Input */}
         <input
           {...register("name")}
           placeholder="Name"
@@ -82,6 +80,7 @@ const SellerRegister = () => {
           <p className="text-red-500 text-sm">{errors.name.message}</p>
         )}
 
+        {/* Email Input */}
         <input
           {...register("email")}
           placeholder="Email"
@@ -91,6 +90,7 @@ const SellerRegister = () => {
           <p className="text-red-500 text-sm">{errors.email.message}</p>
         )}
 
+        {/* Password Input */}
         <input
           {...register("password")}
           placeholder="Password"
@@ -101,6 +101,7 @@ const SellerRegister = () => {
           <p className="text-red-500 text-sm">{errors.password.message}</p>
         )}
 
+        {/* Business Name Input */}
         <input
           {...register("businessName")}
           placeholder="Business Name"
@@ -110,6 +111,7 @@ const SellerRegister = () => {
           <p className="text-red-500 text-sm">{errors.businessName.message}</p>
         )}
 
+        {/* Store Location Input */}
         <input
           {...register("storeLocation")}
           placeholder="Store Location"
@@ -119,19 +121,7 @@ const SellerRegister = () => {
           <p className="text-red-500 text-sm">{errors.storeLocation.message}</p>
         )}
 
-        <input
-          type="file"
-          multiple
-          accept=".pdf,.jpg,.jpeg,.png"
-          onChange={handleFileChange}
-          className="w-full border rounded px-4 py-2"
-        />
-        {files.length > 0 && (
-          <p className="text-sm text-gray-500">
-            {files.length} file(s) selected
-          </p>
-        )}
-
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
@@ -142,6 +132,7 @@ const SellerRegister = () => {
           {loading ? "Registering..." : "Register"}
         </button>
 
+        {/* Error/Success Message */}
         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         {success && (
           <p className="text-green-500 text-sm text-center">

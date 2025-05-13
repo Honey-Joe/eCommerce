@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { loginAdmin, registerAdmin, adminLogout, getAllSellers, getAllUsers, getAdminProfile, updateSellerApproval, deleteSeller} = require('../controllers/adminController');
+const { loginAdmin, registerAdmin, adminLogout, getAdminProfile} = require('../controllers/adminController');
 const adminMiddleware = require('../middleware/adminMiddleware');
+const { getAllUsers } = require('../controllers/userController');
+const { getAllSellers, updateSellerApproval, deleteSeller } = require('../controllers/sellerController');
 
 // Admin login route
 router.post('/login', loginAdmin);

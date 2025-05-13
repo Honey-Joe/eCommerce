@@ -8,6 +8,7 @@ const SellersManagement = () => {
   const dispatch = useDispatch();
   const { list, loading, error } = useSelector((state) => state.sellers);
   const [documentUrl, setDocumentUrl] = useState("");
+  console.log(list)
 
   useEffect(() => {
     dispatch(fetchSellers());
@@ -98,7 +99,13 @@ const SellersManagement = () => {
                     seller.documents.map((e)=>{
                         return(
 
-                            <img src={e} alt="" />
+                            <>
+                              <div>
+                                <a href={e} target="_blank">
+                                  <button className="bg-green-500 px-5 py-2 rounded-lg">View Document</button>
+                                </a>
+                              </div>
+                            </>
                         )
                     })
                   }

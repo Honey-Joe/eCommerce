@@ -25,8 +25,9 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axiosInstance.post("/auth/login", data);
-      const { role } = response.data;
-      dispatch(loginSuccess({ role }));
+      const  {role,status} = response.data;
+      console.log(role)
+      dispatch(loginSuccess({role,status}));
       setTimeout(() => {
         if (role === "seller") {
           navigate("/seller/dashboard");

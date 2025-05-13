@@ -1,5 +1,6 @@
 const express = require('express');
-const { registerUser, registerSeller, login, logout, getUserProfile } = require('../controllers/authController');
+const { registerUser, login, logout, getUserProfile } = require('../controllers/authController');
+const {registerSeller} = require("../controllers/sellerController");
 const adminMiddleware = require('../middleware/adminMiddleware');
 const {verifyToken} = require("../middleware/authMiddleware");
 const upload = require('../middleware/upload');
@@ -9,7 +10,7 @@ const router = express.Router();
 router.post('/register/user', registerUser);
 
 // Seller registration route
-router.post('/register/seller', upload.array('documents', 3), registerSeller); // Limit to 3 files
+router.post('/register/seller', registerSeller); // Limit to 3 files
 router.get('/me',verifyToken, getUserProfile);
 
 // Login route (for both users and sellers)

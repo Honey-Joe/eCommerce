@@ -21,8 +21,9 @@ function App() {
       const checkAuth = async () => {
         try {
           const res = await axiosInstance.get("auth/me");
-          const { role } = res.data;
-          dispatch(loginSuccess({ role }));
+          const { role, status } = res.data;
+          console.log(role, status)
+          dispatch(loginSuccess({ role ,status }));
         } catch (err) {
           dispatch(logout());
         }

@@ -33,33 +33,7 @@ const registerUser = async (req, res) => {
 };
 
 // Register a new seller
-const registerSeller = async (req, res) => {
-  try {
-    const { name, email, password, businessName, storeLocation } = req.body;
 
-    // Handle multiple file uploads
-    let documentUrls = [];
-    if (req.files) {
-      documentUrls = await uploadToCloudinary(req.files, 'seller-documents');
-    }
-
-    const newSeller = new Seller({
-      name,
-      email,
-      password,
-      businessName,
-      storeLocation,
-      documents: documentUrls, // Store multiple URLs
-    });
-
-    await newSeller.save();
-
-    res.status(201).json({ message: 'Seller registered successfully', user: newSeller });
-  } catch (error) {
-    console.error('Registration error:', error.message);
-    res.status(500).json({ message: 'Registration failed', error: error.message });
-  }
-};
 
 
 // Login for both users and sellers
@@ -97,6 +71,7 @@ const login = async (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       role: user.role,
+      status: user.status
     });
   } catch (err) {
     res.status(500).json({ message: 'Error logging in', error: err.message });
@@ -105,15 +80,38 @@ const login = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
   try {
+    // Retrieve user information from the decoded JWT (req.user)
+    const userId = req.user.userId;
+    const role = req.user.role;
+
+    // If the user is a seller, fetch additional seller status
+    if (role === 'seller') {
+      const seller = await Seller.findById(userId);  // Assuming userId corresponds to seller's document ID
+      if (!seller) {
+        return res.status(404).json({ message: "Seller not found" });
+      }
+
+      // Send back the seller status along with other user details
+      return res.status(200).json({
+        userId,
+        role,
+        status: seller.status,  // Send the seller status (approved/pending)
+        message: "Authenticated",
+      });
+    }
+
+    // If the user is not a seller, just return basic info (you can extend this for other roles)
     res.status(200).json({
-      userId: req.user.userId,  // From token decoded in authMiddleware
-      role: req.user.role,
+      userId,
+      role,
       message: "Authenticated",
     });
+
   } catch (err) {
     res.status(500).json({ message: "Failed to retrieve user profile", error: err.message });
   }
 };
+
 
 // Logout: Clear cookie
 const logout = (req, res) => {
@@ -125,4 +123,4 @@ const logout = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-module.exports = { registerUser, registerSeller, login, logout ,getUserProfile}
+module.exports = { registerUser, login, logout ,getUserProfile}

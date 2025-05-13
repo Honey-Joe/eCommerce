@@ -78,51 +78,11 @@ const loginAdmin = async (req, res) => {
     res.status(200).json({ message: 'Admin logged out successfully' });
   }
 
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().select('-password');
-    res.status(200).json(users);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch users', error: err.message });
-  }
-};
+
 
 // Get all sellers
-const getAllSellers = async (req, res) => {
-  try {
-    const sellers = await Seller.find().select('-password');
-    res.status(200).json(sellers);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch sellers', error: err.message });
-  }
-};
-const updateSellerApproval = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const seller = await Seller.findById(id);
-    if (!seller) return res.status(404).json({ message: "Seller not found" });
 
-    seller.status = "approved";
-    await seller.save();
 
-    res.status(200).json({ message: "Seller approved successfully", seller });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
-
-const deleteSeller = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const seller = await Seller.findById(id);
-    if (!seller) return res.status(404).json({ message: "Seller not found" });
-
-    await seller.deleteOne();
-    res.status(200).json({ message: "Seller deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-};
 
 
 
@@ -132,9 +92,5 @@ const deleteSeller = async (req, res) => {
     registerAdmin,
     adminLogout,
     getAdminProfile,
-    getAllUsers,
-    getAllSellers,
-    updateSellerApproval,
-    deleteSeller
   };
   

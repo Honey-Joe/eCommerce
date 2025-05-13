@@ -5,7 +5,7 @@ const initialState = {
   role: null, // Fetched from server if needed
   status: "idle",
   user: null,
-  isAuthenticated: false,
+  statusApproved: null,
 
   error: null,
   loading: false,
@@ -18,7 +18,7 @@ const authSlice = createSlice({
   reducers: {
     loginSuccess: (state, action) => {
       state.role = action.payload.role;
-      state.isAuthenticated = true;
+      state.statusApproved = action.payload.status;
     },
     setUser: (state, action) => {
       state.user = action.payload;
@@ -56,5 +56,5 @@ export const {
 
 export const selectAuthRole = (state) => state.auth.role;
 export const selectAuthStatus = (state) => state.auth.status;
-
+export const selectStatusApproved = (state)=> state.auth.statusApproved
 export default authSlice.reducer;
