@@ -46,7 +46,6 @@ module.exports = { registerSeller };
 const uploadSellerDocuments = async (req, res) => {
   try {
     const sellerId = req.user.userId;
-    console.log(req.user)
 
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: 'No documents uploaded' });
@@ -62,7 +61,7 @@ const uploadSellerDocuments = async (req, res) => {
     }
 
     // Push new documents and update status
-    seller.documents.push(...documentUrls);
+    seller.documents = documentUrls
     seller.status = 'pending';
 
     // Save updated seller

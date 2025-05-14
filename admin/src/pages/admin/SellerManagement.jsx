@@ -7,8 +7,6 @@ import axiosInstance from "../../axios";
 const SellersManagement = () => {
   const dispatch = useDispatch();
   const { list, loading, error } = useSelector((state) => state.sellers);
-  const [documentUrl, setDocumentUrl] = useState("");
-  console.log(list)
 
   useEffect(() => {
     dispatch(fetchSellers());

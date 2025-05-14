@@ -18,5 +18,7 @@ router.put('/:id', sellerAuth, upload.array('images'), productController.updateP
 
 // Delete product (only original seller)
 router.delete('/:id', sellerAuth, productController.deleteProduct);
+router.get('/seller/:sellerId', sellerAuth, productController.getProductBySeller);
+
 
 module.exports = router;

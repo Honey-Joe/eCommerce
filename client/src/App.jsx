@@ -21,9 +21,8 @@ function App() {
       const checkAuth = async () => {
         try {
           const res = await axiosInstance.get("auth/me");
-          const { role, status } = res.data;
-          console.log(role, status)
-          dispatch(loginSuccess({ role ,status }));
+          const { role, status , userId } = res.data;
+          dispatch(loginSuccess({ role ,status, userId }));
         } catch (err) {
           dispatch(logout());
         }
@@ -48,7 +47,7 @@ function App() {
 
         {/* Protected Seller Route */}
         <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
-          <Route path="/seller/dashboard" element={<SellerDashboard />} />
+          <Route path="/seller/products" element={<SellerDashboard />} />
         </Route>
       </Routes>
     </>

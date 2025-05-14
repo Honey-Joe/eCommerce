@@ -25,12 +25,12 @@ const Login = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axiosInstance.post("/auth/login", data);
-      const  {role,status} = response.data;
+      const  {role,status,userId} = response.data;
       console.log(role)
-      dispatch(loginSuccess({role,status}));
+      dispatch(loginSuccess({role,status,userId}));
       setTimeout(() => {
         if (role === "seller") {
-          navigate("/seller/dashboard");
+          navigate("/seller/products");
         } else if (role === "user") {
           navigate("/user/dashboard");
         } else {

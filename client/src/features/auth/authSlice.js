@@ -19,6 +19,7 @@ const authSlice = createSlice({
     loginSuccess: (state, action) => {
       state.role = action.payload.role;
       state.statusApproved = action.payload.status;
+      state.user = action.payload;
     },
     setUser: (state, action) => {
       state.user = action.payload;

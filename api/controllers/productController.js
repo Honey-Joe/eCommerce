@@ -114,3 +114,15 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete product', error: error.message });
   }
 };
+
+exports.getProductBySeller = async (req, res) => {
+  try {
+    const sellerId = req.params.sellerId;
+
+    const products = await Product.find({ seller: sellerId });
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+  }
+};

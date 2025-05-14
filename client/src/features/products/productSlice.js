@@ -22,10 +22,33 @@ const productSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    getProductsStart: (state) => {
+      state.loading = true;
+    },
+    getProductsSuccess: (state, action) => {
+      state.products = action.payload;
+      state.loading = false;
+    },
+    getProductsFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    setProducts: (state, action) => {
+      state.products = action.payload;
+    },
+    deleteProductSuccess: (state, action) => {
+      state.products = state.products.filter(p => p._id !== action.payload);
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+    }
   },
 });
 
-export const { addProductStart, addProductSuccess, addProductFail } = productSlice.actions;
+export const { addProductStart, addProductSuccess, addProductFail , getProductsFailure ,getProductsStart ,getProductsSuccess , setError,setLoading,setProducts,deleteProductSuccess } = productSlice.actions;
 
 export const addProduct = (formData) => async (dispatch) => {
   try {
@@ -42,5 +65,18 @@ export const addProduct = (formData) => async (dispatch) => {
     console.log(err)
   }
 };
+
+
+export const fetchSellerProducts = (sellerId) => async (dispatch) => {
+  try {
+    dispatch(getProductsStart());
+    const { data } = await axiosInstance.get(`/products/seller/${sellerId}`);
+    dispatch(getProductsSuccess(data));
+  } catch (error) {
+    dispatch(getProductsFailure(error.response?.data?.message || error.message));
+  }
+};
+
+
 
 export default productSlice.reducer;

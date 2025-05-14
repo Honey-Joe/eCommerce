@@ -1,7 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLoading, setUsers, setSellers, setError, selectUsers, selectSellers } from '../../features/admin/adminSlice';
+import {
+  setLoading,
+  setUsers,
+  setSellers,
+  setError,
+  selectUsers,
+  selectSellers,
+} from '../../features/admin/adminSlice';
 import axiosInstance from '../../axios';
 import Layout from '../../layouts/Layout';
 
@@ -10,6 +17,12 @@ const AdminDashboard = () => {
   const users = useSelector(selectUsers);
   const sellers = useSelector(selectSellers);
   const location = useLocation();
+
+  const [openSection, setOpenSection] = useState(null);
+
+  const toggleAccordion = (section) => {
+    setOpenSection((prev) => (prev === section ? null : section));
+  };
 
   const fetchAdminData = async () => {
     dispatch(setLoading());
@@ -36,9 +49,11 @@ const AdminDashboard = () => {
     <Layout>
       <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-md">
+        <aside className="w-64 bg-white shadow-md overflow-y-auto">
           <div className="p-6 text-lg font-bold text-blue-600">Admin Panel</div>
-          <nav className="flex flex-col p-4 space-y-2 text-gray-700">
+          <nav className="p-4 space-y-2 text-gray-700">
+
+            {/* Dashboard */}
             <NavLink
               to="/admin/dashboard"
               className={({ isActive }) =>
@@ -47,18 +62,83 @@ const AdminDashboard = () => {
             >
               🏠 Dashboard
             </NavLink>
-            <NavLink to="/admin/users" className="hover:text-blue-500">
-              👥 User Management
-            </NavLink>
-            <NavLink to="/admin/sellers" className="hover:text-blue-500">
-              🛍️ Seller Management
-            </NavLink>
-            <NavLink to="/admin/site-settings" className="hover:text-blue-500">
-              ⚙️ Site Settings
-            </NavLink>
-            <NavLink to="/admin/others" className="hover:text-blue-500">
-              📦 Other Settings
-            </NavLink>
+
+            {/* User Management Accordion */}
+            <div>
+              <button
+                onClick={() => toggleAccordion('user')}
+                className="w-full text-left hover:text-blue-500 font-semibold"
+              >
+                👥 User Management
+              </button>
+              {openSection === 'user' && (
+                <div className="ml-4 mt-2 space-y-1">
+                  <NavLink to="/admin/users" className="block hover:text-blue-500">
+                    View Users
+                  </NavLink>
+                  {/* Add more user links here if needed */}
+                </div>
+              )}
+            </div>
+
+            {/* Seller Management Accordion */}
+            <div>
+              <button
+                onClick={() => toggleAccordion('seller')}
+                className="w-full text-left hover:text-blue-500 font-semibold"
+              >
+                🛍️ Seller Management
+              </button>
+              {openSection === 'seller' && (
+                <div className="ml-4 mt-2 space-y-1">
+                  <NavLink to="/admin/sellers/approved" className="block hover:text-blue-500">
+                    ✅ Approved Sellers
+                  </NavLink>
+                  <NavLink to="/admin/sellers/pending" className="block hover:text-blue-500">
+                    ⏳ Pending Sellers
+                  </NavLink>
+                  <NavLink to="/admin/sellers/disabled" className="block hover:text-blue-500">
+                    ❌ Disabled Sellers
+                  </NavLink>
+                </div>
+              )}
+            </div>
+
+            {/* Site Settings Accordion */}
+            <div>
+              <button
+                onClick={() => toggleAccordion('site')}
+                className="w-full text-left hover:text-blue-500 font-semibold"
+              >
+                ⚙️ Site Settings
+              </button>
+              {openSection === 'site' && (
+                <div className="ml-4 mt-2 space-y-1">
+                  <NavLink to="/admin/site-settings" className="block hover:text-blue-500">
+                    General Settings
+                  </NavLink>
+                  {/* Add more site setting links here */}
+                </div>
+              )}
+            </div>
+
+            {/* Other Settings Accordion */}
+            <div>
+              <button
+                onClick={() => toggleAccordion('other')}
+                className="w-full text-left hover:text-blue-500 font-semibold"
+              >
+                📦 Other Settings
+              </button>
+              {openSection === 'other' && (
+                <div className="ml-4 mt-2 space-y-1">
+                  <NavLink to="/admin/others" className="block hover:text-blue-500">
+                    Misc Settings
+                  </NavLink>
+                </div>
+              )}
+            </div>
+
           </nav>
         </aside>
 
@@ -74,7 +154,7 @@ const AdminDashboard = () => {
                 <h3 className="text-sm text-gray-500">Total Sellers</h3>
                 <p className="text-2xl font-bold text-orange-600">{sellers.length}</p>
               </div>
-              {/* Add more cards here for products, orders, etc. */}
+              {/* You can add more cards here for orders, products, etc. */}
             </div>
           ) : (
             <Outlet />

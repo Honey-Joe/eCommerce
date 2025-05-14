@@ -14,6 +14,12 @@ import UserManagement from "./pages/admin/UserManagement";
 import AllSellers from "./pages/admin/SellerManagement";
 import UsersManagement from "./pages/admin/UserManagement";
 import SellersManagement from "./pages/admin/SellerManagement";
+import UserList from "./pages/admin/users/UserList";
+import ApprovedSellers from "./pages/admin/seller/ApprovedSellers";
+import PendingSellers from "./pages/admin/seller/PendingSellers";
+import DisabledSellers from "./pages/admin/seller/DisabledSellers";
+import SiteSettings from "./pages/admin/sitesettings/SiteSettings";
+import OtherSettings from "./pages/admin/sitesettings/OtherSettings";
 
 function App() {
   const dispatch = useDispatch();
@@ -35,18 +41,25 @@ function App() {
   return (
     <>
       <ToastContainer />
-       <Routes>
-      <Route path="/admin" element={<AdminDashboard />}>
-        <Route path="dashboard" element={<AdminDashboard />} />
-        
-        <Route path="users" element={<UsersManagement />} />
-        <Route path="sellers" element={<SellersManagement />} />
+      <Routes>
+        <Route path="/admin" element={<AdminDashboard />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
 
-        {/* Add other routes as necessary */}
-      </Route>
+          <Route path="users" element={<UsersManagement />} />
+          <Route path="sellers" element={<SellersManagement />} />
+          <Route path="users" element={<UserList />} />
+        <Route path="sellers/approved" element={<ApprovedSellers />} />
+        <Route path="sellers/pending" element={<PendingSellers />} />
+        <Route path="sellers/disabled" element={<DisabledSellers />} />
+        <Route path="site-settings" element={<SiteSettings />} />
+        <Route path="others" element={<OtherSettings />} />
+
+          {/* Add other routes as necessary */}
+        </Route>
         <Route path="login" element={<Login></Login>}></Route>
         <Route path="/" element={<Home></Home>}></Route>
-    </Routes>
+        
+      </Routes>
     </>
   );
 }
