@@ -1,5 +1,6 @@
 const uploadToCloudinary = require('../utils/uploadToCloudinary');
 const Seller = require("../models/Seller");
+const Product = require('../models/Product');
 
 const getAllSellers = async (req, res) => {
   try {

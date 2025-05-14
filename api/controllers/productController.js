@@ -96,24 +96,36 @@ exports.updateProduct = async (req, res) => {
 };
 
 // Delete product (Only the original seller)
+// controllers/productController.js
+
 exports.deleteProduct = async (req, res) => {
   try {
-    const sellerId = req.user._id;
-    const product = await Product.findById(req.params.id);
+    const productId = req.params.id;
+    const sellerId = req.user?.userId;
+    console.log(sellerId) // You must ensure req.user is set via middleware
 
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    const product = await Product.findById(productId);
 
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Check if the product belongs to the current seller
     if (product.seller.toString() !== sellerId.toString()) {
-      return res.status(403).json({ message: 'You are not authorized to delete this product' });
+      return res.status(403).json({ message: 'Unauthorized: Not your product' });
     }
 
     await product.deleteOne();
-
-    res.status(200).json({ message: 'Product deleted' });
+    res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to delete product', error: error.message });
+    console.error(error);
+    res.status(500).json({
+      message: 'Failed to delete product',
+      error: error.message,
+    });
   }
 };
+
 
 exports.getProductBySeller = async (req, res) => {
   try {

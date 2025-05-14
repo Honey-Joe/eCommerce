@@ -1,14 +1,30 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {   fetchSellerProducts} from "../../features/products/productSlice";
+import { deleteProductById, fetchSellerProducts, removeSellerProduct, setProductError, setProductLoading } from "../../features/products/productSlice";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
 
-const SellerProducts = ({ sellerId  }) => {
+const SellerProducts = ({ sellerId }) => {
   const dispatch = useDispatch();
   const { products, loading, error } = useSelector((state) => state.products);
 
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+    if (!confirm) return;
 
+    try {
+      dispatch(setProductLoading(true));
+      await deleteProductById(id); // calling API
+      dispatch(removeSellerProduct(id));
+    } catch (err) {
+      dispatch(setProductError(err.response?.data?.message || "Delete failed"));
+      console.log(err)
+    } finally {
+      dispatch(setProductLoading(false));
+    }
+  };
   useEffect(() => {
     if (sellerId) dispatch(fetchSellerProducts(sellerId));
   }, [dispatch, sellerId]);
@@ -48,7 +64,13 @@ const SellerProducts = ({ sellerId  }) => {
             <h3 className="font-semibold text-lg">{product.name}</h3>
             <p className="text-gray-600">₹{product.price}</p>
             <p className="text-sm text-gray-500">{product.description}</p>
-           
+            <button
+              className="mt-2 px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+              onClick={() => handleDelete(product._id)}
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
+            </button>
           </div>
         ))}
       </div>

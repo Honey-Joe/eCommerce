@@ -1,13 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
-import axiosInstance from '../../axios';
-import {toast} from "react-toastify"
+import { createSlice } from "@reduxjs/toolkit";
+import axiosInstance from "../../axios";
+import { toast } from "react-toastify";
 
 const productSlice = createSlice({
-  name: 'products',
+  name: "products",
   initialState: {
     loading: false,
     error: null,
     products: [],
+    sellerProducts: [], // ✅ Make sure this is initialized
   },
   reducers: {
     addProductStart: (state) => {
@@ -33,39 +34,61 @@ const productSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    setProducts: (state, action) => {
-      state.products = action.payload;
+    setSellerProducts: (state, action) => {
+      state.sellerProducts = action.payload;
     },
-    deleteProductSuccess: (state, action) => {
-      state.products = state.products.filter(p => p._id !== action.payload);
+    removeSellerProduct: (state, action) => {
+      const productId = action.payload;
+      if (Array.isArray(state.sellerProducts)) {
+        state.sellerProducts = state.sellerProducts.filter(
+          (product) => product._id !== productId
+        );
+      }
     },
-    setLoading: (state, action) => {
+    setProductLoading: (state, action) => {
       state.loading = action.payload;
     },
-    setError: (state, action) => {
+    setProductError: (state, action) => {
       state.error = action.payload;
-    }
+    },
   },
 });
 
-export const { addProductStart, addProductSuccess, addProductFail , getProductsFailure ,getProductsStart ,getProductsSuccess , setError,setLoading,setProducts,deleteProductSuccess } = productSlice.actions;
+export const {
+  addProductStart,
+  addProductSuccess,
+  addProductFail,
+  getProductsFailure,
+  getProductsStart,
+  getProductsSuccess,
+  setProductError,
+  setProductLoading,
+  setSellerProducts,
+  removeSellerProduct,
+} = productSlice.actions;
 
 export const addProduct = (formData) => async (dispatch) => {
   try {
     dispatch(addProductStart());
-    const res = await axiosInstance.post('/products', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    const res = await axiosInstance.post("/products", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
       withCredentials: true,
     });
     dispatch(addProductSuccess(res.data.product));
-    toast.success("Product Added Successfully")
+    toast.success("Product Added Successfully");
   } catch (err) {
-    dispatch(addProductFail(err.response?.data?.message || 'Upload failed'));
+    dispatch(addProductFail(err.response?.data?.message || "Upload failed"));
 
-    console.log(err)
+    console.log(err);
   }
 };
 
+export const deleteProductById = async (productId) => {
+  const response = await axiosInstance.delete(`/products/${productId}`, {
+    withCredentials: true,
+  });
+  return response.data;
+};
 
 export const fetchSellerProducts = (sellerId) => async (dispatch) => {
   try {
@@ -73,10 +96,10 @@ export const fetchSellerProducts = (sellerId) => async (dispatch) => {
     const { data } = await axiosInstance.get(`/products/seller/${sellerId}`);
     dispatch(getProductsSuccess(data));
   } catch (error) {
-    dispatch(getProductsFailure(error.response?.data?.message || error.message));
+    dispatch(
+      getProductsFailure(error.response?.data?.message || error.message)
+    );
   }
 };
-
-
 
 export default productSlice.reducer;
