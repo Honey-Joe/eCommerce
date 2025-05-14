@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteProductById, fetchSellerProducts, removeSellerProduct, setProductError, setProductLoading } from "../../features/products/productSlice";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
+import { toast } from "react-toastify";
 
 const SellerProducts = ({ sellerId }) => {
   const dispatch = useDispatch();
@@ -18,9 +19,10 @@ const SellerProducts = ({ sellerId }) => {
       dispatch(setProductLoading(true));
       await deleteProductById(id); // calling API
       dispatch(removeSellerProduct(id));
+      toast.success("Product Deleted Succesfully")
     } catch (err) {
       dispatch(setProductError(err.response?.data?.message || "Delete failed"));
-      console.log(err)
+      toast.error("Delete failed")
     } finally {
       dispatch(setProductLoading(false));
     }
