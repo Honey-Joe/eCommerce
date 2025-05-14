@@ -31,7 +31,7 @@ const sellerSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'],
+      enum: ['pending', 'approved', 'disabled'],
       default: 'pending', // Seller starts with pending status for approval
     },
     createdAt: {

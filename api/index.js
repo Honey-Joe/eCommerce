@@ -6,6 +6,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes'); 
 const sellerRoutes = require('./routes/sellerRoutes')
+const productRoutes = require('./routes/productRoutes');
 dotenv.config();
 
 const cookieParser = require('cookie-parser');
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/sellers', sellerRoutes);
+app.use('/api/products', productRoutes);
 
 
 app.listen(port, () => {

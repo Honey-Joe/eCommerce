@@ -39,33 +39,6 @@ const productSchema = new mongoose.Schema(
         },
       },
     ],
-    variants: [
-      {
-        color: String,
-        size: String,
-        quantity: Number,
-      },
-    ],
-    ratings: {
-      type: Number,
-      default: 0,
-    },
-    numReviews: {
-      type: Number,
-      default: 0,
-    },
-    reviews: [
-      {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        name: String,
-        rating: Number,
-        comment: String,
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
     seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Seller',
