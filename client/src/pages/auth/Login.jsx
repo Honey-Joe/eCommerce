@@ -26,7 +26,6 @@ const Login = () => {
     try {
       const response = await axiosInstance.post("/auth/login", data);
       const  {role,status,userId} = response.data;
-      console.log(role)
       dispatch(loginSuccess({role,status,userId}));
       setTimeout(() => {
         if (role === "seller") {

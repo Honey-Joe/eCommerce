@@ -20,7 +20,7 @@ const registerUser = async (req, res) => {
     const newUser = new User({
       name,
       email,
-      password, // Will be hashed by schema pre-save hook
+      password,
       role: role || 'user',
     });
 

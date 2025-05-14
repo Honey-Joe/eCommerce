@@ -8,10 +8,6 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { loginSuccess, logout } from "./features/auth/authSlice";
 import axiosInstance from "./axios";
-import Unauthorized from "./components/Unauthourized";
-import ProtectedRoute from "./components/ProtectedRoute";
-import UserManagement from "./pages/admin/UserManagement";
-import AllSellers from "./pages/admin/SellerManagement";
 import UsersManagement from "./pages/admin/UserManagement";
 import SellersManagement from "./pages/admin/SellerManagement";
 import UserList from "./pages/admin/users/UserList";
@@ -48,17 +44,16 @@ function App() {
           <Route path="users" element={<UsersManagement />} />
           <Route path="sellers" element={<SellersManagement />} />
           <Route path="users" element={<UserList />} />
-        <Route path="sellers/approved" element={<ApprovedSellers />} />
-        <Route path="sellers/pending" element={<PendingSellers />} />
-        <Route path="sellers/disabled" element={<DisabledSellers />} />
-        <Route path="site-settings" element={<SiteSettings />} />
-        <Route path="others" element={<OtherSettings />} />
+          <Route path="sellers/approved" element={<ApprovedSellers />} />
+          <Route path="sellers/pending" element={<PendingSellers />} />
+          <Route path="sellers/disabled" element={<DisabledSellers />} />
+          <Route path="site-settings" element={<SiteSettings />} />
+          <Route path="others" element={<OtherSettings />} />
 
           {/* Add other routes as necessary */}
         </Route>
         <Route path="login" element={<Login></Login>}></Route>
         <Route path="/" element={<Home></Home>}></Route>
-        
       </Routes>
     </>
   );

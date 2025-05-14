@@ -102,8 +102,6 @@ exports.deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const sellerId = req.user?.userId;
-    console.log(sellerId) // You must ensure req.user is set via middleware
-
     const product = await Product.findById(productId);
 
     if (!product) {
