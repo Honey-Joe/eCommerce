@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const sellerSchema = new mongoose.Schema(
   {
@@ -24,27 +24,40 @@ const sellerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-  role: { type: String, default: 'seller' },
+    role: { type: String, default: "seller" },
     documents: {
-      type: [String],  // Array of Cloudinary URLs for uploaded documents
+      type: [String], // Array of Cloudinary URLs for uploaded documents
       default: [],
     },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'disabled'],
-      default: 'pending', // Seller starts with pending status for approval
+      enum: ["pending", "approved", "disabled"],
+      default: "pending", // Seller starts with pending status for approval
     },
     createdAt: {
       type: Date,
       default: Date.now,
     },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+    },
   },
   { timestamps: true }
 );
 
+sellerSchema.index({location:'2dsphere'})
+
 // Hash password before saving
-sellerSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+sellerSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
@@ -54,4 +67,4 @@ sellerSchema.methods.comparePassword = function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('Seller', sellerSchema);
+module.exports = mongoose.model("Seller", sellerSchema);

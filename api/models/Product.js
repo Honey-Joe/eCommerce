@@ -1,23 +1,23 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Product name is required'],
+      required: [true, "Product name is required"],
       trim: true,
     },
     description: {
       type: String,
-      required: [true, 'Product description is required'],
+      required: [true, "Product description is required"],
     },
     price: {
       type: Number,
-      required: [true, 'Product price is required'],
+      required: [true, "Product price is required"],
     },
     category: {
       type: String,
-      required: [true, 'Product category is required'],
+      required: [true, "Product category is required"],
     },
     brand: {
       type: String,
@@ -35,13 +35,13 @@ const productSchema = new mongoose.Schema(
         },
         alt: {
           type: String,
-          default: 'Product image',
+          default: "Product image",
         },
       },
     ],
     seller: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Seller',
+      ref: "Seller",
     },
     isFeatured: {
       type: Boolean,
@@ -53,15 +53,28 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending","Approved","Disabled","DisabledByAdmin"],
-      default: "Pending"
+      enum: ["Pending", "Approved", "Disabled", "DisabledByAdmin"],
+      default: "Pending",
     },
     isSold: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Product', productSchema);
+productSchema.index({location:'2dsphere'})
+
+module.exports = mongoose.model("Product", productSchema);
