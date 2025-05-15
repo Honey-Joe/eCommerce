@@ -16,7 +16,12 @@ app.use(cookieParser());
 connectDB();
 
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "https://ecommerceintern25.vercel.app/","https://ecommerce-api-tawny-mu.vercel.app/"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://ecommerceintern25.vercel.app",
+    "https://ecommerce-api-tawny-mu.vercel.app"
+  ],
   credentials: true,
 }));
 app.use(express.json());
