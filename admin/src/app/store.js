@@ -4,12 +4,14 @@ import authReducer from '../features/auth/authSlice';
 import adminReducer from '../features/admin/adminSlice';
 import userReducer from "../features/admin/userSlice";
 import sellersReducer from "../features/admin/sellersSlice"
+import productReducer from "../features/admin/productSlice";
 ;const store = configureStore({
   reducer: {
     auth: authReducer,
     admin: adminReducer,
     user: userReducer,
     sellers: sellersReducer,
+    products: productReducer,
   },
 });
 

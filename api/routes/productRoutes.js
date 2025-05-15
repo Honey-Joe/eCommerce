@@ -3,6 +3,7 @@ const router = express.Router();
 const { sellerAuth } = require('../middleware/authMiddleware');
 const productController = require('../controllers/productController');
 const upload = require('../middleware/upload');
+const adminMiddleware = require('../middleware/adminMiddleware');
 
 // Create product (only approved seller)
 router.post('/', sellerAuth, upload.array('images'), productController.createProduct);
@@ -19,6 +20,8 @@ router.put('/:id', sellerAuth, upload.array('images'), productController.updateP
 // Delete product (only original seller)
 router.delete('/:id', sellerAuth, productController.deleteProduct);
 router.get('/seller/:sellerId', sellerAuth, productController.getProductBySeller);
+router.patch('/:id/status',adminMiddleware, productController.updateProductStatus);
+
 
 
 module.exports = router;

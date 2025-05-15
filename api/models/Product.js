@@ -51,6 +51,11 @@ const productSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    status: {
+      type: String,
+      enum: ["Pending","Approved","Disabled"],
+      default: "Pending"
+    }
   },
   { timestamps: true }
 );

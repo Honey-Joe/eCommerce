@@ -139,6 +139,30 @@ const AdminDashboard = () => {
               )}
             </div>
 
+            {/* Product Management  */}
+            <div>
+              <button
+                onClick={() => toggleAccordion('product')}
+                className="w-full text-left hover:text-blue-500 font-semibold"
+              >
+                📦 Product Management
+              </button>
+              {openSection === 'product' && (
+                <div className="ml-4 mt-2 space-y-1">
+                  <NavLink to="/admin/products/approved" className="block hover:text-blue-500">
+                    Approved Products
+                  </NavLink>
+                  <NavLink to="/admin/products/disabled" className="block hover:text-blue-500">
+                    Disabled Products
+                  </NavLink>
+                  <NavLink to="/admin/products/pending" className="block hover:text-blue-500">
+                    Pending Products
+                  </NavLink>
+                </div>
+                
+              )}
+            </div>
+
           </nav>
         </aside>
 

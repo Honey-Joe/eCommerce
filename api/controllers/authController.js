@@ -72,7 +72,11 @@ const login = async (req, res) => {
       message: 'Login successful',
       role: user.role,
       status: user.status,
-      userId: user._id
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      storeLocation : user?.storeLocation,
+      businessName: user?.businessName,
     });
   } catch (err) {
     res.status(500).json({ message: 'Error logging in', error: err.message });
@@ -84,7 +88,7 @@ const getUserProfile = async (req, res) => {
     // Retrieve user information from the decoded JWT (req.user)
     const userId = req.user.userId;
     const role = req.user.role;
-
+    
     // If the user is a seller, fetch additional seller status
     if (role === 'seller') {
       const seller = await Seller.findById(userId);  // Assuming userId corresponds to seller's document ID
@@ -96,7 +100,11 @@ const getUserProfile = async (req, res) => {
       return res.status(200).json({
         userId,
         role,
-        status: seller.status,  // Send the seller status (approved/pending)
+        status: seller.status,
+        name:seller.name,
+        email: seller.email,
+        storeLocation: seller.storeLocation,
+        businessName: seller.businessName,  // Send the seller status (approved/pending)
         message: "Authenticated",
       });
     }

@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch , useSelector} from "react-redux";
 import { loginSuccess, logout } from "./features/auth/authSlice";
 import axiosInstance from "./axios";
 import UsersManagement from "./pages/admin/UserManagement";
@@ -16,6 +16,10 @@ import PendingSellers from "./pages/admin/seller/PendingSellers";
 import DisabledSellers from "./pages/admin/seller/DisabledSellers";
 import SiteSettings from "./pages/admin/sitesettings/SiteSettings";
 import OtherSettings from "./pages/admin/sitesettings/OtherSettings";
+import ApprovedProducts from "./pages/admin/products/ApprovedProducts";
+import PendingProducts from "./pages/admin/products/PendingProducts";
+import DisabledProducts from "./pages/admin/products/DisabledProducts";
+import { fetchProducts } from "./features/admin/productSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -32,7 +36,10 @@ function App() {
     };
 
     checkAuth(); // Run on every refresh
+    dispatch(fetchProducts())
   }, [dispatch]);
+
+
 
   return (
     <>
@@ -47,6 +54,9 @@ function App() {
           <Route path="sellers/approved" element={<ApprovedSellers />} />
           <Route path="sellers/pending" element={<PendingSellers />} />
           <Route path="sellers/disabled" element={<DisabledSellers />} />
+          <Route path="products/approved" element={<ApprovedProducts />} />
+          <Route path="products/pending" element={<PendingProducts />} />
+          <Route path="products/disabled" element={<DisabledProducts />} />
           <Route path="site-settings" element={<SiteSettings />} />
           <Route path="others" element={<OtherSettings />} />
 

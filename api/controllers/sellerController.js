@@ -119,4 +119,20 @@ const deleteSeller = async (req, res) => {
   }
 };
 
-module.exports = {getAllSellers , deleteSeller , updateSellerApproval , registerSeller , uploadSellerDocuments , updateSellerDisable}
+const updateSellerProfile = async(req,res)=>{
+  try{
+    const seller = await Seller.findByIdAndUpdate(
+      req.user.userId,
+      { ...req.body },
+      { new: true }
+    );
+    res.status(200).json({ seller });
+
+  }
+  catch(err){
+        res.status(500).json({ message: 'Failed to update seller profile.' });
+
+  }
+}
+
+module.exports = {getAllSellers , deleteSeller , updateSellerApproval , registerSeller , uploadSellerDocuments , updateSellerDisable, updateSellerProfile}

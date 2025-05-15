@@ -105,6 +105,12 @@ const Navbar = () => {
                       >
                         Orders
                       </Link>
+                      <Link
+                        to="/seller/profile"
+                        className="block px-4 py-2 hover:bg-gray-100"
+                      >
+                        Seller Profile
+                      </Link>
                     </>
                   ) : null}
 

@@ -13,6 +13,7 @@ import axiosInstance from "./axios";
 import {useDispatch} from "react-redux";
 import { loginSuccess, logout } from "./features/auth/authSlice";
 import { useEffect } from "react";
+import SellerProfile from "./pages/seller/SellerProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -21,8 +22,8 @@ function App() {
       const checkAuth = async () => {
         try {
           const res = await axiosInstance.get("auth/me");
-          const { role, status , userId } = res.data;
-          dispatch(loginSuccess({ role ,status, userId }));
+          const { role,status,userId,name,email,storeLocation,businessName } = res.data;
+          dispatch(loginSuccess({ role,status,userId,name,email,storeLocation,businessName}));
         } catch (err) {
           dispatch(logout());
         }
@@ -48,6 +49,9 @@ function App() {
         {/* Protected Seller Route */}
         <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
           <Route path="/seller/products" element={<SellerDashboard />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
+          <Route path="/seller/profile" element={<SellerProfile />} />
         </Route>
       </Routes>
     </>
