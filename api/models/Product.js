@@ -53,8 +53,12 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending","Approved","Disabled"],
+      enum: ["Pending","Approved","Disabled","DisabledByAdmin"],
       default: "Pending"
+    },
+    isSold: {
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }

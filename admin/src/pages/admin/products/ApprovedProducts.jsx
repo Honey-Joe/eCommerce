@@ -17,7 +17,7 @@ const ApprovedProducts = () => {
     if (!window.confirm("Disable this product?")) return;
 
     try {
-      await axiosInstance.patch(`/products/${id}/status`, {status:"Disabled"}, { withCredentials: true });
+      await axiosInstance.patch(`/products/${id}/status`, {status:"DisabledByAdmin"}, { withCredentials: true });
       dispatch(updateProductStatus({ id, status: "disabled" }));
       toast.success("Product disabled");
     } catch (error) {
@@ -41,6 +41,7 @@ const ApprovedProducts = () => {
                 <th className="px-6 py-3">Name</th>
                 <th className="px-6 py-3">Price</th>
                 <th className="px-6 py-3">Seller</th>
+                <th className="px-6 py-3">isSold</th>
                 <th className="px-6 py-3">Actions</th>
               </tr>
             </thead>
@@ -50,6 +51,7 @@ const ApprovedProducts = () => {
                   <td className="px-6 py-4 text-center">{product.name}</td>
                   <td className="px-6 py-4 text-center">₹{product.price}</td>
                   <td className="px-6 py-4 text-center">{product.seller?.name}</td>
+                  <td className="px-6 py-4 text-center">{product.isSold?(<><p>Sold</p></>):(<><p>Unsold</p></>)}</td>
                   <td className="px-6 py-4 text-center">
                     <button
                       onClick={() => handleDisable(product._id)}

@@ -25,6 +25,8 @@ const disabledProducts = () => {
   };
 
   const disabled = list.filter(p => p.status === "Disabled");
+const disabledByAdmin = list.filter(p => p.status === "DisabledByAdmin");
+
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-blue-500">{error}</div>;
@@ -45,6 +47,40 @@ const disabledProducts = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {disabled.map((product) => (
+                <tr key={product._id}>
+                  <td className="px-6 py-4">{product.name}</td>
+                  <td className="px-6 py-4">₹{product.price}</td>
+                  <td className="px-6 py-4">{product.seller?.name}</td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => handleApprove(product._id)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      Approve
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>No disabled products found.</p>
+      )}
+      <h2 className="text-xl font-semibold mb-4">Disabled Products by Admin</h2>
+      {disabledByAdmin.length ? (
+        <div className="overflow-x-auto bg-white rounded-lg shadow">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-6 py-3">Name</th>
+                <th className="px-6 py-3">Price</th>
+                <th className="px-6 py-3">Seller</th>
+                <th className="px-6 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {disabledByAdmin.map((product) => (
                 <tr key={product._id}>
                   <td className="px-6 py-4">{product.name}</td>
                   <td className="px-6 py-4">₹{product.price}</td>

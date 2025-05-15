@@ -61,14 +61,27 @@ const uploadSellerDocuments = async (req, res) => {
       return res.status(404).json({ message: 'Seller not found' });
     }
 
-    // Push new documents and update status
-    seller.documents = documentUrls
+    // Update seller documents and status
+    seller.documents = documentUrls;
     seller.status = 'pending';
-
-    // Save updated seller
     await seller.save();
 
-    res.status(200).json({ message: 'Documents uploaded successfully', seller });
+    // Get all products of the seller
+    const products = await Product.find({ seller: sellerId });
+
+    // Update product statuses
+    const updatePromises = products.map(async (product) => {
+      product.status = product.isSold ? 'Approved' : 'Disabled';
+      return product.save();
+    });
+
+    await Promise.all(updatePromises);
+
+    res.status(200).json({
+      message: 'Documents uploaded and product statuses updated successfully',
+      seller,
+    });
+
   } catch (error) {
     console.error('Upload error:', error.message);
     res.status(500).json({ message: 'Failed to upload documents', error: error.message });
@@ -79,13 +92,33 @@ const uploadSellerDocuments = async (req, res) => {
 const updateSellerApproval = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Find seller
     const seller = await Seller.findById(id);
     if (!seller) return res.status(404).json({ message: "Seller not found" });
 
+    // Update seller status
     seller.status = "approved";
     await seller.save();
 
-    res.status(200).json({ message: "Seller approved successfully", seller });
+    // Approve only products that are Pending and not sold
+    const updatedProducts = await Product.updateMany(
+      {
+        seller: id,
+        status: "Disabled",
+        isSold: false
+      },
+      {
+        $set: { status: "Approved" }
+      }
+    );
+
+    res.status(200).json({
+      message: "Seller approved successfully",
+      seller,
+      updatedProductCount: updatedProducts.modifiedCount
+    });
+
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -100,7 +133,18 @@ const updateSellerDisable = async (req, res) => {
     seller.status = "disabled";
     await seller.save();
 
-    res.status(200).json({ message: "Seller approved successfully", seller });
+    const updatedProducts = await Product.updateMany(
+      {
+        seller: id,
+        status: "Approved",
+        isSold: false
+      },
+      {
+        $set: { status: "Disabled" }
+      }
+    );
+
+    res.status(200).json({ message: "Seller approved successfully", seller ,updatedCount:updatedProducts.modifiedCount });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

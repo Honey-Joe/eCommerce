@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   deleteProductById,
   fetchSellerProducts,
+  isSoldProductById,
   removeSellerProduct,
+  setIssoldStatus,
   setProductError,
   setProductLoading,
 } from "../../features/products/productSlice";
@@ -39,6 +41,27 @@ const SellerProducts = ({ sellerId }) => {
       dispatch(setProductLoading(false));
     }
   };
+  const handleIsSoldStatus = async (id) => {
+    const confirm = window.confirm(
+      "Are you sure you want to chnage sold this  this product?"
+    );
+    if (!confirm) return;
+
+    try {
+      dispatch(setProductLoading(true));
+      await isSoldProductById(id);
+      dispatch(setIssoldStatus(id));
+      toast.success("Product Sold Successfully");
+    } catch (err) {
+      dispatch(
+        setProductError(err.response?.data?.message || "Sold failed")
+      );
+      toast.error("Sold failed");
+    } finally {
+      dispatch(setProductLoading(false));
+    }
+  };
+
 
   // Group products by their status
   const groupedProducts = products.reduce((acc, product) => {
@@ -49,7 +72,7 @@ const SellerProducts = ({ sellerId }) => {
   }, {});
 
   // Optional: Display in a fixed order
-  const statusOrder = ["Approved", "Pending", "Disabled"];
+  const statusOrder = ["Approved", "Pending", "Disabled","DisabledByAdmin"];
 
   return (
     <div className="max-w-6xl mx-auto p-4">
@@ -107,6 +130,16 @@ const SellerProducts = ({ sellerId }) => {
                     >
                       {loading ? "Deleting..." : "Delete"}
                     </button>
+                    {
+                      product.isSold?(<><p className="text-green-500">Sold</p></>):(<> <button
+                      className="mt-2 px-4 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                      onClick={() => handleIsSoldStatus(product._id)}
+                      disabled={loading}
+                    >
+                      {loading ? "Solding..." : "Sold"}
+                    </button></>)
+                    }
+                   
                   </div>
                 ))}
               </div>

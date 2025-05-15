@@ -20,7 +20,9 @@ router.put('/:id', sellerAuth, upload.array('images'), productController.updateP
 // Delete product (only original seller)
 router.delete('/:id', sellerAuth, productController.deleteProduct);
 router.get('/seller/:sellerId', sellerAuth, productController.getProductBySeller);
-router.patch('/:id/status',adminMiddleware, productController.updateProductStatus);
+router.patch('/:id/status',adminMiddleware,sellerAuth, productController.updateProductStatus);
+router.patch("/:id/is-sold", productController.updateIsSold);
+
 
 
 

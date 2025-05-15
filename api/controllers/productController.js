@@ -45,7 +45,7 @@ exports.updateProductStatus = async (req, res) => {
   const { status } = req.body;
 
   // Validate status
-  const allowedStatuses = ['Approved', 'Disabled'];
+  const allowedStatuses = ['Approved', 'DisabledByAdmin',];
   if (!allowedStatuses.includes(status)) {
     return res.status(400).json({ message: 'Invalid status value.' });
   }
@@ -68,6 +68,34 @@ exports.updateProductStatus = async (req, res) => {
   } catch (error) {
     console.error('Error updating product status:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.updateIsSold = async (req, res) => {
+  const { id } = req.params;
+  const { isSold } = req.body;
+
+  if (typeof isSold !== 'boolean') {
+    return res.status(400).json({ message: "isSold must be a boolean value." });
+  }
+
+  try {
+    const product = await Product.findByIdAndUpdate(
+      id,
+      { isSold },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found." });
+    }
+
+    res.status(200).json({
+      message: `Product marked as ${isSold ? "sold" : "unsold"}.`,
+      product,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error.", error: error.message });
   }
 };
 

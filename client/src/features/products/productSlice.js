@@ -8,6 +8,7 @@ const productSlice = createSlice({
     loading: false,
     error: null,
     products: [],
+    isSold: false,
     sellerProducts: [], // ✅ Make sure this is initialized
   },
   reducers: {
@@ -45,6 +46,9 @@ const productSlice = createSlice({
         );
       }
     },
+    setIssoldStatus: (state,action)=>{
+      state.isSold = action.payload;
+    },
     setProductLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -65,6 +69,7 @@ export const {
   setProductLoading,
   setSellerProducts,
   removeSellerProduct,
+  setIssoldStatus
 } = productSlice.actions;
 
 export const addProduct = (formData) => async (dispatch) => {
@@ -85,6 +90,13 @@ export const addProduct = (formData) => async (dispatch) => {
 
 export const deleteProductById = async (productId) => {
   const response = await axiosInstance.delete(`/products/${productId}`, {
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+export const isSoldProductById = async (productId) => {
+  const response = await axiosInstance.patch(`/products/${productId}/is-sold`,{isSold:true}, {
     withCredentials: true,
   });
   return response.data;

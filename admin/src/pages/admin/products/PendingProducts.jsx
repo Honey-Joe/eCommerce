@@ -30,7 +30,7 @@ const PendingProducts = () => {
   const handleDisable = async (id) => {
     if (!window.confirm("Disable this product?")) return;
     try {
-      await axiosInstance.patch(`/products/${id}/status`, { status: "Disabled" });
+      await axiosInstance.patch(`/products/${id}/status`, { status: "DisabledByAdmin" });
       dispatch(updateProductStatus({ id, status: "Disabled" }));
       toast.success("Product Disabled");
     } catch (error) {
