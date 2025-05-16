@@ -10,7 +10,6 @@ const SellerDashboard = () => {
   const dispatch = useDispatch();
   const seller = useSelector((state) => state.auth);
   const token = useSelector((state) => state.auth.token);
-  console.log(seller);
 
   const { uploadStatus, uploadMessage } = useSelector((state) => state.seller);
 
