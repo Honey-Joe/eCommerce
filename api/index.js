@@ -15,15 +15,8 @@ app.use(cookieParser());
 
 connectDB();
 
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://ecommerceintern25.vercel.app",
-    "https://ecommerce25025.vercel.app"
-  ],
-  credentials: true,
-}));
+app.use(cors({ origin: true, credentials: true }));
+
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
