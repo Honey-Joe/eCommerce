@@ -16,7 +16,7 @@ const disabledProducts = () => {
     if (!window.confirm("Approve this Product ?")) return;
 
     try {
-      await axiosInstance.patch(`/products/${id}/status`, {status:"Approved"});
+      await axiosInstance.patch(`/products/${id}/status`, {status:"Approved"},{withCredentials: true});
       dispatch(updateProductStatus({ id, status: "Approved" }));
       toast.success("Product Approved");
     } catch (error) {
