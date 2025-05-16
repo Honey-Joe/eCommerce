@@ -49,8 +49,8 @@ const loginAdmin = async (req, res) => {
     // Store JWT in HTTP-only cookie
     res.cookie("adminToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "None",
       maxAge: 3600000 // 1 hour
     });
 
