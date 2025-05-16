@@ -14,12 +14,31 @@ const getAllSellers = async (req, res) => {
 
 const registerSeller = async (req, res) => {
   try {
-    const { name, email, password, businessName, storeLocation } = req.body;
+    const { name, email, password, businessName, storeLocation, location } = req.body;
 
-    // Check if seller already exists
+    // Check for existing seller
     const existingSeller = await Seller.findOne({ email });
     if (existingSeller) {
       return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    // Parse and validate location
+    let geoLocation = null;
+    if (location) {
+      try {
+        const parsed = JSON.parse(location); // expecting { latitude, longitude }
+
+        if (!parsed.latitude || !parsed.longitude) {
+          return res.status(400).json({ message: 'Latitude and longitude are required in location' });
+        }
+
+        geoLocation = {
+          type: "Point",
+          coordinates: [parsed.longitude, parsed.latitude], // GeoJSON format: [lng, lat]
+        };
+      } catch (err) {
+        return res.status(400).json({ message: 'Invalid location format' });
+      }
     }
 
     const newSeller = new Seller({
@@ -28,19 +47,23 @@ const registerSeller = async (req, res) => {
       password,
       businessName,
       storeLocation,
-      documents: [], // Documents can be uploaded later
+      location: geoLocation,
+      documents: [],
     });
 
     await newSeller.save();
 
-    res.status(201).json({ message: 'Seller registered successfully', user: newSeller });
+    res.status(201).json({
+      message: 'Seller registered successfully',
+      user: newSeller,
+    });
   } catch (error) {
     console.error('Registration error:', error.message);
     res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 };
 
-module.exports = { registerSeller };
+
 
 
 

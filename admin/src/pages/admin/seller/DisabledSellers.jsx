@@ -21,9 +21,11 @@ const DisabledSellers = () => {
         { withCredentials: true }
       );
       dispatch(updateSellerStatus({ id, status: "approved" }));
+
       toast.success("Seller approved successfully!");
     } catch (error) {
       toast.error(error.response?.data?.message || "Approval failed");
+      console.log( error);
       
     }
   };

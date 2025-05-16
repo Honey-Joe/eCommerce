@@ -12,11 +12,18 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Layout from "../../layouts/Layout";
 import { useState } from "react";
+import { places } from "../../data/places";
 
 const SellerRegister = () => {
   const dispatch = useDispatch();
   const { loading, error, success, user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [selectedPlace, setSelectedPlace] = useState(null);
+
+  const handlePlaceChange = (e) => {
+  const place = places.find(p => p.name === e.target.value);
+  setSelectedPlace(place);
+};
 
   const {
     register,
@@ -27,37 +34,40 @@ const SellerRegister = () => {
   });
 
   const onSubmit = async (data) => {
-    try {
-      dispatch(registerStart());
+  try {
+    dispatch(registerStart());
 
-      // Prepare form data for the registration request
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("email", data.email);
-      formData.append("password", data.password);
-      formData.append("businessName", data.businessName);
-      formData.append("storeLocation", data.storeLocation);
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    formData.append("businessName", data.businessName);
+    formData.append("storeLocation", data.storeLocation);
 
-      // Send the registration request
-      const res = await axiosInstance.post("/auth/register/seller", formData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        withCredentials: true, // Important!
-      });
-
-      // Dispatch success action and navigate to login
-      dispatch(registerSuccess({ user: res.data.user, role: "seller" }));
-      toast.success("Seller registered successfully!");
-      navigate("/login");
-    } catch (err) {
-      dispatch(
-        registerFailure(err.response?.data?.message || "Registration failed")
-      );
-      toast.error(err.response?.data?.message || "Registration failed");
-      console.log(err)
+    // Attach the selected location details
+    if (selectedPlace) {
+      formData.append("location", JSON.stringify(selectedPlace));
     }
-  };
+
+    const res = await axiosInstance.post("/auth/register/seller", formData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
+
+    dispatch(registerSuccess({ user: res.data.user, role: "seller" }));
+    toast.success("Seller registered successfully!");
+    navigate("/login");
+  } catch (err) {
+    dispatch(
+      registerFailure(err.response?.data?.message || "Registration failed")
+    );
+    toast.error(err.response?.data?.message || "Registration failed");
+    console.error(err);
+  }
+};
+
 
   return (
     <Layout>
@@ -120,6 +130,18 @@ const SellerRegister = () => {
         {errors.storeLocation && (
           <p className="text-red-500 text-sm">{errors.storeLocation.message}</p>
         )}
+        <select
+  onChange={handlePlaceChange}
+  className="w-full px-4 py-2 border rounded"
+  required
+>
+  <option value="">Select Location</option>
+  {places.map((place) => (
+    <option key={place.name} value={place.name}>
+      {place.name}
+    </option>
+  ))}
+</select>
 
         {/* Submit Button */}
         <button

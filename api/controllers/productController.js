@@ -8,11 +8,11 @@ exports.createProduct = async (req, res) => {
     const sellerId = req.user.userId;
 
     const seller = await Seller.findById(sellerId);
-    if (!seller || !seller === "approved") {
+    if (!seller || seller.status !== "approved") {
       return res.status(403).json({ message: 'Only approved sellers can create products' });
     }
 
-    const { name, description, price, category, brand, stock, isFeatured } = req.body;
+    const { name, description, price, category, brand, stock, isFeatured, longitude, latitude } = req.body;
 
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
@@ -30,6 +30,10 @@ exports.createProduct = async (req, res) => {
       isFeatured,
       images: imageUrls,
       seller: sellerId,
+      location: {
+        type: "Point",
+        coordinates: [parseFloat(longitude), parseFloat(latitude)],
+      },
     });
 
     await newProduct.save();
@@ -40,6 +44,7 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: 'Failed to create product', error: error.message });
   }
 };
+
 exports.updateProductStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;

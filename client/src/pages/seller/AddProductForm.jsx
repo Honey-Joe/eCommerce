@@ -1,56 +1,96 @@
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { addProduct } from '../../features/products/productSlice';
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct } from "../../features/products/productSlice";
+import { toast } from "react-toastify";
+import { places } from "../../data/places";
 
 const AddProductForm = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.products);
 
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    brand: '',
-    stock: '',
+    name: "",
+    description: "",
+    price: "",
+    category: "",
+    brand: "",
+    stock: "",
     isFeatured: false,
+    location: "",
   });
 
-  const [media, setMedia] = useState({ images: []});
+  const [coordinates, setCoordinates] = useState([]); // Default empty array
+  const [media, setMedia] = useState({ images: [] });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
+
+    if (name === "location") {
+      const place = places.find((p) => p.name === value);
+      if (place) {
+        setCoordinates([place.longitude, place.latitude]);
+      } else {
+        setCoordinates([]);
+      }
+    }
   };
 
   const handleMediaChange = (e, type) => {
+    const files = Array.from(e.target.files);
     setMedia((prev) => ({
       ...prev,
-      [type]: [...prev[type], ...Array.from(e.target.files)],
+      [type]: [...prev[type], ...files],
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!Array.isArray(coordinates) || coordinates.length !== 2) {
+      alert("Please select a valid location before submitting.");
+      return;
+    }
+
     const data = new FormData();
     Object.entries(formData).forEach(([key, val]) => data.append(key, val));
+    data.append("longitude", coordinates[0]);
+    data.append("latitude", coordinates[1]);
 
-    media.images.forEach((img) => data.append('images', img));
+    media.images.forEach((img) => data.append("images", img));
 
-    dispatch(addProduct(data));
+    await dispatch(addProduct(data));
+
+    // Reset form on success
+    setFormData({
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+      brand: "",
+      stock: "",
+      isFeatured: false,
+      location: "",
+    });
+    setCoordinates([]);
+    setMedia({ images: [] });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-md max-w-3xl mx-auto mt-10 space-y-4">
-      <h2 className="text-2xl font-bold text-center text-gray-800">Add Product</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-xl shadow-md max-w-3xl mx-auto mt-10 space-y-4"
+    >
+      <h2 className="text-2xl font-bold text-center text-gray-800">
+        Add Product
+      </h2>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
       <input
-        type="text"
         name="name"
         placeholder="Product Name"
         value={formData.name}
@@ -58,7 +98,6 @@ const AddProductForm = () => {
         className="w-full p-3 border rounded-xl"
         required
       />
-
       <textarea
         name="description"
         placeholder="Product Description"
@@ -120,12 +159,39 @@ const AddProductForm = () => {
       </label>
 
       <div>
-        <label className="block mb-1 font-medium text-gray-700">Upload Images</label>
+        <label className="block mb-1 font-medium text-gray-700">
+          Select Location
+        </label>
+        <select
+          name="location"
+          value={formData.location}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-xl"
+          required
+        >
+          <option value="">-- Select a Location --</option>
+          {places.map((place) => (
+            <option key={place.name} value={place.name}>
+              {place.name}
+            </option>
+          ))}
+        </select>
+        {coordinates.length === 2 && (
+          <p className="text-sm text-gray-500 mt-1">
+            Coordinates: Longitude {coordinates[0]}, Latitude {coordinates[1]}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">
+          Upload Images
+        </label>
         <input
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => handleMediaChange(e, 'images')}
+          onChange={(e) => handleMediaChange(e, "images")}
           className="block w-full text-sm"
         />
         <div className="flex flex-wrap mt-2 gap-2">
@@ -140,14 +206,12 @@ const AddProductForm = () => {
         </div>
       </div>
 
-      
-
       <button
         type="submit"
         disabled={loading}
         className="w-full bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700"
       >
-        {loading ? 'Submitting...' : 'Add Product'}
+        {loading ? "Submitting..." : "Add Product"}
       </button>
     </form>
   );
