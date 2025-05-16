@@ -20,7 +20,7 @@ app.use(cors({
     "http://localhost:5173",
     "http://localhost:5174",
     "https://ecommerceintern25.vercel.app",
-    "https://ecommerce-api-tawny-mu.vercel.app"
+    "https://ecommerce25025.vercel.app"
   ],
   credentials: true,
 }));
