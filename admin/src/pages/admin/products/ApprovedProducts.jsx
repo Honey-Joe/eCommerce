@@ -7,7 +7,6 @@ import axiosInstance from "../../../axios";
 const ApprovedProducts = () => {
   const dispatch = useDispatch();
   const { list, loading, error } = useSelector((state) => state.products);
-  console.log(list);
 
   useEffect(() => {
     dispatch(fetchProducts());

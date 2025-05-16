@@ -39,7 +39,7 @@ const DisabledSellers = () => {
   return (
     <div>
       <div>
-        <h2 className="text-xl font-semibold mb-4">Approved Sellers</h2>
+        <h2 className="text-xl font-semibold mb-4">Disabled Sellers</h2>
         {disabledSellers.length > 0 ? (
           <div className="overflow-x-auto bg-white rounded-lg shadow-md">
             <table className="min-w-full divide-y divide-gray-200">
