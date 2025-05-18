@@ -163,6 +163,23 @@ const AdminDashboard = () => {
               )}
             </div>
 
+<div>
+              <button
+                onClick={() => toggleAccordion('category')}
+                className="w-full text-left hover:text-blue-500 font-semibold"
+              >
+                📦 Category Management
+              </button>
+              {openSection === 'category' && (
+                <div className="ml-4 mt-2 space-y-1">
+                  <NavLink to="/admin/addcategory" className="block hover:text-blue-500">
+                    Add Category
+                  </NavLink>
+                 
+                </div>
+                
+              )}
+            </div>
           </nav>
         </aside>
 

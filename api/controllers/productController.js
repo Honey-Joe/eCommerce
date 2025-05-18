@@ -3,6 +3,8 @@ const Seller = require('../models/Seller');
 const uploadToCloudinary = require('../utils/uploadToCloudinary');
 
 // Create product (Only for approved sellers)
+
+
 exports.createProduct = async (req, res) => {
   try {
     const sellerId = req.user.userId;
@@ -12,12 +14,39 @@ exports.createProduct = async (req, res) => {
       return res.status(403).json({ message: 'Only approved sellers can create products' });
     }
 
-    const { name, description, price, category, brand, stock, isFeatured, longitude, latitude } = req.body;
+    const {
+      name,
+      description,
+      price,
+      category,
+      brand,
+      stock,
+      isFeatured,
+      longitude,
+      latitude
+    } = req.body;
 
+    if (!price) {
+      return res.status(400).json({ message: "Product price is required" });
+    }
+
+    // Parse attributes safely
+    let parsedAttributes = {};
+    if (typeof req.body.attributes === "string") {
+      try {
+        parsedAttributes = JSON.parse(req.body.attributes);
+      } catch (err) {
+        return res.status(400).json({ message: "Invalid attributes format. Must be valid JSON." });
+      }
+    } else if (typeof req.body.attributes === "object") {
+      parsedAttributes = req.body.attributes;
+    }
+
+    // Upload images to Cloudinary
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
-      const urls = await uploadToCloudinary(req.files, 'product-images');
-      imageUrls = urls.map((url) => ({ url }));
+      const cloudinaryResponses = await uploadToCloudinary(req.files, 'product-images');
+      imageUrls = cloudinaryResponses.map((img) => ({ url: img.url }));
     }
 
     const newProduct = new Product({
@@ -29,6 +58,7 @@ exports.createProduct = async (req, res) => {
       stock,
       isFeatured,
       images: imageUrls,
+      attributes: parsedAttributes,
       seller: sellerId,
       location: {
         type: "Point",
@@ -44,6 +74,7 @@ exports.createProduct = async (req, res) => {
     res.status(500).json({ message: 'Failed to create product', error: error.message });
   }
 };
+
 
 exports.updateProductStatus = async (req, res) => {
   const { id } = req.params;

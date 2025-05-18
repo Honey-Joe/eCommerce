@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../features/products/productSlice";
 import { toast } from "react-toastify";
 import { places } from "../../data/places";
+import axiosInstance from "../../axios";
 
 const AddProductForm = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.products);
+
+  const [categories, setCategories] = useState([]);
+  const [attributes, setAttributes] = useState([]);
+  const [extraFields, setExtraFields] = useState({});
+  const [coordinates, setCoordinates] = useState([]);
+  const [media, setMedia] = useState({ images: [] });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -19,8 +26,26 @@ const AddProductForm = () => {
     location: "",
   });
 
-  const [coordinates, setCoordinates] = useState([]); // Default empty array
-  const [media, setMedia] = useState({ images: [] });
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axiosInstance.get("/categories");
+        setCategories(data);
+      } catch (err) {
+        toast.error("Failed to load categories");
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const selected = categories.find((cat) => cat.name === formData.category);
+    if (selected) {
+      setAttributes(selected.attributes || []);
+    } else {
+      setAttributes([]);
+    }
+  }, [formData.category, categories]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -47,37 +72,46 @@ const AddProductForm = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!Array.isArray(coordinates) || coordinates.length !== 2) {
-      alert("Please select a valid location before submitting.");
-      return;
-    }
-
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, val]) => data.append(key, val));
-    data.append("longitude", coordinates[0]);
-    data.append("latitude", coordinates[1]);
-
-    media.images.forEach((img) => data.append("images", img));
-
-    await dispatch(addProduct(data));
-
-    // Reset form on success
-    setFormData({
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      brand: "",
-      stock: "",
-      isFeatured: false,
-      location: "",
-    });
-    setCoordinates([]);
-    setMedia({ images: [] });
+  const handleExtraFieldChange = (name, value) => {
+    setExtraFields((prev) => ({ ...prev, [name]: value }));
   };
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!Array.isArray(coordinates) || coordinates.length !== 2) {
+    return toast.error("Please select a valid location before submitting.");
+  }
+
+  const data = new FormData();
+  Object.entries(formData).forEach(([key, val]) => data.append(key, val));
+  data.append("longitude", coordinates[0]);
+  data.append("latitude", coordinates[1]);
+
+  // ✅ Fix: Send attributes as JSON string
+  data.append("attributes", JSON.stringify(extraFields));
+
+  // Upload media
+  media.images.forEach((img) => data.append("images", img));
+
+  await dispatch(addProduct(data));
+
+  // Reset form
+  setFormData({
+    name: "",
+    description: "",
+    price: "",
+    category: "",
+    brand: "",
+    stock: "",
+    isFeatured: false,
+    location: "",
+  });
+  setCoordinates([]);
+  setAttributes([]);
+  setExtraFields({});
+  setMedia({ images: [] });
+};
 
   return (
     <form
@@ -98,6 +132,8 @@ const AddProductForm = () => {
         className="w-full p-3 border rounded-xl"
         required
       />
+
+
       <textarea
         name="description"
         placeholder="Product Description"
@@ -107,26 +143,75 @@ const AddProductForm = () => {
         required
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          type="number"
-          name="price"
-          placeholder="Price"
-          value={formData.price}
-          onChange={handleChange}
-          className="p-3 border rounded-xl"
-          required
-        />
-        <input
-          type="text"
+      <input
+        name="price"
+        placeholder="Product price"
+        value={formData.price}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-xl"
+        required
+      />
+
+      <div>
+        <label className="block mb-1 font-medium text-gray-700">Category</label>
+        <select
           name="category"
-          placeholder="Category"
           value={formData.category}
           onChange={handleChange}
-          className="p-3 border rounded-xl"
+          className="w-full p-3 border rounded-xl"
           required
-        />
+        >
+          <option value="">-- Select a Category --</option>
+          {categories.map((category) => (
+            <option key={category._id} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
+
+      {attributes.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          {attributes.map((attr, index) => (
+            <div key={index}>
+              <label className="block font-medium">{attr.name}</label>
+              {attr.type === "text" && (
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded"
+                  onChange={(e) =>
+                    handleExtraFieldChange(attr.name, e.target.value)
+                  }
+                />
+              )}
+              {attr.type === "number" && (
+                <input
+                  type="number"
+                  className="w-full p-2 border rounded"
+                  onChange={(e) =>
+                    handleExtraFieldChange(attr.name, e.target.value)
+                  }
+                />
+              )}
+              {attr.type === "dropdown" && (
+                <select
+                  className="w-full p-2 border rounded"
+                  onChange={(e) =>
+                    handleExtraFieldChange(attr.name, e.target.value)
+                  }
+                >
+                  <option value="">-- Select --</option>
+                  {attr.options.map((opt, i) => (
+                    <option key={i} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <input

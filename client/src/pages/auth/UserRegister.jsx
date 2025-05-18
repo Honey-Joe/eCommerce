@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,87 +26,94 @@ const UserRegister = () => {
     resolver: zodResolver(userRegisterSchema),
   });
 
+  const [location, setLocation] = useState(null);
+
+  // Get user location on component mount
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLocation({ latitude, longitude });
+      },
+      (err) => {
+        console.error("Geolocation error:", err);
+        toast.warn("Unable to fetch location. Please enable location services.");
+      }
+    );
+  }, []);
+
   const onSubmit = async (formData) => {
+    if (!location) {
+      return toast.error("Location is required to register.");
+    }
+
+    const payload = {
+      ...formData,
+      location, // { latitude, longitude }
+    };
+
     try {
       dispatch(registerStart());
-      const res = await axiosInstance.post("/auth/register/user", formData);
+      const res = await axiosInstance.post("/auth/register/user", payload);
       dispatch(registerSuccess({ user: res.data.user, role: "user" }));
       navigate("/login");
       toast.success("User registered successfully!");
     } catch (err) {
-      dispatch(
-        registerFailure(err.response?.data?.message || "Registration failed")
-      );
+      dispatch(registerFailure(err.response?.data?.message || "Registration failed"));
       toast.error(err.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <>
-
     <Layout>
-
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-md mx-auto p-6 bg-white shadow-md rounded-md space-y-4"
-    >
-      <h2 className="text-2xl font-bold text-center text-gray-800"> User Register</h2>
-
-      <div>
-        <input
-          {...register("name")}
-          placeholder="Name"
-          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-        )}
-      </div>
-
-      <div>
-        <input
-          {...register("email")}
-          placeholder="Email"
-          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-        )}
-      </div>
-
-      <div>
-        <input
-          {...register("password")}
-          placeholder="Password"
-          type="password"
-          className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-        )}
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className={`w-full py-2 text-white font-semibold rounded ${
-          loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-        }`}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-w-md mx-auto p-6 bg-white shadow-md rounded-md space-y-4"
       >
-        {loading ? "Registering..." : "Register"}
-      </button>
+        <h2 className="text-2xl font-bold text-center text-gray-800">User Register</h2>
 
-      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-      {success && (
-        <p className="text-green-500 text-sm text-center">
-          User registered successfully!
-        </p>
-      )}
-    </form>
+        <div>
+          <input
+            {...register("name")}
+            placeholder="Name"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+        </div>
 
+        <div>
+          <input
+            {...register("email")}
+            placeholder="Email"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+        </div>
+
+        <div>
+          <input
+            {...register("password")}
+            placeholder="Password"
+            type="password"
+            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-2 text-white font-semibold rounded ${
+            loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {loading ? "Registering..." : "Register"}
+        </button>
+
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        {success && <p className="text-green-500 text-sm text-center">User registered successfully!</p>}
+      </form>
     </Layout>
-    
-    </>
   );
 };
 

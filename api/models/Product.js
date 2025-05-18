@@ -27,6 +27,12 @@ const productSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    attributes: {
+  type: Map,
+  of: String,
+  default: {},
+},
+
     images: [
       {
         url: {
@@ -46,10 +52,6 @@ const productSchema = new mongoose.Schema(
     isFeatured: {
       type: Boolean,
       default: false,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
     },
     status: {
       type: String,
@@ -71,10 +73,15 @@ const productSchema = new mongoose.Schema(
         required: false,
       },
     },
+    place: {
+      type: String,
+      default: "", // Optional: store the name of the place selected (e.g., "Trichy")
+    },
   },
   { timestamps: true }
 );
 
-productSchema.index({location:'2dsphere'})
+// For geospatial queries
+productSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model("Product", productSchema);

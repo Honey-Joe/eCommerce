@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes'); 
 const sellerRoutes = require('./routes/sellerRoutes')
 const productRoutes = require('./routes/productRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 dotenv.config();
 
 const cookieParser = require('cookie-parser');
@@ -30,6 +31,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/sellers', sellerRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
+
 
 
 app.listen(port, () => {

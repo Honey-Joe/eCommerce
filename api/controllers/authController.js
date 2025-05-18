@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 // Register a new user
 const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, location } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -22,11 +22,15 @@ const registerUser = async (req, res) => {
       email,
       password,
       role: role || 'user',
+      location: {
+        type: 'Point',
+        coordinates: [parseFloat(location.longitude), parseFloat(location.latitude)],
+      },
     });
 
     await newUser.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (err) {
     res.status(500).json({ message: 'Error registering user', error: err.message });
   }
