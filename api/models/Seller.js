@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+const documentSchema = new mongoose.Schema({
+  url: { type: String },
+  expiry: { type: Date, default: null }, // Optional expiry date
+});
+
 const sellerSchema = new mongoose.Schema(
   {
     name: {
@@ -25,10 +30,12 @@ const sellerSchema = new mongoose.Schema(
       required: true,
     },
     role: { type: String, default: "seller" },
+
     documents: {
-      type: [String], // Array of Cloudinary URLs for uploaded documents
-      default: [],
+      url:{type:String},
+      expiry:{type:Date}
     },
+
     status: {
       type: String,
       enum: ["pending", "approved", "disabled"],
@@ -53,7 +60,7 @@ const sellerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-sellerSchema.index({location:'2dsphere'})
+sellerSchema.index({ location: "2dsphere" });
 
 // Hash password before saving
 sellerSchema.pre("save", async function (next) {

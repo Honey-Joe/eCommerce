@@ -75,41 +75,60 @@ const uploadSellerDocuments = async (req, res) => {
       return res.status(400).json({ message: 'No documents uploaded' });
     }
 
-    // Upload files to Cloudinary
-    const documentUrls = await uploadToCloudinary(req.files, 'seller-documents');
+    // Parse expiryDates from JSON string
+    let parsedExpiryDates = {};
+    if (req.body.expiryDates) {
+      try {
+        parsedExpiryDates = JSON.parse(req.body.expiryDates);
+      } catch (err) {
+        return res.status(400).json({ message: 'Invalid expiryDates format' });
+      }
+    }
 
-    // Find the seller
+    // Upload to Cloudinary
+    const uploadedDocs = await uploadToCloudinary(req.files, 'seller-documents');
+
+    // Take only the first uploaded document (since schema is not an array anymore)
+    const firstDoc = uploadedDocs[0];
+    const documentToStore = {
+      url: firstDoc.url,
+      expiry: parsedExpiryDates[firstDoc.originalname]
+        ? new Date(parsedExpiryDates[firstDoc.originalname])
+        : null,
+    };
+
+    // Update Seller
     const seller = await Seller.findById(sellerId);
     if (!seller) {
       return res.status(404).json({ message: 'Seller not found' });
     }
 
-    // Update seller documents and status
-    seller.documents = documentUrls;
+    seller.documents = documentToStore; // overwrite the document object
     seller.status = 'pending';
     await seller.save();
 
-    // Get all products of the seller
+    // Disable all unsold products
     const products = await Product.find({ seller: sellerId });
-
-    // Update product statuses
-    const updatePromises = products.map(async (product) => {
-      product.status = product.isSold ? 'Approved' : 'Disabled';
-      return product.save();
-    });
-
-    await Promise.all(updatePromises);
+    await Promise.all(
+      products.map((product) => {
+        product.status = product.isSold ? 'Approved' : 'Disabled';
+        return product.save();
+      })
+    );
 
     res.status(200).json({
-      message: 'Documents uploaded and product statuses updated successfully',
+      message: 'Document uploaded and statuses updated',
       seller,
     });
-
   } catch (error) {
-    console.error('Upload error:', error.message);
-    res.status(500).json({ message: 'Failed to upload documents', error: error.message });
+    console.error('Document upload error:', error);
+    res.status(500).json({
+      message: 'Server error during document upload',
+      error: error.message,
+    });
   }
 };
+
 
 
 const updateSellerApproval = async (req, res) => {

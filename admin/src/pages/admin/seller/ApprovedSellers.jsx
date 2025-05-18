@@ -59,6 +59,9 @@ const ApprovedSellers = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
+                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Expiry Date
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -81,6 +84,21 @@ const ApprovedSellers = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-green-500 font-semibold">
                       {seller.status}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap space-y-1">
+                      {seller.documents ? (
+                        <>
+                          <div>
+                            {seller.documents.expiry
+                              ? new Date(
+                                  seller.documents.expiry
+                                ).toLocaleDateString()
+                              : "No expiry date"}
+                          </div>{" "}
+                        </>
+                      ) : (
+                        <></>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button

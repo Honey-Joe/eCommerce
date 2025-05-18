@@ -11,6 +11,7 @@ import axiosInstance from "../../../axios";
 const PendingSellers = () => {
   const dispatch = useDispatch();
   const { list, loading, error } = useSelector((state) => state.sellers);
+  console.log(list);
 
   useEffect(() => {
     dispatch(fetchSellers());
@@ -78,6 +79,9 @@ const PendingSellers = () => {
                     Documents
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Expriy Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -101,23 +105,32 @@ const PendingSellers = () => {
                       Pending
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap space-y-1">
-                      {seller.documents?.length > 0 ? (
-                        seller.documents.map((doc, index) => (
-                          <div key={index}>
-                            <a
-                              href={doc}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm text-green-600 hover:underline"
-                            >
-                              View Document {index + 1}
-                            </a>
-                          </div>
-                        ))
+                      {seller.documents ? (
+                        <>
+                          <a
+                            href={seller.documents.url}
+                            className="text-green-500"
+                          >
+                            View Document
+                          </a>
+                        </>
                       ) : (
-                        <span className="text-sm text-gray-400">
-                          No Documents
-                        </span>
+                        <></>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap space-y-1">
+                      {seller.documents ? (
+                        <>
+                          <div>
+                            {seller.documents.expiry
+                              ? new Date(
+                                  seller.documents.expiry
+                                ).toLocaleDateString()
+                              : "No expiry date"}
+                          </div>{" "}
+                        </>
+                      ) : (
+                        <></>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap flex gap-2">

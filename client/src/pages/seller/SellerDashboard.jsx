@@ -58,69 +58,7 @@ const SellerDashboard = () => {
                 </Modal>
               </div>
 
-              <div className="mt-6">
-                <label className="block mb-1 font-medium text-gray-700">
-                  Upload Documents
-                </label>
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                  multiple
-                  onChange={handleDocumentChange}
-                  className="block w-full text-sm"
-                />
-
-                {/* Preview Area */}
-                <div className="flex flex-wrap mt-2 gap-3">
-                  {documents.map((file, idx) => {
-                    const fileType = file.type;
-                    const isImage = fileType.startsWith("image/");
-
-                    return (
-                      <div
-                        key={idx}
-                        className="w-20 h-20 border rounded flex items-center justify-center overflow-hidden"
-                      >
-                        {isImage ? (
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt="Document Preview"
-                            className="object-cover w-full h-full"
-                          />
-                        ) : (
-                          <div className="text-xs text-center px-1">
-                            📄 {file.name.split(".").pop().toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Upload Button */}
-                <button
-                  onClick={handleUploadDocuments}
-                  disabled={uploadStatus === "loading"}
-                  className="mt-3 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-200"
-                >
-                  {uploadStatus === "loading"
-                    ? "Uploading..."
-                    : "Upload Documents"}
-                </button>
-
-                {/* Upload Status Message */}
-                {uploadMessage && (
-                  <p
-                    className={`mt-2 ${
-                      uploadStatus === "succeeded"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {uploadMessage}
-                  </p>
-                )}
-              </div>
+              
             </div>
           </>
         ) : seller.statusApproved === "pending" ? (
@@ -129,69 +67,7 @@ const SellerDashboard = () => {
               Your documents are under review. Please wait for admin approval.
               Upload the Documents
             </p>
-            <div className="mt-6">
-              <label className="block mb-1 font-medium text-gray-700">
-                Upload Documents
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                multiple
-                onChange={handleDocumentChange}
-                className="block w-full text-sm"
-              />
-
-              {/* Preview Area */}
-              <div className="flex flex-wrap mt-2 gap-3">
-                {documents.map((file, idx) => {
-                  const fileType = file.type;
-                  const isImage = fileType.startsWith("image/");
-
-                  return (
-                    <div
-                      key={idx}
-                      className="w-20 h-20 border rounded flex items-center justify-center overflow-hidden"
-                    >
-                      {isImage ? (
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt="Document Preview"
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <div className="text-xs text-center px-1">
-                          📄 {file.name.split(".").pop().toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Upload Button */}
-              <button
-                onClick={handleUploadDocuments}
-                disabled={uploadStatus === "loading"}
-                className="mt-3 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-200"
-              >
-                {uploadStatus === "loading"
-                  ? "Uploading..."
-                  : "Upload Documents"}
-              </button>
-
-              {/* Upload Status Message */}
-              {uploadMessage && (
-                <p
-                  className={`mt-2 ${
-                    uploadStatus === "succeeded"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {uploadMessage}
-                </p>
-              )}
-            </div>
+            
           </div>
         ) : seller.statusApproved === "disabled" ? (
           <div className="bg-red-100 p-4 rounded shadow-md">
@@ -199,69 +75,7 @@ const SellerDashboard = () => {
               Your account is disabled yet. Please contact the Admin
             </p>
 
-            <div className="mt-6">
-              <label className="block mb-1 font-medium text-gray-700">
-                Upload Documents
-              </label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-                multiple
-                onChange={handleDocumentChange}
-                className="block w-full text-sm"
-              />
-
-              {/* Preview Area */}
-              <div className="flex flex-wrap mt-2 gap-3">
-                {documents.map((file, idx) => {
-                  const fileType = file.type;
-                  const isImage = fileType.startsWith("image/");
-
-                  return (
-                    <div
-                      key={idx}
-                      className="w-20 h-20 border rounded flex items-center justify-center overflow-hidden"
-                    >
-                      {isImage ? (
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt="Document Preview"
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <div className="text-xs text-center px-1">
-                          📄 {file.name.split(".").pop().toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Upload Button */}
-              <button
-                onClick={handleUploadDocuments}
-                disabled={uploadStatus === "loading"}
-                className="mt-3 bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition duration-200"
-              >
-                {uploadStatus === "loading"
-                  ? "Uploading..."
-                  : "Upload Documents"}
-              </button>
-
-              {/* Upload Status Message */}
-              {uploadMessage && (
-                <p
-                  className={`mt-2 ${
-                    uploadStatus === "succeeded"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {uploadMessage}
-                </p>
-              )}
-            </div>
+            
           </div>
         ) : (
           <div className="bg-gray-100 p-4 rounded shadow-md">

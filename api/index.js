@@ -12,6 +12,7 @@ dotenv.config();
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+require('./cron/documentExpiryChecker'); // <-- Import the cron job
 
 connectDB();
 
