@@ -11,7 +11,6 @@ import axiosInstance from "../../../axios";
 const PendingSellers = () => {
   const dispatch = useDispatch();
   const { list, loading, error } = useSelector((state) => state.sellers);
-  console.log(list);
 
   useEffect(() => {
     dispatch(fetchSellers());
