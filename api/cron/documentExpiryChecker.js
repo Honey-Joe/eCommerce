@@ -1,9 +1,7 @@
-// cron/documentExpiryChecker.js
-const cron = require('node-cron');
-const Seller = require('../models/Seller'); // adjust the path if needed
+// lib/checkDocumentExpiry.js
+const Seller = require('../models/Seller'); // adjust path as needed
 
-// Runs every day at midnight
-cron.schedule('0 0 * * *', async () => {
+const checkDocumentExpiry = async () => {
   console.log('⏰ Checking for expired seller documents...');
 
   try {
@@ -25,4 +23,6 @@ cron.schedule('0 0 * * *', async () => {
   } catch (err) {
     console.error('❌ Error checking document expiries:', err);
   }
-});
+};
+
+module.exports = checkDocumentExpiry;
