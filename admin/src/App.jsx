@@ -21,6 +21,7 @@ import PendingProducts from "./pages/admin/products/PendingProducts";
 import DisabledProducts from "./pages/admin/products/DisabledProducts";
 import { fetchProducts } from "./features/admin/productSlice";
 import AdminCreateCategory from "./pages/admin/category/AdminCreateCategory";
+import CategoryList from "./pages/admin/category/CategoryList";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,7 +40,6 @@ function App() {
     const checkExpiry = async ()=>{
       try{
         const res = await axiosInstance.get('cron/trigger-document-check');
-        console.log(res.data)
       }catch(err){
         console.log(err);
       }
@@ -71,6 +71,7 @@ function App() {
           <Route path="site-settings" element={<SiteSettings />} />
           <Route path="others" element={<OtherSettings />} />
           <Route path="addcategory" element={<AdminCreateCategory />} />
+          <Route path="viewcategory" element={<CategoryList />} />
 
           {/* Add other routes as necessary */}
         </Route>

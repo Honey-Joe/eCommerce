@@ -2,7 +2,6 @@
 const Seller = require('../models/Seller'); // adjust path as needed
 
 const checkDocumentExpiry = async () => {
-  console.log('⏰ Checking for expired seller documents...');
 
   try {
     const now = new Date();
@@ -15,11 +14,9 @@ const checkDocumentExpiry = async () => {
       if (hasExpired && seller.status !== 'pending') {
         seller.status = 'pending';
         await seller.save();
-        console.log(`✅ Seller ${seller.email} set to pending due to expired document.`);
       }
     }
 
-    console.log('✅ Seller document expiry check completed.');
   } catch (err) {
     console.error('❌ Error checking document expiries:', err);
   }

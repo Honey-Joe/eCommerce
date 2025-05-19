@@ -175,6 +175,9 @@ const AdminDashboard = () => {
                   <NavLink to="/admin/addcategory" className="block hover:text-blue-500">
                     Add Category
                   </NavLink>
+                  <NavLink to="/admin/viewcategory" className="block hover:text-blue-500">
+                    View Category
+                  </NavLink>
                  
                 </div>
                 

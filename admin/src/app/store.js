@@ -5,6 +5,7 @@ import adminReducer from '../features/admin/adminSlice';
 import userReducer from "../features/admin/userSlice";
 import sellersReducer from "../features/admin/sellersSlice"
 import productReducer from "../features/admin/productSlice";
+import categoryReducer from '../features/admin/categorySlice';
 ;const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -12,6 +13,7 @@ import productReducer from "../features/admin/productSlice";
     user: userReducer,
     sellers: sellersReducer,
     products: productReducer,
+    category : categoryReducer
   },
 });
 
