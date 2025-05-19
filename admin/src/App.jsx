@@ -37,15 +37,7 @@ function App() {
       }
     };
 
-    const checkExpiry = async ()=>{
-      try{
-        const res = await axiosInstance.get('cron/trigger-document-check');
-      }catch(err){
-        console.log(err);
-      }
-    }
 
-    checkExpiry();
     checkAuth(); // Run on every refresh
     dispatch(fetchProducts())
   }, [dispatch]);

@@ -14,6 +14,7 @@ dotenv.config();
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+require('./cron/documentExpiryChecker');
 
 connectDB();
 
@@ -32,7 +33,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/sellers', sellerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
-app.use('/api/cron', cronRoutes);
 
 
 
