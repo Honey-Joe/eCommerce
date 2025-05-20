@@ -29,7 +29,7 @@ const Login = () => {
       dispatch(loginSuccess({role,status,userId,name,email,storeLocation,businessName}));
       setTimeout(() => {
         if (role === "seller") {
-          navigate("/seller/products");
+          navigate("/seller/profile");
         } else if (role === "user") {
           navigate("/user/dashboard");
         } else {

@@ -7,20 +7,23 @@ const sellerSlice = createSlice({
   initialState: {
     uploadStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
     uploadMessage: '',
+    loading: false
   },
   reducers: {
     setSellerInfo(state, action) {
       state.sellerInfo = action.payload;
     },
     uploadStart(state) {
-      state.uploadStatus = 'loading';
+      state.loading = true;
       state.uploadMessage = '';
     },
     uploadSuccess(state, action) {
       state.uploadStatus = 'succeeded';
+      state.loading = false
       state.uploadMessage = action.payload;
     },
     uploadFailure(state, action) {
+      state.loading = false
       state.uploadStatus = 'failed';
       state.uploadMessage = action.payload;
     },

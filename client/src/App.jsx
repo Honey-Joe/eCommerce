@@ -15,6 +15,7 @@ import { loginSuccess, logout } from "./features/auth/authSlice";
 import { useEffect } from "react";
 import SellerProfile from "./pages/seller/SellerProfile";
 import ProductDetails from "./pages/product/ProductDetails";
+import SellerProfilePage from "./pages/seller/SellerProfilePage";
 
 function App() {
   const dispatch = useDispatch();
@@ -67,10 +68,10 @@ function App() {
 
         {/* Protected Seller Route */}
         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
-          <Route path="/seller/products" element={<SellerDashboard />} />
+          <Route path="/seller/profile" element={<SellerProfilePage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
-          <Route path="/seller/profile" element={<SellerProfile />} />
+          <Route path="/seller/product" element={<SellerProfile />} />
         </Route>
         <Route path="/product/:id" element={<ProductDetails></ProductDetails>} />
       </Routes>

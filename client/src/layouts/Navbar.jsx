@@ -1,138 +1,90 @@
-// src/components/Navbar.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Logout from "../components/Logout";
-import { useState } from "react";
 
 const Navbar = () => {
   const { role } = useSelector((state) => state.auth);
   const isLoggedIn = !!role;
-  const [showDropdown, setShowDropdown] = useState(false);
 
   return (
-    <nav className="bg-white shadow sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+    <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
-        <div className="flex items-center space-x-3">
-          <Link to="/" className="text-2xl font-bold text-blue-600">
+        <div>
+          <Link to="/" className="text-3xl font-extrabold text-blue-600 tracking-tight">
             ShopEase
           </Link>
         </div>
 
         {/* Nav Links */}
-        <div className="hidden md:flex space-x-6 text-gray-700 font-medium">
-          <Link to="/" className="hover:text-blue-600">
+        <div className="hidden md:flex space-x-8 text-gray-700 font-medium text-base">
+          <Link to="/" className="hover:text-blue-600 transition-colors duration-200">
             Home
           </Link>
-          <Link to="/products" className="hover:text-blue-600">
+          <Link to="/products" className="hover:text-blue-600 transition-colors duration-200">
             Products
           </Link>
-          <Link to="/about" className="hover:text-blue-600">
+          <Link to="/about" className="hover:text-blue-600 transition-colors duration-200">
             About
           </Link>
-          <Link to="/contact" className="hover:text-blue-600">
+          <Link to="/contact" className="hover:text-blue-600 transition-colors duration-200">
             Contact
           </Link>
         </div>
 
         {/* Right Side */}
-        <div className="flex items-center space-x-4">
-          <Link
-            to="/cart"
-            className="relative text-gray-700 hover:text-blue-600"
-          >
+        <div className="flex items-center space-x-5">
+          {/* Cart */}
+          <Link to="/cart" className="relative text-gray-700 hover:text-blue-600 text-xl">
             🛒
-            <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white rounded-full px-1">
+            <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white rounded-full px-1 animate-pulse">
               3
             </span>
           </Link>
 
+          {/* Authenticated User */}
           {isLoggedIn ? (
-            <div className="relative">
-              <button
-                className="flex items-center space-x-2 focus:outline-none"
-                onClick={() => setShowDropdown((prev) => !prev)}
-              >
+            role === "seller" ? (
+              <Link to="/seller/profile" className="group">
                 <img
-                  src="https://i.pravatar.cc/40" // Replace with dynamic user image if available
+                  src="https://i.pravatar.cc/40"
                   alt="Avatar"
-                  className="w-8 h-8 rounded-full border"
+                  className="w-9 h-9 rounded-full border border-blue-500 group-hover:scale-110 transition-transform duration-200"
                 />
-                <svg
-                  className="w-4 h-4 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              </Link>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/user/profile"
+                  className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-md z-50 border">
-                  {role === "user" ? (
-                    <>
-                      <Link
-                        to="/user/profile"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        to="/user/orders"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                      >
-                        Orders
-                      </Link>
-                    </>
-                  ) : role === "seller" ? (
-                    <>
-                      <Link
-                        to="/seller/products"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                      >
-                        Product Management
-                      </Link>
-                      <Link
-                        to="/seller/orders"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                      >
-                        Orders
-                      </Link>
-                      <Link
-                        to="/seller/profile"
-                        className="block px-4 py-2 hover:bg-gray-100"
-                      >
-                        Seller Profile
-                      </Link>
-                    </>
-                  ) : null}
-
-                  <div className="border-t my-1" />
-                  <div className="flex justify-between w-full py-2">
-                    <Logout />
-                  </div>
-                </div>
-              )}
-            </div>
+                  Profile
+                </Link>
+                <Logout />
+              </div>
+            )
           ) : (
-            <>
-              <Link to="/login" className="hover:text-blue-600">
+            <div className="flex items-center space-x-3 text-sm">
+              <Link
+                to="/login"
+                className="text-gray-700 hover:text-blue-600 transition font-medium"
+              >
                 Login
               </Link>
-              <Link to="/userregister" className="hover:text-blue-600">
+              <Link
+                to="/userregister"
+                className="text-gray-700 hover:text-blue-600 transition font-medium"
+              >
                 Register
               </Link>
-              <Link to="/sellerregister" className="hover:text-blue-600">
+              <Link
+                to="/sellerregister"
+                className="text-white bg-blue-600 px-4 py-1.5 rounded-full hover:bg-blue-700 transition font-medium"
+              >
                 Become a Seller
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>

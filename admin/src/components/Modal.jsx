@@ -1,11 +1,17 @@
-// src/components/Modal.jsx
-import React from 'react';
-
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-[#0000007c] flex justify-center items-center z-50">
+    <div
+      className="fixed inset-0 bg-[#0000007c] flex justify-center items-center z-50"
+      onClick={handleBackdropClick}
+    >
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full relative">
         <button
           onClick={onClose}
@@ -19,4 +25,4 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
-export default Modal;
+export default Modal

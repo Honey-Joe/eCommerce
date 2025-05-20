@@ -1,31 +1,34 @@
 // src/components/LogoutButton.jsx
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { logout } from '../features/auth/authSlice';
-import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../axios';
+import React from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../axios";
+import { FiLogOut } from "react-icons/fi";
 
 const Logout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-
     dispatch(logout());
     try {
-      await axiosInstance.post('/auth/logout');
-      navigate('/login');
+      await axiosInstance.post("/auth/logout");
+      navigate("/login");
     } catch (error) {
-      console.error('Logout failed:', error.response ? error.response.data.message : error.message);
+      console.error(
+        "Logout failed:",
+        error.response ? error.response.data.message : error.message
+      );
     }
   };
 
   return (
     <button
+      className="flex items-center gap-3 px-4 py-2 rounded-xl w-full text-left transition-all duration-200 hover:bg-red-100 text-red-600 hover:shadow"
       onClick={handleLogout}
-      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition mx-auto"
     >
-      Logout
+      <FiLogOut className="text-lg" /> Logout
     </button>
   );
 };

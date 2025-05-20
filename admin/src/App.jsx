@@ -22,6 +22,7 @@ import DisabledProducts from "./pages/admin/products/DisabledProducts";
 import { fetchProducts } from "./features/admin/productSlice";
 import AdminCreateCategory from "./pages/admin/category/AdminCreateCategory";
 import CategoryList from "./pages/admin/category/CategoryList";
+import AdminCategoryManager from "./pages/admin/category/AdminCategoryManager";
 
 function App() {
   const dispatch = useDispatch();
@@ -62,7 +63,7 @@ function App() {
           <Route path="products/disabled" element={<DisabledProducts />} />
           <Route path="site-settings" element={<SiteSettings />} />
           <Route path="others" element={<OtherSettings />} />
-          <Route path="addcategory" element={<AdminCreateCategory />} />
+          <Route path="addcategory" element={<AdminCategoryManager />} />
           <Route path="viewcategory" element={<CategoryList />} />
 
           {/* Add other routes as necessary */}

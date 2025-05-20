@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,6 +11,7 @@ import {
 } from "../../features/admin/adminSlice";
 import axiosInstance from "../../axios";
 import Layout from "../../layouts/Layout";
+import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -19,202 +20,184 @@ const AdminDashboard = () => {
   const location = useLocation();
 
   const [openSection, setOpenSection] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [sidebarWidth, setSidebarWidth] = useState(260);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const sidebarRef = useRef();
+
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      dispatch(setLoading());
+      try {
+        const [usersRes, sellersRes] = await Promise.all([
+          axiosInstance.get("/admin/users", { withCredentials: true }),
+          axiosInstance.get("/admin/sellers", { withCredentials: true }),
+        ]);
+        dispatch(setUsers(usersRes.data));
+        dispatch(setSellers(sellersRes.data));
+      } catch (error) {
+        dispatch(
+          setError(error.response?.data?.message || "Failed to fetch admin data")
+        );
+      }
+    };
+    fetchAdminData();
+  }, [dispatch]);
 
   const toggleAccordion = (section) => {
     setOpenSection((prev) => (prev === section ? null : section));
   };
 
-  const fetchAdminData = async () => {
-    dispatch(setLoading());
-    try {
-      const [usersRes, sellersRes] = await Promise.all([
-        axiosInstance.get("/admin/users", { withCredentials: true }),
-        axiosInstance.get("/admin/sellers", { withCredentials: true }),
-      ]);
+  const handleMouseDown = () => {
+    setIsDragging(true);
+  };
 
-      dispatch(setUsers(usersRes.data));
-      dispatch(setSellers(sellersRes.data));
-    } catch (error) {
-      dispatch(
-        setError(error.response?.data?.message || "Failed to fetch admin data")
-      );
-    }
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    const newWidth = Math.max(200, e.clientX);
+    setSidebarWidth(newWidth);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
   };
 
   useEffect(() => {
-    fetchAdminData();
-  }, []);
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    } else {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
 
   const showDashboardStats = location.pathname === "/admin/dashboard";
 
+  const AccordionSection = ({ label, icon, sectionKey, links }) => (
+    <div>
+      <button
+        onClick={() => toggleAccordion(sectionKey)}
+        className="w-full flex justify-between items-center px-2 py-2 hover:text-blue-600 font-medium"
+      >
+        <span>{icon} {label}</span>
+        <span>{openSection === sectionKey ? <ChevronUp size={"16px"} /> : <ChevronDown size={"16px"} />}</span>
+      </button>
+      {openSection === sectionKey && (
+        <div className="ml-4 mt-1 space-y-1 transition-all duration-300">
+          {links.map(({ path, label }) => (
+            <NavLink
+              key={path}
+              to={path}
+              className={({ isActive }) =>
+                `block px-2 py-1 rounded hover:bg-blue-100 ${
+                  isActive ? "text-blue-600 font-semibold" : ""
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <Layout>
-      <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen overflow-hidden bg-gray-100 relative">
+        {/* Mobile Toggle */}
+        <button
+          className="absolute top-4 left-4 z-50 md:hidden bg-white p-2 rounded shadow"
+          onClick={() => setIsSidebarOpen((prev) => !prev)}
+        >
+          {isSidebarOpen ? <X /> : <Menu />}
+        </button>
+
         {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-md overflow-y-auto">
+        <aside
+          ref={sidebarRef}
+          className={`bg-white shadow-md overflow-y-auto transition-all duration-300 ${
+            isSidebarOpen ? "block" : "hidden"
+          } md:block`}
+          style={{ width: sidebarWidth }}
+        >
           <div className="p-6 text-lg font-bold text-blue-600">Admin Panel</div>
-          <nav className="p-4 space-y-2 text-gray-700">
-            {/* Dashboard */}
+          <nav className="p-4 space-y-3 text-gray-700 text-sm">
             <NavLink
               to="/admin/dashboard"
               className={({ isActive }) =>
-                isActive ? "font-semibold text-blue-600" : "hover:text-blue-500"
+                `block px-2 py-2 rounded hover:bg-blue-100 ${
+                  isActive ? "text-blue-600 font-bold" : ""
+                }`
               }
             >
               🏠 Dashboard
             </NavLink>
 
-            {/* User Management Accordion */}
-            <div>
-              <button
-                onClick={() => toggleAccordion("user")}
-                className="w-full text-left hover:text-blue-500 font-semibold"
-              >
-                👥 User Management
-              </button>
-              {openSection === "user" && (
-                <div className="ml-4 mt-2 space-y-1">
-                  <NavLink
-                    to="/admin/users"
-                    className="block hover:text-blue-500"
-                  >
-                    View Users
-                  </NavLink>
-                  {/* Add more user links here if needed */}
-                </div>
-              )}
-            </div>
+            <AccordionSection
+              label="User Management"
+              icon="👥"
+              sectionKey="user"
+              links={[{ path: "/admin/users", label: "View Users" }]}
+            />
 
-            {/* Seller Management Accordion */}
-            <div>
-              <button
-                onClick={() => toggleAccordion("seller")}
-                className="w-full text-left hover:text-blue-500 font-semibold"
-              >
-                🛍️ Seller Management
-              </button>
-              {openSection === "seller" && (
-                <div className="ml-4 mt-2 space-y-1">
-                  <NavLink
-                    to="/admin/sellers/approved"
-                    className="block hover:text-blue-500"
-                  >
-                    ✅ Approved Sellers
-                  </NavLink>
-                  <NavLink
-                    to="/admin/sellers/pending"
-                    className="block hover:text-blue-500"
-                  >
-                    ⏳ Pending Sellers
-                  </NavLink>
-                  <NavLink
-                    to="/admin/sellers/disabled"
-                    className="block hover:text-blue-500"
-                  >
-                    ❌ Disabled Sellers
-                  </NavLink>
-                </div>
-              )}
-            </div>
+            <AccordionSection
+              label="Seller Management"
+              icon="🛍️"
+              sectionKey="seller"
+              links={[
+                { path: "/admin/sellers/approved", label: "Approved Sellers" },
+                { path: "/admin/sellers/pending", label: "Pending Sellers" },
+                { path: "/admin/sellers/disabled", label: "Disabled Sellers" },
+              ]}
+            />
 
-            {/* Site Settings Accordion */}
-            <div>
-              <button
-                onClick={() => toggleAccordion("site")}
-                className="w-full text-left hover:text-blue-500 font-semibold"
-              >
-                ⚙️ Site Settings
-              </button>
-              {openSection === "site" && (
-                <div className="ml-4 mt-2 space-y-1">
-                  <NavLink
-                    to="/admin/site-settings"
-                    className="block hover:text-blue-500"
-                  >
-                    General Settings
-                  </NavLink>
-                  {/* Add more site setting links here */}
-                </div>
-              )}
-            </div>
+            <AccordionSection
+              label="Product Management"
+              icon="📦"
+              sectionKey="product"
+              links={[
+                { path: "/admin/products/approved", label: "Approved Products" },
+                { path: "/admin/products/pending", label: "Pending Products" },
+                { path: "/admin/products/disabled", label: "Disabled Products" },
+              ]}
+            />
 
-            {/* Other Settings Accordion */}
-            <div>
-              <button
-                onClick={() => toggleAccordion("other")}
-                className="w-full text-left hover:text-blue-500 font-semibold"
-              >
-                📦 Other Settings
-              </button>
-              {openSection === "other" && (
-                <div className="ml-4 mt-2 space-y-1">
-                  <NavLink
-                    to="/admin/others"
-                    className="block hover:text-blue-500"
-                  >
-                    Misc Settings
-                  </NavLink>
-                </div>
-              )}
-            </div>
+            <AccordionSection
+              label="Category Management"
+              icon="📁"
+              sectionKey="category"
+              links={[
+                { path: "/admin/addcategory", label: "Add Category" },
+              ]}
+            />
 
-            {/* Product Management  */}
-            <div>
-              <button
-                onClick={() => toggleAccordion("product")}
-                className="w-full text-left hover:text-blue-500 font-semibold"
-              >
-                📦 Product Management
-              </button>
-              {openSection === "product" && (
-                <div className="ml-4 mt-2 space-y-1">
-                  <NavLink
-                    to="/admin/products/approved"
-                    className="block hover:text-blue-500"
-                  >
-                    Approved Products
-                  </NavLink>
-                  <NavLink
-                    to="/admin/products/disabled"
-                    className="block hover:text-blue-500"
-                  >
-                    Disabled Products
-                  </NavLink>
-                  <NavLink
-                    to="/admin/products/pending"
-                    className="block hover:text-blue-500"
-                  >
-                    Pending Products
-                  </NavLink>
-                </div>
-              )}
-            </div>
+            <AccordionSection
+              label="Site Settings"
+              icon="⚙️"
+              sectionKey="site"
+              links={[{ path: "/admin/site-settings", label: "General Settings" }]}
+            />
 
-            <div>
-              <button
-                onClick={() => toggleAccordion("category")}
-                className="w-full text-left hover:text-blue-500 font-semibold"
-              >
-                📦 Category Management
-              </button>
-              {openSection === "category" && (
-                <div className="ml-4 mt-2 space-y-1">
-                  <NavLink
-                    to="/admin/addcategory"
-                    className="block hover:text-blue-500"
-                  >
-                    Add Category
-                  </NavLink>
-                  <NavLink
-                    to="/admin/viewcategory"
-                    className="block hover:text-blue-500"
-                  >
-                    View Category
-                  </NavLink>
-                </div>
-              )}
-            </div>
+            <AccordionSection
+              label="Other Settings"
+              icon="🔧"
+              sectionKey="other"
+              links={[{ path: "/admin/others", label: "Misc Settings" }]}
+            />
           </nav>
+
+          {/* Drag Handle */}
+          <div
+            className="absolute top-0 right-0 h-full w-2 cursor-col-resize"
+            onMouseDown={handleMouseDown}
+          />
         </aside>
 
         {/* Main Content */}
@@ -223,9 +206,7 @@ const AdminDashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-sm text-gray-500">Total Users</h3>
-                <p className="text-2xl font-bold text-blue-600">
-                  {users.length}
-                </p>
+                <p className="text-2xl font-bold text-blue-600">{users.length}</p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-sm text-gray-500">Total Sellers</h3>
@@ -233,7 +214,6 @@ const AdminDashboard = () => {
                   {sellers.length}
                 </p>
               </div>
-              {/* You can add more cards here for orders, products, etc. */}
             </div>
           ) : (
             <Outlet />
