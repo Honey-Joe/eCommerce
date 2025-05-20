@@ -7,6 +7,7 @@ const productSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
+    product: null,
     products: [],
     isSold: false,
     sellerProducts: [], // ✅ Make sure this is initialized
@@ -37,6 +38,10 @@ const productSlice = createSlice({
     },
     setSellerProducts: (state, action) => {
       state.sellerProducts = action.payload;
+    },
+    setProduct:(state,action) =>{
+      state.loading = false
+      state.product = action.payload;
     },
     removeSellerProduct: (state, action) => {
       const productId = action.payload;
@@ -69,7 +74,8 @@ export const {
   setProductLoading,
   setSellerProducts,
   removeSellerProduct,
-  setIssoldStatus
+  setIssoldStatus,
+  setProduct
 } = productSlice.actions;
 
 export const addProduct = (formData) => async (dispatch) => {
@@ -87,6 +93,19 @@ export const addProduct = (formData) => async (dispatch) => {
     console.log(err);
   }
 };
+
+export const fetchProductById = (id) => async (dispatch) => {
+  try {
+    dispatch(setProductLoading(true));
+    const response = await axiosInstance.get(`/products/${id}`);
+    dispatch(setProduct(response.data));
+  } catch (err) {
+    dispatch(setProductError(err.message));
+  } finally {
+    dispatch(setProductLoading(false));
+  }
+};
+
 
 export const deleteProductById = async (productId) => {
   const response = await axiosInstance.delete(`/products/${productId}`, {

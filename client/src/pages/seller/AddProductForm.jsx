@@ -76,109 +76,113 @@ const AddProductForm = () => {
     setExtraFields((prev) => ({ ...prev, [name]: value }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!Array.isArray(coordinates) || coordinates.length !== 2) {
-    return toast.error("Please select a valid location before submitting.");
-  }
+    if (!Array.isArray(coordinates) || coordinates.length !== 2) {
+      return toast.error("Please select a valid location before submitting.");
+    }
 
-  const data = new FormData();
-  Object.entries(formData).forEach(([key, val]) => data.append(key, val));
-  data.append("longitude", coordinates[0]);
-  data.append("latitude", coordinates[1]);
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, val]) => data.append(key, val));
+    data.append("longitude", coordinates[0]);
+    data.append("latitude", coordinates[1]);
 
-  // ✅ Fix: Send attributes as JSON string
-  data.append("attributes", JSON.stringify(extraFields));
+    // ✅ Fix: Send attributes as JSON string
+    data.append("attributes", JSON.stringify(extraFields));
 
-  // Upload media
-  media.images.forEach((img) => data.append("images", img));
+    // Upload media
+    media.images.forEach((img) => data.append("images", img));
 
-  await dispatch(addProduct(data));
+    await dispatch(addProduct(data));
 
-  // Reset form
-  setFormData({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    brand: "",
-    stock: "",
-    isFeatured: false,
-    location: "",
-  });
-  setCoordinates([]);
-  setAttributes([]);
-  setExtraFields({});
-  setMedia({ images: [] });
-};
+    // Reset form
+    setFormData({
+      name: "",
+      description: "",
+      price: "",
+      category: "",
+      brand: "",
+      stock: "",
+      isFeatured: false,
+      location: "",
+    });
+    setCoordinates([]);
+    setAttributes([]);
+    setExtraFields({});
+    setMedia({ images: [] });
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-md max-w-3xl mx-auto mt-10 space-y-4"
+      className="bg-white p-4 rounded-xl shadow-lg max-w-md w-full mx-auto space-y-4 border border-gray-200"
     >
-      <h2 className="text-2xl font-bold text-center text-gray-800">
+      <h2 className="text-xl font-semibold text-center text-gray-800">
         Add Product
       </h2>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
       <input
         name="name"
         placeholder="Product Name"
         value={formData.name}
         onChange={handleChange}
-        className="w-full p-3 border rounded-xl"
+        className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       />
-
 
       <textarea
         name="description"
         placeholder="Product Description"
         value={formData.description}
         onChange={handleChange}
-        className="w-full p-3 border rounded-xl"
+        className="w-full p-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       />
 
       <input
         name="price"
-        placeholder="Product price"
+        type="number"
+        placeholder="Price"
         value={formData.price}
         onChange={handleChange}
-        className="w-full p-3 border rounded-xl"
+        className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       />
 
       <div>
-        <label className="block mb-1 font-medium text-gray-700">Category</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Category
+        </label>
         <select
           name="category"
           value={formData.category}
           onChange={handleChange}
-          className="w-full p-3 border rounded-xl"
+          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         >
-          <option value="">-- Select a Category --</option>
-          {categories.map((category) => (
-            <option key={category._id} value={category.name}>
-              {category.name}
+          <option value="">-- Select Category --</option>
+          {categories.map((cat) => (
+            <option key={cat._id} value={cat.name}>
+              {cat.name}
             </option>
           ))}
         </select>
       </div>
 
       {attributes.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-3">
           {attributes.map((attr, index) => (
             <div key={index}>
-              <label className="block font-medium">{attr.name}</label>
+              <label className="block text-sm text-gray-700 font-medium mb-1">
+                {attr.name}
+              </label>
               {attr.type === "text" && (
                 <input
                   type="text"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                   onChange={(e) =>
                     handleExtraFieldChange(attr.name, e.target.value)
                   }
@@ -187,7 +191,7 @@ const AddProductForm = () => {
               {attr.type === "number" && (
                 <input
                   type="number"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                   onChange={(e) =>
                     handleExtraFieldChange(attr.name, e.target.value)
                   }
@@ -195,7 +199,7 @@ const AddProductForm = () => {
               )}
               {attr.type === "dropdown" && (
                 <select
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
                   onChange={(e) =>
                     handleExtraFieldChange(attr.name, e.target.value)
                   }
@@ -213,14 +217,14 @@ const AddProductForm = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <input
           type="text"
           name="brand"
           placeholder="Brand"
           value={formData.brand}
           onChange={handleChange}
-          className="p-3 border rounded-xl"
+          className="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="number"
@@ -228,33 +232,34 @@ const AddProductForm = () => {
           placeholder="Stock"
           value={formData.stock}
           onChange={handleChange}
-          className="p-3 border rounded-xl"
+          className="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
           required
         />
       </div>
 
-      <label className="flex items-center space-x-2 text-gray-600">
+      <label className="flex items-center space-x-2 text-sm text-gray-700 font-medium">
         <input
           type="checkbox"
           name="isFeatured"
           checked={formData.isFeatured}
           onChange={handleChange}
+          className="accent-blue-600"
         />
-        <span>Mark as Featured</span>
+        <span>Featured</span>
       </label>
 
       <div>
-        <label className="block mb-1 font-medium text-gray-700">
-          Select Location
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Location
         </label>
         <select
           name="location"
           value={formData.location}
           onChange={handleChange}
-          className="w-full p-3 border rounded-xl"
+          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
           required
         >
-          <option value="">-- Select a Location --</option>
+          <option value="">-- Select Location --</option>
           {places.map((place) => (
             <option key={place.name} value={place.name}>
               {place.name}
@@ -262,14 +267,14 @@ const AddProductForm = () => {
           ))}
         </select>
         {coordinates.length === 2 && (
-          <p className="text-sm text-gray-500 mt-1">
-            Coordinates: Longitude {coordinates[0]}, Latitude {coordinates[1]}
+          <p className="text-xs text-gray-500 mt-1">
+            Coordinates: {coordinates[0]}, {coordinates[1]}
           </p>
         )}
       </div>
 
       <div>
-        <label className="block mb-1 font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           Upload Images
         </label>
         <input
@@ -277,7 +282,7 @@ const AddProductForm = () => {
           accept="image/*"
           multiple
           onChange={(e) => handleMediaChange(e, "images")}
-          className="block w-full text-sm"
+          className="w-full text-sm file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
         <div className="flex flex-wrap mt-2 gap-2">
           {media.images.map((file, idx) => (
@@ -285,7 +290,7 @@ const AddProductForm = () => {
               key={idx}
               src={URL.createObjectURL(file)}
               alt="Preview"
-              className="w-20 h-20 object-cover rounded"
+              className="w-16 h-16 object-cover rounded border"
             />
           ))}
         </div>
@@ -294,7 +299,7 @@ const AddProductForm = () => {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700"
+        className="w-full bg-blue-600 text-white p-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50"
       >
         {loading ? "Submitting..." : "Add Product"}
       </button>

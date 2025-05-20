@@ -10,27 +10,46 @@ import "react-toastify/dist/ReactToastify.css";
 import UserRegister from "./pages/auth/UserRegister";
 import SellerRegister from "./pages/auth/SellerRegister";
 import axiosInstance from "./axios";
-import {useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import { loginSuccess, logout } from "./features/auth/authSlice";
 import { useEffect } from "react";
 import SellerProfile from "./pages/seller/SellerProfile";
+import ProductDetails from "./pages/product/ProductDetails";
 
 function App() {
   const dispatch = useDispatch();
-  
-    useEffect(() => {
-      const checkAuth = async () => {
-        try {
-          const res = await axiosInstance.get("auth/me");
-          const { role,status,userId,name,email,storeLocation,businessName } = res.data;
-          dispatch(loginSuccess({ role,status,userId,name,email,storeLocation,businessName}));
-        } catch (err) {
-          dispatch(logout());
-        }
-      };
-  
-      checkAuth(); // Run on every refresh
-    }, [dispatch]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await axiosInstance.get("auth/me");
+        const {
+          role,
+          status,
+          userId,
+          name,
+          email,
+          storeLocation,
+          businessName,
+        } = res.data;
+        dispatch(
+          loginSuccess({
+            role,
+            status,
+            userId,
+            name,
+            email,
+            storeLocation,
+            businessName,
+          })
+        );
+      } catch (err) {
+        dispatch(logout());
+      }
+    };
+
+    checkAuth(); // Run on every refresh
+  }, [dispatch]);
   return (
     <>
       <ToastContainer />
@@ -42,17 +61,18 @@ function App() {
         <Route path="/sellerregister" element={<SellerRegister />} />
 
         {/* Protected User Route */}
-        <Route element={<ProtectedRoute allowedRoles={['user']} />}>
+        <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
           <Route path="/user/dashboard" element={<UserDashboard />} />
         </Route>
 
         {/* Protected Seller Route */}
-        <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
+        <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
           <Route path="/seller/products" element={<SellerDashboard />} />
         </Route>
-        <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
+        <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
           <Route path="/seller/profile" element={<SellerProfile />} />
         </Route>
+        <Route path="/product/:id" element={<ProductDetails></ProductDetails>} />
       </Routes>
     </>
   );

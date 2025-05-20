@@ -10,8 +10,11 @@ import {
   setProductLoading,
 } from "../../features/products/productSlice";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { motion } from "framer-motion";
+
 import { Carousel } from "react-responsive-carousel";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const SellerProducts = ({ sellerId }) => {
   const dispatch = useDispatch();
@@ -21,47 +24,7 @@ const SellerProducts = ({ sellerId }) => {
     if (sellerId) dispatch(fetchSellerProducts(sellerId));
   }, [dispatch, sellerId]);
 
-  const handleDelete = async (id) => {
-    const confirm = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
-    if (!confirm) return;
-
-    try {
-      dispatch(setProductLoading(true));
-      await deleteProductById(id);
-      dispatch(removeSellerProduct(id));
-      toast.success("Product Deleted Successfully");
-    } catch (err) {
-      dispatch(
-        setProductError(err.response?.data?.message || "Delete failed")
-      );
-      toast.error("Delete failed");
-    } finally {
-      dispatch(setProductLoading(false));
-    }
-  };
-  const handleIsSoldStatus = async (id) => {
-    const confirm = window.confirm(
-      "Are you sure you want to chnage sold this  this product?"
-    );
-    if (!confirm) return;
-
-    try {
-      dispatch(setProductLoading(true));
-      await isSoldProductById(id);
-      dispatch(setIssoldStatus(id));
-      toast.success("Product Sold Successfully");
-    } catch (err) {
-      dispatch(
-        setProductError(err.response?.data?.message || "Sold failed")
-      );
-      toast.error("Sold failed");
-    } finally {
-      dispatch(setProductLoading(false));
-    }
-  };
-
+  
 
   // Group products by their status
   const groupedProducts = products.reduce((acc, product) => {
@@ -72,10 +35,10 @@ const SellerProducts = ({ sellerId }) => {
   }, {});
 
   // Optional: Display in a fixed order
-  const statusOrder = ["Approved", "Pending", "Disabled","DisabledByAdmin"];
+  const statusOrder = ["Approved", "Pending", "Disabled", "DisabledByAdmin"];
 
   return (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Your Products</h2>
 
       {loading && <p>Loading products...</p>}
@@ -84,63 +47,70 @@ const SellerProducts = ({ sellerId }) => {
       {statusOrder.map(
         (status) =>
           groupedProducts[status]?.length > 0 && (
-            <div key={status} className="mb-8">
-              <h3 className="text-xl font-semibold mb-3 text-blue-700">
+            <div key={status} className="mb-10">
+              <h3 className="text-2xl font-bold mb-4 text-blue-700">
                 {status} Products
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {groupedProducts[status].map((product) => (
-                  <div
+                  <motion.div
                     key={product._id}
-                    className="border p-4 rounded shadow hover:shadow-lg transition"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-white border border-gray-200 p-4 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 relative"
                   >
                     <Carousel
-                      showArrows={true}
+                      showArrows
                       showThumbs={false}
                       infiniteLoop
                       autoPlay
                       interval={3000}
-                      className="w-full max-w-md mx-auto rounded-lg shadow"
+                      className="rounded-xl overflow-hidden"
                     >
                       {product.images.map((image, index) => (
-                        <div key={index}>
+                        <div key={index} className="relative h-56 sm:h-64">
                           <img
                             src={image.url}
                             alt={image.alt || product.name}
-                            className="h-64 object-cover rounded"
+                            className="object-cover h-full w-full"
                           />
                         </div>
                       ))}
                     </Carousel>
 
-                    <h4 className="font-semibold text-lg mt-2">
-                      {product.name}
-                    </h4>
-                    <p className="text-gray-600">₹{product.price}</p>
-                    <p className="text-sm text-gray-500">
-                      {product.description}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Status: {product.status}
-                    </p>
-                    <button
-                      className="mt-2 px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                      onClick={() => handleDelete(product._id)}
-                      disabled={loading}
-                    >
-                      {loading ? "Deleting..." : "Delete"}
-                    </button>
-                    {
-                      product.isSold?(<><p className="text-green-500">Sold</p></>):(<> <button
-                      className="mt-2 px-4 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                      onClick={() => handleIsSoldStatus(product._id)}
-                      disabled={loading}
-                    >
-                      {loading ? "Solding..." : "Sold"}
-                    </button></>)
-                    }
-                   
-                  </div>
+                    <div className="mt-4 space-y-1">
+                      <h4 className="text-lg font-semibold text-gray-800">
+                        {product.name}
+                      </h4>
+                      <p className="text-sm text-gray-500 truncate">
+                        {product.description}
+                      </p>
+                      <p className="text-blue-600 font-bold text-md">
+                        ₹{product.price}
+                      </p>
+                      <span
+                        className={`inline-block mt-1 px-2 py-1 text-xs rounded-full font-medium ${
+                          product.status === "approved"
+                            ? "bg-green-100 text-green-700"
+                            : product.status === "pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {product.status}
+                      </span>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      {/* View button */}
+                      <Link to={`/product/${product._id}`} className="block">
+                        <button className="w-full py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition">
+                          View
+                        </button>
+                      </Link>
+
+                      
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             </div>

@@ -109,6 +109,7 @@ const PendingSellers = () => {
                           <a
                             href={seller.documents.url}
                             className="text-green-500"
+                            target="_blank"
                           >
                             View Document
                           </a>
