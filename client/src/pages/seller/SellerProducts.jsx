@@ -39,8 +39,6 @@ const SellerProducts = ({ sellerId }) => {
 
   return (
     <div className="">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Your Products</h2>
-
       {loading && <p>Loading products...</p>}
       {error && <p className="text-red-600">{error}</p>}
 

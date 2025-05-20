@@ -8,7 +8,6 @@ cron.schedule('* * * * *', async () => {
   console.log('⏰ Running daily document expiry check...');
 
   try {
-    await connectDB(); // Ensure DB is connected
     const now = new Date();
     const sellers = await Seller.find({});
 
