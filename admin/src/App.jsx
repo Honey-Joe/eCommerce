@@ -23,6 +23,7 @@ import { fetchProducts } from "./features/admin/productSlice";
 import AdminCreateCategory from "./pages/admin/category/AdminCreateCategory";
 import CategoryList from "./pages/admin/category/CategoryList";
 import AdminCategoryManager from "./pages/admin/category/AdminCategoryManager";
+import BrandManagement from "./pages/admin/brand/BrandManagement";
 
 function App() {
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ function App() {
           <Route path="others" element={<OtherSettings />} />
           <Route path="addcategory" element={<AdminCategoryManager />} />
           <Route path="viewcategory" element={<CategoryList />} />
+          <Route path="brand" element={<BrandManagement></BrandManagement>} />
 
           {/* Add other routes as necessary */}
         </Route>

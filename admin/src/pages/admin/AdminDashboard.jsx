@@ -179,6 +179,15 @@ const AdminDashboard = () => {
             />
 
             <AccordionSection
+              label="Brand Management"
+              icon="📁"
+              sectionKey="brand"
+              links={[
+                { path: "/admin/brand", label: "Manage Brand" },
+              ]}
+            />
+
+            <AccordionSection
               label="Site Settings"
               icon="⚙️"
               sectionKey="site"
