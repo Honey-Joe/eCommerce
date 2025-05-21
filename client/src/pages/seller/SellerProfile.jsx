@@ -28,8 +28,9 @@ const SellerProfile = () => {
         name: user.name || "",
         email: user.email || "",
         businessName: user.businessName || "",
-        storeLocation: user.storeLocation || "",
+        storeLocation: user.location?.place || "",
       };
+      console.log(user)
       setFormData(userData);
       setTempData(userData);
     }

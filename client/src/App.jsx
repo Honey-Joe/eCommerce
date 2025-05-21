@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import SellerDashboard from "./pages/seller/SellerDashboard";
 import UserDashboard from "./pages/user/UserDashboard";
 import Login from "./pages/auth/Login";
 import Unauthorized from "./components/Unauthorized";
@@ -30,9 +29,10 @@ function App() {
           userId,
           name,
           email,
-          storeLocation,
           businessName,
+          location
         } = res.data;
+        console.log(res.data)
         dispatch(
           loginSuccess({
             role,
@@ -40,8 +40,8 @@ function App() {
             userId,
             name,
             email,
-            storeLocation,
             businessName,
+            location
           })
         );
       } catch (err) {

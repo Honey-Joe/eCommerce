@@ -79,7 +79,7 @@ const login = async (req, res) => {
       userId: user._id,
       name: user.name,
       email: user.email,
-      storeLocation : user?.storeLocation,
+      location : user?.location,
       businessName: user?.businessName,
     });
   } catch (err) {
@@ -107,7 +107,7 @@ const getUserProfile = async (req, res) => {
         status: seller.status,
         name:seller.name,
         email: seller.email,
-        storeLocation: seller.storeLocation,
+        location: seller.location,
         businessName: seller.businessName,  // Send the seller status (approved/pending)
         message: "Authenticated",
       });

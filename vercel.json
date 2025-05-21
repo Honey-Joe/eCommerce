@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://api.ecommerceintern25.vercel.app/" },
-    { "source": "/admin/(.*)", "destination": "https://admin.ecommerceintern25.vercel.app/" },
-        { "source": "/clienr/(.*)", "destination": "https://ecommerceintern26.vercel.app/" }
-
-  ]
-}
