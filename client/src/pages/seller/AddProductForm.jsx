@@ -24,7 +24,6 @@ const AddProductForm = () => {
     isFeatured: false,
     location: "",
   });
-  console.log(formData);
 
   useEffect(() => {
     const fetchCategories = async () => {
