@@ -89,7 +89,6 @@ export const addProduct = (formData) => async (dispatch) => {
     toast.success("Product Added Successfully");
   } catch (err) {
     dispatch(addProductFail(err.response?.data?.message || "Upload failed"));
-
     console.log(err);
   }
 };

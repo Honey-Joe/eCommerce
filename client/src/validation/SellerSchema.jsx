@@ -6,5 +6,4 @@ export const sellerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   businessName: z.string().min(2, "Business name is required"),
-  storeLocation: z.string().min(2, "Store location is required"),
 });

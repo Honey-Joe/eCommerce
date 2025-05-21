@@ -19,12 +19,14 @@ exports.createProduct = async (req, res) => {
       description,
       price,
       category,
-      brand,
       stock,
       isFeatured,
       longitude,
-      latitude
+      latitude,
+      place
     } = req.body;
+
+    console.log(place);
 
     if (!price) {
       return res.status(400).json({ message: "Product price is required" });
@@ -54,7 +56,6 @@ exports.createProduct = async (req, res) => {
       description,
       price,
       category,
-      brand,
       stock,
       isFeatured,
       images: imageUrls,
@@ -63,6 +64,7 @@ exports.createProduct = async (req, res) => {
       location: {
         type: "Point",
         coordinates: [parseFloat(longitude), parseFloat(latitude)],
+        place: place
       },
     });
 

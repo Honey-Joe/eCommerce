@@ -29,9 +29,9 @@ const Login = () => {
       dispatch(loginSuccess({role,status,userId,name,email,storeLocation,businessName}));
       setTimeout(() => {
         if (role === "seller") {
-          navigate("/seller/profile");
+          navigate("/");
         } else if (role === "user") {
-          navigate("/user/dashboard");
+          navigate("/");
         } else {
           navigate("/");
         }

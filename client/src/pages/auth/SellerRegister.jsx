@@ -21,9 +21,9 @@ const SellerRegister = () => {
   const [selectedPlace, setSelectedPlace] = useState(null);
 
   const handlePlaceChange = (e) => {
-  const place = places.find(p => p.name === e.target.value);
-  setSelectedPlace(place);
-};
+    const place = places.find((p) => p.name === e.target.value);
+    setSelectedPlace(place);
+  };
 
   const {
     register,
@@ -34,40 +34,38 @@ const SellerRegister = () => {
   });
 
   const onSubmit = async (data) => {
-  try {
-    dispatch(registerStart());
+    try {
+      dispatch(registerStart());
 
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("email", data.email);
-    formData.append("password", data.password);
-    formData.append("businessName", data.businessName);
-    formData.append("storeLocation", data.storeLocation);
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("businessName", data.businessName);
 
-    // Attach the selected location details
-    if (selectedPlace) {
-      formData.append("location", JSON.stringify(selectedPlace));
+      // Attach the selected location details
+      if (selectedPlace) {
+        formData.append("location", JSON.stringify(selectedPlace));
+      }
+
+      const res = await axiosInstance.post("/auth/register/seller", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      dispatch(registerSuccess({ user: res.data.user, role: "seller" }));
+      toast.success("Seller registered successfully!");
+      navigate("/login");
+    } catch (err) {
+      dispatch(
+        registerFailure(err.response?.data?.message || "Registration failed")
+      );
+      toast.error(err.response?.data?.message || "Registration failed");
+      console.error(err);
     }
-
-    const res = await axiosInstance.post("/auth/register/seller", formData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      withCredentials: true,
-    });
-
-    dispatch(registerSuccess({ user: res.data.user, role: "seller" }));
-    toast.success("Seller registered successfully!");
-    navigate("/login");
-  } catch (err) {
-    dispatch(
-      registerFailure(err.response?.data?.message || "Registration failed")
-    );
-    toast.error(err.response?.data?.message || "Registration failed");
-    console.error(err);
-  }
-};
-
+  };
 
   return (
     <Layout>
@@ -122,26 +120,19 @@ const SellerRegister = () => {
         )}
 
         {/* Store Location Input */}
-        <input
-          {...register("storeLocation")}
-          placeholder="Store Location"
-          className="w-full px-4 py-2 border rounded focus:ring-blue-500"
-        />
-        {errors.storeLocation && (
-          <p className="text-red-500 text-sm">{errors.storeLocation.message}</p>
-        )}
+
         <select
-  onChange={handlePlaceChange}
-  className="w-full px-4 py-2 border rounded"
-  required
->
-  <option value="">Select Location</option>
-  {places.map((place) => (
-    <option key={place.name} value={place.name}>
-      {place.name}
-    </option>
-  ))}
-</select>
+          onChange={handlePlaceChange}
+          className="w-full px-4 py-2 border rounded"
+          required
+        >
+          <option value="">Select Location</option>
+          {places.map((place) => (
+            <option key={place.name} value={place.name}>
+              {place.name}
+            </option>
+          ))}
+        </select>
 
         {/* Submit Button */}
         <button

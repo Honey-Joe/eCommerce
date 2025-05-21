@@ -25,10 +25,6 @@ const sellerSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    storeLocation: {
-      type: String,
-      required: true,
-    },
     role: { type: String, default: "seller" },
 
     documents: {
@@ -55,6 +51,9 @@ const sellerSchema = new mongoose.Schema(
         type: [Number], // [longitude, latitude]
         required: false,
       },
+      place:{
+        type:String,
+      }
     },
   },
   { timestamps: true }

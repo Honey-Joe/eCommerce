@@ -8,6 +8,7 @@ import axiosInstance from "../../../axios";
 const ApprovedSellers = () => {
   const dispatch = useDispatch();
   const { list, loading, error } = useSelector((state) => state.sellers);
+  console.log(list);
 
   useEffect(() => {
     dispatch(fetchSellers());
@@ -80,7 +81,7 @@ const ApprovedSellers = () => {
                       {seller.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {seller.storeLocation}
+                      {seller.location.place}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-green-500 font-semibold">
                       {seller.status}

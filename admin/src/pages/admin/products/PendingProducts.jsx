@@ -55,7 +55,9 @@ const PendingProducts = () => {
                 <th className="px-6 py-3 text-left">Name</th>
                 <th className="px-6 py-3 text-left">Price</th>
                 <th className="px-6 py-3 text-left">Seller</th>
+                <th className="px-6 py-3 text-left">Location</th>
                 <th className="px-6 py-3 text-center">Actions</th>
+
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -64,6 +66,7 @@ const PendingProducts = () => {
                   <td className="px-6 py-4">{product.name}</td>
                   <td className="px-6 py-4">₹{product.price}</td>
                   <td className="px-6 py-4">{product.seller?.name}</td>
+                  <td className="px-6 py-4">{product.location.place}</td>
                   <td className="px-6 py-4 text-center flex justify-center gap-2">
                     <button
                       onClick={() => openModal(product)}

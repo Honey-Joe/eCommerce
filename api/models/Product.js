@@ -19,9 +19,6 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Product category is required"],
     },
-    brand: {
-      type: String,
-    },
     stock: {
       type: Number,
       required: true,
@@ -72,10 +69,10 @@ const productSchema = new mongoose.Schema(
         type: [Number], // [longitude, latitude]
         required: false,
       },
-    },
-    place: {
-      type: String,
-      default: "", // Optional: store the name of the place selected (e.g., "Trichy")
+      place: {
+        type: String,
+        required: false
+      }
     },
   },
   { timestamps: true }

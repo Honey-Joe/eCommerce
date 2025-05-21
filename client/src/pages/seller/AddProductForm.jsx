@@ -20,11 +20,11 @@ const AddProductForm = () => {
     description: "",
     price: "",
     category: "",
-    brand: "",
     stock: "",
     isFeatured: false,
     location: "",
   });
+  console.log(formData);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -57,7 +57,7 @@ const AddProductForm = () => {
     if (name === "location") {
       const place = places.find((p) => p.name === value);
       if (place) {
-        setCoordinates([place.longitude, place.latitude]);
+        setCoordinates([place.longitude, place.latitude,place.name]);
       } else {
         setCoordinates([]);
       }
@@ -79,7 +79,7 @@ const AddProductForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!Array.isArray(coordinates) || coordinates.length !== 2) {
+    if (!Array.isArray(coordinates) || coordinates.length !== 3) {
       return toast.error("Please select a valid location before submitting.");
     }
 
@@ -87,6 +87,7 @@ const AddProductForm = () => {
     Object.entries(formData).forEach(([key, val]) => data.append(key, val));
     data.append("longitude", coordinates[0]);
     data.append("latitude", coordinates[1]);
+    data.append("place",coordinates[2]);
 
     // ✅ Fix: Send attributes as JSON string
     data.append("attributes", JSON.stringify(extraFields));
@@ -112,6 +113,7 @@ const AddProductForm = () => {
     setExtraFields({});
     setMedia({ images: [] });
   };
+
 
   return (
     <form
@@ -217,15 +219,8 @@ const AddProductForm = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <input
-          type="text"
-          name="brand"
-          placeholder="Brand"
-          value={formData.brand}
-          onChange={handleChange}
-          className="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+        
         <input
           type="number"
           name="stock"
@@ -266,9 +261,9 @@ const AddProductForm = () => {
             </option>
           ))}
         </select>
-        {coordinates.length === 2 && (
+        {coordinates.length === 3 && (
           <p className="text-xs text-gray-500 mt-1">
-            Coordinates: {coordinates[0]}, {coordinates[1]}
+            Coordinates: {coordinates[0]}, {coordinates[1]} ,{coordinates[2]}
           </p>
         )}
       </div>
