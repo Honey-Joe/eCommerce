@@ -83,6 +83,9 @@ const SellerProducts = ({ sellerId }) => {
                       <p className="text-sm text-gray-500 truncate">
                         {product.description}
                       </p>
+                      <p className="text-sm text-gray-500 truncate">
+                        Brand : {product.brand}
+                      </p>
                       <p className="text-blue-600 font-bold text-md">
                         ₹{product.price}
                       </p>

@@ -205,6 +205,10 @@ const ProductDetails = () => {
                 {new Date(product.createdAt).toLocaleDateString()}
               </p>
               <p>
+                <span className="font-medium">Brand:</span>{" "}
+                {product.brand}
+              </p>
+              <p>
                 <span className="font-medium">Product ID:</span> {product._id}
               </p>
             </div>
