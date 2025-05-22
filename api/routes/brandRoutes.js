@@ -4,9 +4,10 @@ const brandController = require('../controllers/brandcontroller');
 const adminMiddleware = require('../middleware/adminMiddleware');
 const { sellerAuth } = require('../middleware/authMiddleware');
 const upload = require('../middleware/upload');
+const adminOrSellerAuth = require('../middleware/adminOrSellerMiddleware');
 
 // Create
-router.post('/',adminMiddleware,sellerAuth, upload.array('logo'), brandController.createBrand);
+router.post('/',adminOrSellerAuth, upload.array('logo'), brandController.createBrand);
 
 // Read
 router.get('/', brandController.getAllBrands);

@@ -2,7 +2,7 @@ const express = require('express');
 const { registerUser, login, logout, getUserProfile } = require('../controllers/authController');
 const {registerSeller} = require("../controllers/sellerController");
 const adminMiddleware = require('../middleware/adminMiddleware');
-const {verifyToken} = require("../middleware/authMiddleware");
+const {verifyToken, userAuth, sellerAuth} = require("../middleware/authMiddleware");
 const upload = require('../middleware/upload');
 const router = express.Router();
 
