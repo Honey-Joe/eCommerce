@@ -37,7 +37,7 @@ export const {
 export const fetchBrands = () => async (dispatch) => {
   dispatch(fetchBrandsStart());
   try {
-    const { data } = await axiosInstance.get('/brands');
+    const { data } = await axiosInstance.get('/brands', {withCredentials:true});
     dispatch(fetchBrandsSuccess(data));
   } catch (err) {
     dispatch(fetchBrandsFailure(err.message));
@@ -53,7 +53,8 @@ export const createBrand = (brandName) => async (dispatch) => {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    });
+      withCredentials:true
+    },);
 
     dispatch(addBrand(data));
     return data;

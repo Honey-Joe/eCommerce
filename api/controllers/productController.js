@@ -28,8 +28,6 @@ exports.createProduct = async (req, res) => {
       place
     } = req.body;
 
-    console.log(place);
-
     if (!price) {
       return res.status(400).json({ message: "Product price is required" });
     }
