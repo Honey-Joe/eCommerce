@@ -9,6 +9,7 @@ const productSlice = createSlice({
     error: null,
     product: null,
     products: [],
+    parentProducts: [],
     isSold: false,
     sellerProducts: [], // ✅ Make sure this is initialized
   },
@@ -60,6 +61,8 @@ const productSlice = createSlice({
     setProductError: (state, action) => {
       state.error = action.payload;
     },
+    setParentProduct: (state, action) => {
+      state.parentProducts = action.payload;}
   },
 });
 
@@ -75,7 +78,8 @@ export const {
   setSellerProducts,
   removeSellerProduct,
   setIssoldStatus,
-  setProduct
+  setProduct,
+  setParentProduct
 } = productSlice.actions;
 
 export const addProduct = (formData) => async (dispatch) => {
@@ -105,7 +109,14 @@ export const fetchProductById = (id) => async (dispatch) => {
   }
 };
 
-
+export const fetchParentProducts = () => async (dispatch) => {
+  try {
+    const { data } = await axiosInstance.get('/products/parents');
+    dispatch(setParentProduct(data));
+  } catch (err) {
+    dispatch(setProductError('Failed to load parent products'));
+  }
+};
 export const deleteProductById = async (productId) => {
   const response = await axiosInstance.delete(`/products/${productId}`, {
     withCredentials: true,

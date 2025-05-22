@@ -10,6 +10,7 @@ router.post('/', sellerAuth, upload.array('images'), productController.createPro
 
 // Get all products
 router.get('/', productController.getAllProducts);
+router.get('/parents', productController.getParentProducts);
 
 // Get single product
 router.get('/:id', productController.getProductById);

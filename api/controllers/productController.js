@@ -25,7 +25,9 @@ exports.createProduct = async (req, res) => {
       isFeatured,
       longitude,
       latitude,
-      place
+      place,
+      isVariant,
+      parentProduct
     } = req.body;
 
     if (!price) {
@@ -51,7 +53,7 @@ exports.createProduct = async (req, res) => {
       imageUrls = cloudinaryResponses.map((img) => ({ url: img.url }));
     }
 
-    const newProduct = new Product({
+    const productData = {
       name,
       description,
       price,
@@ -67,11 +69,22 @@ exports.createProduct = async (req, res) => {
         coordinates: [parseFloat(longitude), parseFloat(latitude)],
         place: place
       },
-    });
+      isVariant: isVariant === 'true' || isVariant === true, // handle string "true" from form-data
+      parentProduct: isVariant ? parentProduct : null
+    };
 
+    const newProduct = new Product(productData);
     await newProduct.save();
 
+    // If it's a variant, add to parent's variants array
+    if (productData.isVariant && parentProduct) {
+      await Product.findByIdAndUpdate(parentProduct, {
+        $addToSet: { variants: newProduct._id }
+      });
+    }
+
     res.status(201).json({ message: 'Product created', product: newProduct });
+
   } catch (error) {
     console.error('Create Product Error:', error.message);
     res.status(500).json({ message: 'Failed to create product', error: error.message });
@@ -243,5 +256,17 @@ exports.getProductBySeller = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+  }
+};
+exports.getParentProducts = async (req, res) => {
+  try {
+    const parentProducts = await Product.find({
+      isVariant: false,
+    });
+
+    res.status(200).json(parentProducts);
+  } catch (error) {
+    console.error("Error fetching parent products:", error);
+    res.status(500).json({ message: "Server error while fetching parent products" });
   }
 };

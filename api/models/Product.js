@@ -25,11 +25,10 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
     attributes: {
-  type: Map,
-  of: String,
-  default: {},
-},
-
+      type: Map,
+      of: String,
+      default: {},
+    },
     images: [
       {
         url: {
@@ -42,9 +41,8 @@ const productSchema = new mongoose.Schema(
         },
       },
     ],
-    brand:{
-      type:String,
-
+    brand: {
+      type: String,
     },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
@@ -75,14 +73,35 @@ const productSchema = new mongoose.Schema(
       },
       place: {
         type: String,
-        required: false
-      }
+        required: false,
+      },
     },
+
+    // ✅ NEW FIELD: Is this a variant or main product?
+    isVariant: {
+      type: Boolean,
+      default: false,
+    },
+
+    // ✅ NEW FIELD: Reference to main product (if variant)
+    parentProduct: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      default: null,
+    },
+
+    // ✅ NEW FIELD: Array of variant references (used only for main product)
+    variants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   { timestamps: true }
 );
 
-// For geospatial queries
+// Geospatial index
 productSchema.index({ location: "2dsphere" });
 
 module.exports = mongoose.model("Product", productSchema);

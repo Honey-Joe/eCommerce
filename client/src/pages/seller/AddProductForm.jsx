@@ -1,34 +1,48 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addProduct } from "../../features/products/productSlice";
+import {
+  addProduct,
+  fetchParentProducts,
+} from "../../features/products/productSlice";
 import { toast } from "react-toastify";
 import { places } from "../../data/places";
 import axiosInstance from "../../axios";
+import Select from "react-select";
+
 import { createBrand, fetchBrands } from "../../features/products/brandSlice";
+
+const initialFormData = {
+  name: "",
+  description: "",
+  price: "",
+  category: "",
+  stock: "",
+  isFeatured: false,
+  location: "",
+};
 
 const AddProductForm = () => {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.products);
+  const { parentProducts, loading, error } = useSelector((state) => state.products);
   const { brands } = useSelector((state) => state.brands);
-  console.log(brands);
+  console.log(parentProducts)
+
   const [customBrand, setCustomBrand] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
-
   const [categories, setCategories] = useState([]);
   const [attributes, setAttributes] = useState([]);
   const [extraFields, setExtraFields] = useState({});
   const [coordinates, setCoordinates] = useState([]);
   const [media, setMedia] = useState({ images: [] });
 
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    stock: "",
-    isFeatured: false,
-    location: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
+  console.log(formData);
+
+  const [isVariant, setIsVariant] = useState(false);
+  const [parentProduct, setParentProduct] = useState(null);
+  useEffect(() => {
+    dispatch(fetchParentProducts());
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -40,25 +54,18 @@ const AddProductForm = () => {
       }
     };
     dispatch(fetchBrands());
-
     fetchCategories();
   }, [dispatch]);
 
   const handleBrandChange = (e) => {
     const value = e.target.value;
     setSelectedBrand(value);
-    if (value !== "Other") {
-      setCustomBrand("");
-    }
+    if (value !== "Other") setCustomBrand("");
   };
 
   useEffect(() => {
     const selected = categories.find((cat) => cat.name === formData.category);
-    if (selected) {
-      setAttributes(selected.attributes || []);
-    } else {
-      setAttributes([]);
-    }
+    setAttributes(selected?.attributes || []);
   }, [formData.category, categories]);
 
   const handleChange = (e) => {
@@ -70,12 +77,14 @@ const AddProductForm = () => {
 
     if (name === "location") {
       const place = places.find((p) => p.name === value);
-      if (place) {
-        setCoordinates([place.longitude, place.latitude, place.name]);
-      } else {
-        setCoordinates([]);
-      }
+      setCoordinates(
+        place ? [place.longitude, place.latitude, place.name] : []
+      );
     }
+  };
+
+  const handleExtraFieldChange = (name, value) => {
+    setExtraFields((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleMediaChange = (e, type) => {
@@ -84,10 +93,6 @@ const AddProductForm = () => {
       ...prev,
       [type]: [...prev[type], ...files],
     }));
-  };
-
-  const handleExtraFieldChange = (name, value) => {
-    setExtraFields((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -103,12 +108,17 @@ const AddProductForm = () => {
       if (!customBrand.trim()) {
         return toast.error("Please enter a brand name.");
       }
+      
 
       try {
-        const newBrand = await dispatch(createBrand(customBrand));
-        brandToSubmit = newBrand.name;
-      } catch (err) {
-        return toast.error("Failed to create brand.");
+        const resultAction = await dispatch(createBrand(customBrand));
+        if (resultAction.payload) {
+          brandToSubmit = resultAction.payload.name;
+        } else {
+          return toast.error("Failed to create brand.");
+        }
+      } catch {
+        return toast.error("Brand creation failed.");
       }
     }
 
@@ -120,11 +130,15 @@ const AddProductForm = () => {
     data.append("brand", brandToSubmit);
     data.append("attributes", JSON.stringify(extraFields));
     media.images.forEach((img) => data.append("images", img));
-
+    if (isVariant && parentProduct?.value) {
+        data.append("parentProduct", parentProduct.value);
+        data.append("isVariant", true);
+        
+      }
+      console.log(data);
     await dispatch(addProduct(data));
 
-    // Reset
-    setFormData({ ...initialFormData });
+    setFormData(initialFormData);
     setCoordinates([]);
     setAttributes([]);
     setExtraFields({});
@@ -141,6 +155,33 @@ const AddProductForm = () => {
       <h2 className="text-xl font-semibold text-center text-gray-800">
         Add Product
       </h2>
+      <label className="flex items-center space-x-2 text-sm text-gray-700 font-medium">
+        <input
+          type="checkbox"
+          checked={isVariant}
+          onChange={() => setIsVariant((prev) => !prev)}
+          className="accent-blue-600"
+        />
+        <span>Is Variant?</span>
+      </label>
+
+      {isVariant && (
+        <div className="mt-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Select Parent Product
+          </label>
+          <Select
+            options={parentProducts.map((prod) => ({
+              label: prod.name,
+              value: prod._id,
+            }))}
+            onChange={(selected) => setParentProduct(selected)}
+            placeholder="Search for parent product..."
+            className="text-sm"
+            
+          />
+        </div>
+      )}
 
       {error && <p className="text-red-600 text-sm text-center">{error}</p>}
 
@@ -149,7 +190,7 @@ const AddProductForm = () => {
         placeholder="Product Name"
         value={formData.name}
         onChange={handleChange}
-        className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
         required
       />
 
@@ -158,7 +199,7 @@ const AddProductForm = () => {
         placeholder="Product Description"
         value={formData.description}
         onChange={handleChange}
-        className="w-full p-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-2 border border-gray-300 rounded-lg text-sm resize-none"
         required
       />
 
@@ -168,9 +209,10 @@ const AddProductForm = () => {
         placeholder="Price"
         value={formData.price}
         onChange={handleChange}
-        className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
         required
       />
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Brand
@@ -178,7 +220,7 @@ const AddProductForm = () => {
         <select
           value={selectedBrand}
           onChange={handleBrandChange}
-          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border border-gray-300 rounded-lg text-sm"
           required
         >
           <option value="">-- Select Brand --</option>
@@ -198,7 +240,7 @@ const AddProductForm = () => {
             placeholder="Enter new brand name"
             value={customBrand}
             onChange={(e) => setCustomBrand(e.target.value)}
-            className="w-full mt-2 p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full mt-2 p-2 border border-gray-300 rounded-lg text-sm"
             required
           />
         )}
@@ -212,7 +254,7 @@ const AddProductForm = () => {
           name="category"
           value={formData.category}
           onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border border-gray-300 rounded-lg text-sm"
           required
         >
           <option value="">-- Select Category --</option>
@@ -234,7 +276,7 @@ const AddProductForm = () => {
               {attr.type === "text" && (
                 <input
                   type="text"
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                   onChange={(e) =>
                     handleExtraFieldChange(attr.name, e.target.value)
                   }
@@ -243,7 +285,7 @@ const AddProductForm = () => {
               {attr.type === "number" && (
                 <input
                   type="number"
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                   onChange={(e) =>
                     handleExtraFieldChange(attr.name, e.target.value)
                   }
@@ -251,7 +293,7 @@ const AddProductForm = () => {
               )}
               {attr.type === "dropdown" && (
                 <select
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                   onChange={(e) =>
                     handleExtraFieldChange(attr.name, e.target.value)
                   }
@@ -269,17 +311,15 @@ const AddProductForm = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-        <input
-          type="number"
-          name="stock"
-          placeholder="Stock"
-          value={formData.stock}
-          onChange={handleChange}
-          className="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-          required
-        />
-      </div>
+      <input
+        type="number"
+        name="stock"
+        placeholder="Stock"
+        value={formData.stock}
+        onChange={handleChange}
+        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+        required
+      />
 
       <label className="flex items-center space-x-2 text-sm text-gray-700 font-medium">
         <input
@@ -300,7 +340,7 @@ const AddProductForm = () => {
           name="location"
           value={formData.location}
           onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border border-gray-300 rounded-lg text-sm"
           required
         >
           <option value="">-- Select Location --</option>
@@ -312,7 +352,7 @@ const AddProductForm = () => {
         </select>
         {coordinates.length === 3 && (
           <p className="text-xs text-gray-500 mt-1">
-            Coordinates: {coordinates[0]}, {coordinates[1]} ,{coordinates[2]}
+            Coordinates: {coordinates[0]}, {coordinates[1]}, {coordinates[2]}
           </p>
         )}
       </div>
@@ -326,24 +366,14 @@ const AddProductForm = () => {
           accept="image/*"
           multiple
           onChange={(e) => handleMediaChange(e, "images")}
-          className="w-full text-sm file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          className="w-full text-sm"
         />
-        <div className="flex flex-wrap mt-2 gap-2">
-          {media.images.map((file, idx) => (
-            <img
-              key={idx}
-              src={URL.createObjectURL(file)}
-              alt="Preview"
-              className="w-16 h-16 object-cover rounded border"
-            />
-          ))}
-        </div>
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 text-white p-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+        className="w-full py-2 px-4 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700"
       >
         {loading ? "Submitting..." : "Add Product"}
       </button>
