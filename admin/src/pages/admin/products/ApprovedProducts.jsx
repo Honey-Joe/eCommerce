@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts, updateProductStatus } from "../../../features/admin/productSlice";
+import {
+  fetchProducts,
+  updateProductStatus,
+} from "../../../features/admin/productSlice";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../axios";
 
@@ -35,7 +38,9 @@ const ApprovedProducts = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Approved Products</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+        Approved Products
+      </h2>
 
       {approved.length ? (
         <div className="overflow-x-auto bg-white rounded-2xl shadow-xl border border-gray-200">
@@ -46,6 +51,7 @@ const ApprovedProducts = () => {
                 <th className="px-6 py-3 text-left">Price</th>
                 <th className="px-6 py-3 text-left">Seller</th>
                 <th className="px-6 py-3 text-left">isSold</th>
+                <th className="px-6 py-3 text-left">Brand</th>
                 <th className="px-6 py-3 text-left">Actions</th>
               </tr>
             </thead>
@@ -55,9 +61,15 @@ const ApprovedProducts = () => {
                   key={product._id}
                   className="hover:bg-gray-50 transition duration-200"
                 >
-                  <td className="px-6 py-4 text-sm text-gray-800">{product.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800">₹{product.price}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800">{product.seller?.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    {product.name}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    ₹{product.price}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    {product.seller?.name}
+                  </td>
                   <td className="px-6 py-4 text-sm">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -69,6 +81,10 @@ const ApprovedProducts = () => {
                       {product.isSold ? "Sold" : "Unsold"}
                     </span>
                   </td>
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    {product?.brand}
+                  </td>
+
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleDisable(product._id)}

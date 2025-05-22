@@ -1,3 +1,4 @@
+const Brand = require('../models/Brand');
 const Product = require('../models/Product');
 const Seller = require('../models/Seller');
 const uploadToCloudinary = require('../utils/uploadToCloudinary');
@@ -20,6 +21,7 @@ exports.createProduct = async (req, res) => {
       price,
       category,
       stock,
+      brand,
       isFeatured,
       longitude,
       latitude,
@@ -57,6 +59,7 @@ exports.createProduct = async (req, res) => {
       price,
       category,
       stock,
+      brand,
       isFeatured,
       images: imageUrls,
       attributes: parsedAttributes,
@@ -82,22 +85,34 @@ exports.updateProductStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  // Validate status
-  const allowedStatuses = ['Approved', 'DisabledByAdmin',];
+  const allowedStatuses = ['Approved', 'DisabledByAdmin'];
   if (!allowedStatuses.includes(status)) {
     return res.status(400).json({ message: 'Invalid status value.' });
   }
 
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
-
-    if (!updatedProduct) {
+    // Find the product
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).json({ message: 'Product not found.' });
     }
+
+    // If trying to approve, check if brand is approved
+    if (status === 'Approved') {
+      const brand = await Brand.findOne({ name: product.brand });
+
+      if (!brand) {
+        return res.status(400).json({ message: 'Associated brand not found.' });
+      }
+
+      if (brand.status !== 'approved') {
+        return res.status(400).json({ message: 'Product cannot be approved because the brand is not approved.' });
+      }
+    }
+
+    // Update product status
+    product.status = status;
+    const updatedProduct = await product.save();
 
     res.status(200).json({
       message: `Product status updated to ${status}`,

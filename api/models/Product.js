@@ -42,6 +42,10 @@ const productSchema = new mongoose.Schema(
         },
       },
     ],
+    brand:{
+      type:String,
+
+    },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Seller",

@@ -14,7 +14,7 @@ router.get('/:id', brandController.getBrandById);
 
 // Update
 router.put('/:id', adminMiddleware, brandController.updateBrand);
-router.put('/:id',adminMiddleware, brandController.updateBrandStatus);
+router.put('/:id/status',adminMiddleware, brandController.updateBrandStatus);
 // Delete
 router.delete('/:id',adminMiddleware, brandController.deleteBrand);
 

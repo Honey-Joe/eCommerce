@@ -184,6 +184,7 @@ const AdminDashboard = () => {
               sectionKey="brand"
               links={[
                 { path: "/admin/brand", label: "Manage Brand" },
+                {path: "/admin/pendingbrands" ,label: "Pending Brands"}
               ]}
             />
 

@@ -4,10 +4,15 @@ import { addProduct } from "../../features/products/productSlice";
 import { toast } from "react-toastify";
 import { places } from "../../data/places";
 import axiosInstance from "../../axios";
+import { createBrand, fetchBrands } from "../../features/products/brandSlice";
 
 const AddProductForm = () => {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.products);
+  const { brands } = useSelector((state) => state.brands);
+  console.log(brands);
+  const [customBrand, setCustomBrand] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("");
 
   const [categories, setCategories] = useState([]);
   const [attributes, setAttributes] = useState([]);
@@ -34,8 +39,18 @@ const AddProductForm = () => {
         toast.error("Failed to load categories");
       }
     };
+    dispatch(fetchBrands());
+
     fetchCategories();
-  }, []);
+  }, [dispatch]);
+
+  const handleBrandChange = (e) => {
+    const value = e.target.value;
+    setSelectedBrand(value);
+    if (value !== "Other") {
+      setCustomBrand("");
+    }
+  };
 
   useEffect(() => {
     const selected = categories.find((cat) => cat.name === formData.category);
@@ -56,7 +71,7 @@ const AddProductForm = () => {
     if (name === "location") {
       const place = places.find((p) => p.name === value);
       if (place) {
-        setCoordinates([place.longitude, place.latitude,place.name]);
+        setCoordinates([place.longitude, place.latitude, place.name]);
       } else {
         setCoordinates([]);
       }
@@ -82,37 +97,41 @@ const AddProductForm = () => {
       return toast.error("Please select a valid location before submitting.");
     }
 
+    let brandToSubmit = selectedBrand;
+
+    if (selectedBrand === "Other") {
+      if (!customBrand.trim()) {
+        return toast.error("Please enter a brand name.");
+      }
+
+      try {
+        const newBrand = await dispatch(createBrand(customBrand));
+        brandToSubmit = newBrand.name;
+      } catch (err) {
+        return toast.error("Failed to create brand.");
+      }
+    }
+
     const data = new FormData();
     Object.entries(formData).forEach(([key, val]) => data.append(key, val));
     data.append("longitude", coordinates[0]);
     data.append("latitude", coordinates[1]);
-    data.append("place",coordinates[2]);
-
-    // ✅ Fix: Send attributes as JSON string
+    data.append("place", coordinates[2]);
+    data.append("brand", brandToSubmit);
     data.append("attributes", JSON.stringify(extraFields));
-
-    // Upload media
     media.images.forEach((img) => data.append("images", img));
 
     await dispatch(addProduct(data));
 
-    // Reset form
-    setFormData({
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      brand: "",
-      stock: "",
-      isFeatured: false,
-      location: "",
-    });
+    // Reset
+    setFormData({ ...initialFormData });
     setCoordinates([]);
     setAttributes([]);
     setExtraFields({});
     setMedia({ images: [] });
+    setSelectedBrand("");
+    setCustomBrand("");
   };
-
 
   return (
     <form
@@ -152,6 +171,38 @@ const AddProductForm = () => {
         className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         required
       />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Brand
+        </label>
+        <select
+          value={selectedBrand}
+          onChange={handleBrandChange}
+          className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        >
+          <option value="">-- Select Brand --</option>
+          {brands
+            .filter((brand) => brand.status === "approved")
+            .map((brand) => (
+              <option key={brand._id} value={brand.name}>
+                {brand.name}
+              </option>
+            ))}
+          <option value="Other">Other</option>
+        </select>
+
+        {selectedBrand === "Other" && (
+          <input
+            type="text"
+            placeholder="Enter new brand name"
+            value={customBrand}
+            onChange={(e) => setCustomBrand(e.target.value)}
+            className="w-full mt-2 p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        )}
+      </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -219,7 +270,6 @@ const AddProductForm = () => {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-        
         <input
           type="number"
           name="stock"
