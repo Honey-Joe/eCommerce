@@ -34,6 +34,8 @@ const DisabledProducts = () => {
                 <th className="px-6 py-3 text-left">Name</th>
                 <th className="px-6 py-3 text-left">Price</th>
                 <th className="px-6 py-3 text-left">Seller</th>
+                <th className="px-6 py-3 text-left">Brand</th>
+                <th className="px-6 py-3 text-left">Status</th>
                 <th className="px-6 py-3 text-center">Actions</th>
               </tr>
             </thead>
@@ -43,6 +45,8 @@ const DisabledProducts = () => {
                   <td className="px-6 py-4">{product.name}</td>
                   <td className="px-6 py-4">₹{product.price}</td>
                   <td className="px-6 py-4">{product.seller?.name}</td>
+                  <td className="px-6 py-4">{product.brand}</td>
+                  <td className="px-6 py-4">{product.status}</td>
                   <td className="px-6 py-4 text-center">
                     <button
                       onClick={() => handleApprove(product._id)}
@@ -65,13 +69,11 @@ const DisabledProducts = () => {
   if (loading) return <div className="text-center py-6">Loading...</div>;
   if (error) return <div className="text-red-500 text-center">{error}</div>;
 
-  const disabled = list.filter((p) => p.status === "Disabled");
-  const disabledByAdmin = list.filter((p) => p.status === "DisabledByAdmin");
+const disabled = list.filter((p) => p.status === "Disabled" || p.status === "DisabledByAdmin");
 
   return (
     <div>
-      {renderTable(disabled, "Disabled Products by Seller")}
-      {renderTable(disabledByAdmin, "Disabled Products by Admin")}
+      {renderTable(disabled, "Disabled Products")}
     </div>
   );
 };
