@@ -23,6 +23,7 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { product, loading, error, variants } = useSelector((state) => state.products);
+  console.log(product);
 useEffect(() => {
   dispatch(fetchProductById(id));
 }, [dispatch, id]);
@@ -139,6 +140,16 @@ const variant = variants?.variants || [];
                 No Images Available
               </div>
             )}
+            <p>
+              {Object.entries(product.attributes).map(([key, value]) => (
+                <span
+                  key={key}
+                  className="text-sm text-gray-600 font-medium mr-2"
+                >
+                  {key}: {value}
+                </span>
+              ))}
+            </p>
           </motion.div>
 
           {/* Details */}
@@ -194,7 +205,14 @@ const variant = variants?.variants || [];
                         ₹{variant.price}
                       </p>
                       <p className="text-blue-600 font-semibold text-sm">
-                        Size: {variant.attributes?.Size}
+                        {Object.entries(variant.attributes).map(([key, value]) => (
+                          <span
+                            key={key}
+                            className="text-sm text-gray-600 font-medium mr-2"
+                          >
+                            {key}: {value}
+                          </span>
+                        ))}
                       </p>
                       
                     </div>

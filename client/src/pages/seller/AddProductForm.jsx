@@ -139,7 +139,6 @@ const AddProductForm = () => {
       data.append("parentProduct", parentProduct.value);
       data.append("isVariant", true);
     }
-    console.log(data);
     await dispatch(addProduct(data));
 
     setFormData(initialFormData);
@@ -194,9 +193,6 @@ const AddProductForm = () => {
                 ...prev,
                 category: selected.category,
                 name: selected.label + " Variant",
-                description: "", // optionally clear or fetch from parent
-                price: "",
-                stock: "",
                 isFeatured: false,
               }));
 
@@ -264,6 +260,7 @@ const AddProductForm = () => {
           onChange={handleBrandChange}
           className="w-full p-2 border border-gray-300 rounded-lg text-sm"
           required
+          disabled={!!parentProduct}
         >
           <option value="">-- Select Brand --</option>
           {brands
@@ -298,6 +295,7 @@ const AddProductForm = () => {
           onChange={handleChange}
           className="w-full p-2 border border-gray-300 rounded-lg text-sm"
           required
+          disabled={!!parentProduct}
         >
           <option value="">-- Select Category --</option>
           {categories.map((cat) => (
