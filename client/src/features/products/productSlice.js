@@ -114,12 +114,12 @@ export const fetchProductById = (id) => async (dispatch) => {
   }
 };
 
-export const fetchParentProducts = () => async (dispatch) => {
+export const fetchParentProducts = (sellerId) => async (dispatch) => {
   try {
-    const { data } = await axiosInstance.get('/products/parents');
+    const { data } = await axiosInstance.get(`products/parent-products/seller/${sellerId}`);
     dispatch(setParentProduct(data));
   } catch (err) {
-    dispatch(setProductError('Failed to load parent products'));
+    console.error("Error fetching parent products:", err);
   }
 };
 export const deleteProductById = async (productId) => {

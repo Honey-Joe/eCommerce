@@ -23,9 +23,13 @@ const initialFormData = {
 
 const AddProductForm = () => {
   const dispatch = useDispatch();
-  const { parentProducts, loading, error } = useSelector(
+  const { parentProducts, loading, error,products } = useSelector(
     (state) => state.products
   );
+
+
+  const getsellerId = products.map((product) => product.seller);
+  const sellerId = getsellerId[0];
   const [imagePreviews, setImagePreviews] = useState([]);
 
   const { brands } = useSelector((state) => state.brands);
@@ -41,10 +45,11 @@ const AddProductForm = () => {
 
   const [isVariant, setIsVariant] = useState(false);
   const [parentProduct, setParentProduct] = useState(null);
-  console.log("Parent Product:", parentProduct);
-  useEffect(() => {
-    dispatch(fetchParentProducts());
-  }, [dispatch]);
+ useEffect(() => {
+    if (products.length !== 0) {
+      dispatch(fetchParentProducts(sellerId));
+    }
+  }, [dispatch, sellerId, products]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -169,7 +174,12 @@ const AddProductForm = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Select Parent Product
           </label>
-          <Select
+          {
+            parentProducts.length === 0 ? (
+              <p className="text-sm text-gray-500">
+                No parent products available. Please add a product first.
+              </p>
+            ) : (<Select
             options={parentProducts.map((prod) => ({
               label: prod.name,
               value: prod._id,
@@ -209,7 +219,9 @@ const AddProductForm = () => {
             }}
             placeholder="Search for parent product..."
             className="text-sm"
-          />
+          />)
+          }
+          
         </div>
       )}
 
