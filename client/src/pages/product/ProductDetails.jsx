@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Carousel } from "react-responsive-carousel";
 import { motion } from "framer-motion";
-
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Layout from "../../layouts/Layout";
 import {
@@ -22,11 +21,8 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { user } = useSelector((state) => state.auth);
   const { product, loading, error, variants } = useSelector((state) => state.products);
-  
-
 useEffect(() => {
   dispatch(fetchProductById(id));
 }, [dispatch, id]);
@@ -36,11 +32,7 @@ useEffect(() => {
     dispatch(fetchVariantsByParentProductId(product._id));
   }
 }, [dispatch, product?._id]);
-console.log(variants);
 const variant = variants?.variants || [];
-  console.log("Variants:", variant);
-console.log("Product Details:", product);
-console.log("Variant:", variant);
 
 
   const handleDelete = async (productId) => {
@@ -201,6 +193,10 @@ console.log("Variant:", variant);
                       <p className="text-blue-600 font-semibold text-sm">
                         ₹{variant.price}
                       </p>
+                      <p className="text-blue-600 font-semibold text-sm">
+                        Size: {variant.attributes?.Size}
+                      </p>
+                      
                     </div>
                   </div>
                 ))}
