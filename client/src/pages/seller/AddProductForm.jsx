@@ -23,10 +23,12 @@ const initialFormData = {
 
 const AddProductForm = () => {
   const dispatch = useDispatch();
-  const { parentProducts, loading, error } = useSelector((state) => state.products);
-  const { brands } = useSelector((state) => state.brands);
-  console.log(parentProducts)
+  const { parentProducts, loading, error } = useSelector(
+    (state) => state.products
+  );
+  const [imagePreviews, setImagePreviews] = useState([]);
 
+  const { brands } = useSelector((state) => state.brands);
   const [customBrand, setCustomBrand] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
   const [categories, setCategories] = useState([]);
@@ -36,10 +38,10 @@ const AddProductForm = () => {
   const [media, setMedia] = useState({ images: [] });
 
   const [formData, setFormData] = useState(initialFormData);
-  console.log(formData);
 
   const [isVariant, setIsVariant] = useState(false);
   const [parentProduct, setParentProduct] = useState(null);
+  console.log("Parent Product:", parentProduct);
   useEffect(() => {
     dispatch(fetchParentProducts());
   }, [dispatch]);
@@ -89,6 +91,8 @@ const AddProductForm = () => {
 
   const handleMediaChange = (e, type) => {
     const files = Array.from(e.target.files);
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
     setMedia((prev) => ({
       ...prev,
       [type]: [...prev[type], ...files],
@@ -108,17 +112,13 @@ const AddProductForm = () => {
       if (!customBrand.trim()) {
         return toast.error("Please enter a brand name.");
       }
-      
 
       try {
         const resultAction = await dispatch(createBrand(customBrand));
-        if (resultAction.payload) {
-          brandToSubmit = resultAction.payload.name;
-        } else {
-          return toast.error("Failed to create brand.");
-        }
-      } catch {
-        return toast.error("Brand creation failed.");
+        brandToSubmit = resultAction.name;
+      } catch (err) {
+        console.error("Brand creation error:", err);
+        return toast.error("Failed to create brand.", err);
       }
     }
 
@@ -131,11 +131,10 @@ const AddProductForm = () => {
     data.append("attributes", JSON.stringify(extraFields));
     media.images.forEach((img) => data.append("images", img));
     if (isVariant && parentProduct?.value) {
-        data.append("parentProduct", parentProduct.value);
-        data.append("isVariant", true);
-        
-      }
-      console.log(data);
+      data.append("parentProduct", parentProduct.value);
+      data.append("isVariant", true);
+    }
+    console.log(data);
     await dispatch(addProduct(data));
 
     setFormData(initialFormData);
@@ -174,11 +173,42 @@ const AddProductForm = () => {
             options={parentProducts.map((prod) => ({
               label: prod.name,
               value: prod._id,
+              category: prod.category,
+              brand: prod.brand,
             }))}
-            onChange={(selected) => setParentProduct(selected)}
+            onChange={(selected) => {
+              setParentProduct(selected);
+
+              // Auto-fill logic
+              setFormData((prev) => ({
+                ...prev,
+                category: selected.category,
+                name: selected.label + " Variant",
+                description: "", // optionally clear or fetch from parent
+                price: "",
+                stock: "",
+                isFeatured: false,
+              }));
+
+              setSelectedBrand(selected.brand);
+              setCustomBrand("");
+
+              const selectedCategory = categories.find(
+                (cat) => cat.name === selected.category
+              );
+              if (selectedCategory?.attributes) {
+                setAttributes(selectedCategory.attributes);
+
+                // Pre-fill attributes with default or empty values
+                const initialExtraFields = {};
+                selectedCategory.attributes.forEach((attr) => {
+                  initialExtraFields[attr.name] = "";
+                });
+                setExtraFields(initialExtraFields);
+              }
+            }}
             placeholder="Search for parent product..."
             className="text-sm"
-            
           />
         </div>
       )}
@@ -368,6 +398,18 @@ const AddProductForm = () => {
           onChange={(e) => handleMediaChange(e, "images")}
           className="w-full text-sm"
         />
+
+        {/* Image Preview */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {imagePreviews.map((src, index) => (
+            <img
+              key={index}
+              src={src}
+              alt={`Preview ${index + 1}`}
+              className="h-24 w-24 object-cover rounded border"
+            />
+          ))}
+        </div>
       </div>
 
       <button
