@@ -9,6 +9,7 @@ import Layout from "../../layouts/Layout";
 import {
   deleteProductById,
   fetchProductById,
+  fetchVariantsByParentProductId,
   isSoldProductById,
   removeSellerProduct,
   setIssoldStatus,
@@ -23,12 +24,25 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
+  const { product, loading, error, variants } = useSelector((state) => state.products);
+  
 
-  useEffect(() => {
-    dispatch(fetchProductById(id));
-  }, [dispatch, id]);
+useEffect(() => {
+  dispatch(fetchProductById(id));
+}, [dispatch, id]);
 
-  const { product, loading, error } = useSelector((state) => state.products);
+useEffect(() => {
+  if (product?._id) {
+    dispatch(fetchVariantsByParentProductId(product._id));
+  }
+}, [dispatch, product?._id]);
+console.log(variants);
+const variant = variants?.variants || [];
+  console.log("Variants:", variant);
+console.log("Product Details:", product);
+console.log("Variant:", variant);
+
+
   const handleDelete = async (productId) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
@@ -136,6 +150,7 @@ const ProductDetails = () => {
           </motion.div>
 
           {/* Details */}
+         
           <motion.div
             className="space-y-5"
             initial={{ opacity: 0 }}
@@ -164,6 +179,34 @@ const ProductDetails = () => {
                 {product.status}
               </span>
             </div>
+             {variant.length > 0 && (
+            <div className="mt-10">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Available Variants
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {variant.map((variant) => (
+                  <div
+                    key={variant._id}
+                    onClick={() => navigate(`/product/${variant._id}`)}
+                    className="cursor-pointer border rounded-lg overflow-hidden hover:shadow-lg transition"
+                  >
+                    <img
+                      src={variant.images?.[0]?.url || "/placeholder.jpg"}
+                      alt={variant.name}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-2">
+                      <p className="text-sm font-medium">{variant.name}</p>
+                      <p className="text-blue-600 font-semibold text-sm">
+                        ₹{variant.price}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
             {product.isSold && (
               <p className="text-green-600 font-semibold">
@@ -205,8 +248,7 @@ const ProductDetails = () => {
                 {new Date(product.createdAt).toLocaleDateString()}
               </p>
               <p>
-                <span className="font-medium">Brand:</span>{" "}
-                {product.brand}
+                <span className="font-medium">Brand:</span> {product.brand}
               </p>
               <p>
                 <span className="font-medium">Product ID:</span> {product._id}

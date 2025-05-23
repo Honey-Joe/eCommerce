@@ -270,3 +270,26 @@ exports.getParentProducts = async (req, res) => {
     res.status(500).json({ message: "Server error while fetching parent products" });
   }
 };
+exports.getVariantsByParentProductId = async (req, res) => {
+  try {
+    const { parentId } = req.params;
+
+    // Validate parent product exists
+    const parentProduct = await Product.findById(parentId);
+    if (!parentProduct) {
+      return res.status(404).json({ message: "Parent product not found" });
+    }
+
+    // Fetch variant products referencing this parent
+    const variants = await Product.find({ parentProduct: parentId, isVariant: true });
+
+    return res.status(200).json({
+      success: true,
+      count: variants.length,
+      variants,
+    });
+  } catch (error) {
+    console.error("Error fetching variants:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

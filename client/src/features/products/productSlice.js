@@ -10,6 +10,7 @@ const productSlice = createSlice({
     product: null,
     products: [],
     parentProducts: [],
+    variants: [],
     isSold: false,
     sellerProducts: [], // ✅ Make sure this is initialized
   },
@@ -62,7 +63,10 @@ const productSlice = createSlice({
       state.error = action.payload;
     },
     setParentProduct: (state, action) => {
-      state.parentProducts = action.payload;}
+      state.parentProducts = action.payload;},
+    setVariants: (state, action) => {
+      state.variants = action.payload;
+    },
   },
 });
 
@@ -79,7 +83,8 @@ export const {
   removeSellerProduct,
   setIssoldStatus,
   setProduct,
-  setParentProduct
+  setParentProduct,
+  setVariants
 } = productSlice.actions;
 
 export const addProduct = (formData) => async (dispatch) => {
@@ -140,6 +145,14 @@ export const fetchSellerProducts = (sellerId) => async (dispatch) => {
     dispatch(
       getProductsFailure(error.response?.data?.message || error.message)
     );
+  }
+};
+export const fetchVariantsByParentProductId = (parentId) => async (dispatch) => {
+  try {
+    const { data } = await axiosInstance.get(`/products/parents/${parentId}/variants`);
+    dispatch(setVariants(data));
+  } catch (error) {
+    console.error("Error fetching variants:", error);
   }
 };
 
