@@ -87,6 +87,87 @@ const login = async (req, res) => {
   }
 };
 
+const userLogin = async (req, res) => {const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "No user account found with this email" });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "User login successful",
+      role: user.role,
+      status: user.status,
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      location: user.location,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error logging in user", error: err.message });
+  }
+};
+
+const sellerLogin = async (req, res) => { const { email, password } = req.body;
+
+  try {
+    const seller = await Seller.findOne({ email });
+    if (!seller) {
+      return res.status(404).json({ message: "No seller account found with this email" });
+    }
+
+    const isMatch = await seller.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { userId: seller._id, role: seller.role },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Seller login successful",
+      role: seller.role,
+      status: seller.status,
+      userId: seller._id,
+      name: seller.name,
+      email: seller.email,
+      location: seller.location,
+      businessName: seller.businessName,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error logging in seller", error: err.message });
+  }
+};
+
 const getUserProfile = async (req, res) => {
   try {
     // Retrieve user information from the decoded JWT (req.user)
@@ -136,4 +217,4 @@ const logout = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-module.exports = { registerUser, login, logout ,getUserProfile}
+module.exports = { registerUser, login, logout ,getUserProfile, userLogin, sellerLogin};

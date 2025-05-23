@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import UserDashboard from "./pages/user/UserDashboard";
-import Login from "./pages/auth/Login";
 import Unauthorized from "./components/Unauthorized";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -15,6 +14,8 @@ import { useEffect } from "react";
 import SellerProfile from "./pages/seller/SellerProfile";
 import ProductDetails from "./pages/product/ProductDetails";
 import SellerProfilePage from "./pages/seller/SellerProfilePage";
+import UserLogin from "./pages/auth/UserLogin";
+import SellerLogin from "./pages/auth/SellerLogin";
 
 function App() {
   const dispatch = useDispatch();
@@ -32,7 +33,6 @@ function App() {
           businessName,
           location
         } = res.data;
-        console.log(res.data)
         dispatch(
           loginSuccess({
             role,
@@ -55,7 +55,8 @@ function App() {
     <>
       <ToastContainer />
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/user/login" element={<UserLogin />} />
+        <Route path="/seller/login" element={<SellerLogin />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/" element={<Home />} />
         <Route path="/userregister" element={<UserRegister />} />

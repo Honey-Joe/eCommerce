@@ -30,7 +30,6 @@ const SellerProfile = () => {
         businessName: user.businessName || "",
         storeLocation: user.location?.place || "",
       };
-      console.log(user)
       setFormData(userData);
       setTempData(userData);
     }

@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Layout from "../../layouts/Layout";
 
-const Login = () => {
+const SellerLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); //
 
@@ -24,18 +24,10 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axiosInstance.post("/auth/login", data);
-      const  {role,status,userId,name,email,storeLocation,businessName} = response.data;
-      dispatch(loginSuccess({role,status,userId,name,email,storeLocation,businessName}));
-      setTimeout(() => {
-        if (role === "seller") {
-          navigate("/");
-        } else if (role === "user") {
-          navigate("/");
-        } else {
-          navigate("/");
-        }
-      }, 100); // short delay
+      const response = await axiosInstance.post("/auth/seller/login", data);
+      const  {role,userId,name,email,location,businessName,status} = response.data;
+      dispatch(loginSuccess({role,userId,name,email,location,businessName,status}));
+      navigate("/seller/profile") // short delay
 
       toast.success("Login successful!");
     } catch (error) {
@@ -56,7 +48,7 @@ const Login = () => {
             className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md"
           >
             <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
-              Login
+              Seller Login
             </h2>
 
             {/* Email field */}
@@ -117,4 +109,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SellerLogin;

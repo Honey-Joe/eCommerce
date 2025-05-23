@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser, login, logout, getUserProfile } = require('../controllers/authController');
+const { registerUser, login, logout, getUserProfile, userLogin, sellerLogin } = require('../controllers/authController');
 const {registerSeller} = require("../controllers/sellerController");
 const adminMiddleware = require('../middleware/adminMiddleware');
 const {verifyToken, userAuth, sellerAuth} = require("../middleware/authMiddleware");
@@ -15,6 +15,8 @@ router.get('/me',verifyToken, getUserProfile);
 
 // Login route (for both users and sellers)
 router.post('/login', login);
+router.post('/user/login', userLogin);
+router.post('/seller/login', sellerLogin);
 router.post('/logout', logout);
 
 

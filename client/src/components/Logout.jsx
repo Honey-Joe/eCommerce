@@ -14,7 +14,7 @@ const Logout = () => {
     dispatch(logout());
     try {
       await axiosInstance.post("/auth/logout");
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error(
         "Logout failed:",
