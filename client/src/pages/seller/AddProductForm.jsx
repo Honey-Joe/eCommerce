@@ -260,7 +260,7 @@ const AddProductForm = () => {
           onChange={handleBrandChange}
           className="w-full p-2 border border-gray-300 rounded-lg text-sm"
           required
-          disabled={!!parentProduct}
+          disabled={isVariant}
         >
           <option value="">-- Select Brand --</option>
           {brands
@@ -295,7 +295,7 @@ const AddProductForm = () => {
           onChange={handleChange}
           className="w-full p-2 border border-gray-300 rounded-lg text-sm"
           required
-          disabled={!!parentProduct}
+          disabled={isVariant}
         >
           <option value="">-- Select Category --</option>
           {categories.map((cat) => (
