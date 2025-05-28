@@ -27,8 +27,8 @@ const UserRegister = () => {
   });
 
   const [location, setLocation] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null);
 
-  // Get user location on component mount
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -37,30 +37,37 @@ const UserRegister = () => {
       },
       (err) => {
         console.error("Geolocation error:", err);
-        toast.warn("Unable to fetch location. Please enable location services.");
+        toast.warn("Enable location services to register.");
       }
     );
   }, []);
 
   const onSubmit = async (formData) => {
-    if (!location) {
-      return toast.error("Location is required to register.");
-    }
+    if (!location) return toast.error("Location is required to register.");
 
-    const payload = {
-      ...formData,
-      location, // { latitude, longitude }
-    };
+    const payload = new FormData();
+    payload.append("name", formData.name);
+    payload.append("email", formData.email);
+    payload.append("password", formData.password);
+    payload.append("location[latitude]", location.latitude);
+    payload.append("location[longitude]", location.longitude);
+
+    if (profilePicture) {
+      payload.append("profilePicture", profilePicture);
+    }
 
     try {
       dispatch(registerStart());
-      const res = await axiosInstance.post("/auth/register/user", payload);
+      const res = await axiosInstance.post("/auth/register/user", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       dispatch(registerSuccess({ user: res.data.user, role: "user" }));
-      navigate("/login");
+      navigate("/user/login");
       toast.success("User registered successfully!");
     } catch (err) {
       dispatch(registerFailure(err.response?.data?.message || "Registration failed"));
       toast.error(err.response?.data?.message || "Registration failed");
+      console.error("Registration error:", err);
     }
   };
 
@@ -69,6 +76,7 @@ const UserRegister = () => {
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-md mx-auto p-6 bg-white shadow-md rounded-md space-y-4"
+        encType="multipart/form-data"
       >
         <h2 className="text-2xl font-bold text-center text-gray-800">User Register</h2>
 
@@ -98,6 +106,16 @@ const UserRegister = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+        </div>
+
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setProfilePicture(e.target.files[0])}
+            className="w-full text-gray-700 text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">Upload profile picture (optional)</p>
         </div>
 
         <button

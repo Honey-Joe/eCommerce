@@ -12,19 +12,32 @@ const registerUser = async (req, res) => {
   const { name, email, password, role, location } = req.body;
 
   try {
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Upload profile picture (only 1 file expected)
+    let profilePictureUrl = '';
+    if (req.file) {
+      const uploadedImage = await uploadToCloudinary([req.file], 'profile-pictures');
+      profilePictureUrl = uploadedImage[0]?.url || '';
+    }
+
+    // Create new user
     const newUser = new User({
       name,
       email,
       password,
       role: role || 'user',
+      profilePicture: profilePictureUrl,
       location: {
         type: 'Point',
-        coordinates: [parseFloat(location.longitude), parseFloat(location.latitude)],
+        coordinates: [
+          parseFloat(location.longitude),
+          parseFloat(location.latitude),
+        ],
       },
     });
 
@@ -32,6 +45,7 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({ message: 'User registered successfully', user: newUser });
   } catch (err) {
+    console.error('User registration error:', err);
     res.status(500).json({ message: 'Error registering user', error: err.message });
   }
 };

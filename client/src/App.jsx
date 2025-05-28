@@ -16,6 +16,7 @@ import ProductDetails from "./pages/product/ProductDetails";
 import SellerProfilePage from "./pages/seller/SellerProfilePage";
 import UserLogin from "./pages/auth/UserLogin";
 import SellerLogin from "./pages/auth/SellerLogin";
+import UserProfile from "./pages/user/UserProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -74,6 +75,7 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
           <Route path="/seller/product" element={<SellerProfile />} />
         </Route>
+         
         <Route path="/product/:id" element={<ProductDetails></ProductDetails>} />
       </Routes>
     </>

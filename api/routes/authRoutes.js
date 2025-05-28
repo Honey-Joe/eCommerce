@@ -7,7 +7,7 @@ const upload = require('../middleware/upload');
 const router = express.Router();
 
 // User registration route
-router.post('/register/user', registerUser);
+router.post('/register/user',upload.single('profilePicture'), registerUser);
 
 // Seller registration route
 router.post('/register/seller', registerSeller); // Limit to 3 files

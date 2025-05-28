@@ -64,7 +64,7 @@ const Navbar = () => {
             ) : (
               <div className="flex items-center space-x-3">
                 <Link
-                  to="/user/profile"
+                  to="/user/dashboard"
                   className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
                 >
                   Profile
