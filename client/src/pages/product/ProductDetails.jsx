@@ -22,19 +22,20 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { product, loading, error, variants } = useSelector((state) => state.products);
+  const { product, loading, error, variants } = useSelector(
+    (state) => state.products
+  );
   console.log(product);
-useEffect(() => {
-  dispatch(fetchProductById(id));
-}, [dispatch, id]);
+  useEffect(() => {
+    dispatch(fetchProductById(id));
+  }, [dispatch, id]);
 
-useEffect(() => {
-  if (product?._id) {
-    dispatch(fetchVariantsByParentProductId(product._id));
-  }
-}, [dispatch, product?._id]);
-const variant = variants?.variants || [];
-
+  useEffect(() => {
+    if (product?._id) {
+      dispatch(fetchVariantsByParentProductId(product._id));
+    }
+  }, [dispatch, product?._id]);
+  const variant = variants?.variants || [];
 
   const handleDelete = async (productId) => {
     if (!window.confirm("Are you sure you want to delete this product?"))
@@ -141,19 +142,28 @@ const variant = variants?.variants || [];
               </div>
             )}
             <p>
-              {Object.entries(product.attributes).map(([key, value]) => (
-                <span
-                  key={key}
-                  className="text-sm text-gray-600 font-medium mr-2"
-                >
-                  {key}: {value}
-                </span>
-              ))}
+              {product.attributes ? (
+                <>
+                  {Object?.entries(product.attributes)?.map(
+                    ([key, value]) =>
+                      value && (
+                        <span
+                          key={key}
+                          className="text-sm text-gray-600 font-medium mr-2"
+                        >
+                          {key}: {value}
+                        </span>
+                      )
+                  )}
+                </>
+              ) : (
+                <></>
+              )}
             </p>
           </motion.div>
 
           {/* Details */}
-         
+
           <motion.div
             className="space-y-5"
             initial={{ opacity: 0 }}
@@ -182,45 +192,47 @@ const variant = variants?.variants || [];
                 {product.status}
               </span>
             </div>
-             {variant.length > 0 && (
-            <div className="mt-10">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Available Variants
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {variant.map((variant) => (
-                  <div
-                    key={variant._id}
-                    onClick={() => navigate(`/product/${variant._id}`)}
-                    className="cursor-pointer border rounded-lg overflow-hidden hover:shadow-lg transition"
-                  >
-                    <img
-                      src={variant.images?.[0]?.url || "/placeholder.jpg"}
-                      alt={variant.name}
-                      className="w-full h-40 object-cover"
-                    />
-                    <div className="p-2">
-                      <p className="text-sm font-medium">{variant.name}</p>
-                      <p className="text-blue-600 font-semibold text-sm">
-                        ₹{variant.price}
-                      </p>
-                      <p className="text-blue-600 font-semibold text-sm">
-                        {Object.entries(variant.attributes).map(([key, value]) => (
-                          <span
-                            key={key}
-                            className="text-sm text-gray-600 font-medium mr-2"
-                          >
-                            {key}: {value}
-                          </span>
-                        ))}
-                      </p>
-                      
+            {variant.length > 0 && (
+              <div className="mt-10">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  Available Variants
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {variant.map((variant) => (
+                    <div
+                      key={variant._id}
+                      onClick={() => navigate(`/product/${variant._id}`)}
+                      className="cursor-pointer border rounded-lg overflow-hidden hover:shadow-lg transition"
+                    >
+                      <img
+                        src={variant.images?.[0]?.url || "/placeholder.jpg"}
+                        alt={variant.name}
+                        className="w-full h-40 object-cover"
+                      />
+                      <div className="p-2">
+                        <p className="text-sm font-medium">{variant.name}</p>
+                        <p className="text-blue-600 font-semibold text-sm">
+                          ₹{variant.price}
+                        </p>
+                        <p className="text-blue-600 font-semibold text-sm">
+                          {Object.entries(variant.attributes).map(
+                            ([key, value]) =>
+                              value && (
+                                <span
+                                  key={key}
+                                  className="text-sm text-gray-600 font-medium mr-2"
+                                >
+                                  {key}: {value}
+                                </span>
+                              )
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
             {product.isSold && (
               <p className="text-green-600 font-semibold">

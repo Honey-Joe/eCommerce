@@ -10,6 +10,7 @@ const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const brandRoutes = require('./routes/brandRoutes');
 const userRoutes = require('./routes/userRoutes');
+const searchCountRoutes = require('./routes/searchCountRoutes');
 
 dotenv.config();
 
@@ -37,6 +38,8 @@ app.use('/api/sellers', sellerRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/brands', brandRoutes);
+app.use("/api/search", searchCountRoutes);
+
 
 
 

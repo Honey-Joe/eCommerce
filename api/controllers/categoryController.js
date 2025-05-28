@@ -1,4 +1,5 @@
 const Category = require('../models/Category');
+const Product = require('../models/Product');
 
 // Create new category
 exports.createCategory = async (req, res) => {
@@ -38,6 +39,37 @@ exports.getCategoryById = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch category', error: error.message });
   }
 };
+
+
+exports.searchCategories = async (req, res) => {
+  try {
+    const { search } = req.query;
+
+    // Find categories matching the search keyword (case-insensitive)
+    const categories = await Category.find({
+      name: { $regex: search || "", $options: "i" }
+    }).limit(20);
+
+    // For each category, find products related to that category
+    const categoriesWithProducts = await Promise.all(
+      categories.map(async (category) => {
+        const products = await Product.find({ categoryId: category._id }).limit(10); // limit products per category
+
+        return {
+          _id: category._id,
+          name: category.name,
+          attributes: category.attributes,
+          products, // embed related products
+        };
+      })
+    );
+
+    res.status(200).json(categoriesWithProducts);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch categories", details: err.message });
+  }
+};
+
 
 // Update category
 exports.updateCategory = async (req, res) => {

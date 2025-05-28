@@ -5,13 +5,16 @@ import sellerReducer from "../features/seller/sellerSlice"
 import productReducer from "../features/products/productSlice";
 import brandReducer from '../features/products/brandSlice';
 import userReducer from '../features/user/userSlice';
+import searchReducer from '../features/search/searchSlice';
+
 const store = configureStore({
   reducer: {
     auth: authReducer,
     user: userReducer,
     seller : sellerReducer,
     products : productReducer,
-    brands: brandReducer
+    brands: brandReducer,
+    search:searchReducer
   },
 });
 

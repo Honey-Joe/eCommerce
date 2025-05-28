@@ -1,10 +1,10 @@
-const Brand = require('../models/Brand');
-const Product = require('../models/Product');
-const Seller = require('../models/Seller');
-const uploadToCloudinary = require('../utils/uploadToCloudinary');
+const Brand = require("../models/Brand");
+const Product = require("../models/Product");
+const Seller = require("../models/Seller");
+const uploadToCloudinary = require("../utils/uploadToCloudinary");
+const Category = require("../models/Category");
 
 // Create product (Only for approved sellers)
-
 
 exports.createProduct = async (req, res) => {
   try {
@@ -12,7 +12,9 @@ exports.createProduct = async (req, res) => {
 
     const seller = await Seller.findById(sellerId);
     if (!seller || seller.status !== "approved") {
-      return res.status(403).json({ message: 'Only approved sellers can create products' });
+      return res
+        .status(403)
+        .json({ message: "Only approved sellers can create products" });
     }
 
     const {
@@ -27,8 +29,12 @@ exports.createProduct = async (req, res) => {
       latitude,
       place,
       isVariant,
-      parentProduct
+      parentProduct,
     } = req.body;
+    const categoryDoc = await Category.findOne({ name: category });
+    if (!categoryDoc) {
+      return res.status(404).json({ message: "Category not found" });
+    }
 
     if (!price) {
       return res.status(400).json({ message: "Product price is required" });
@@ -40,7 +46,9 @@ exports.createProduct = async (req, res) => {
       try {
         parsedAttributes = JSON.parse(req.body.attributes);
       } catch (err) {
-        return res.status(400).json({ message: "Invalid attributes format. Must be valid JSON." });
+        return res
+          .status(400)
+          .json({ message: "Invalid attributes format. Must be valid JSON." });
       }
     } else if (typeof req.body.attributes === "object") {
       parsedAttributes = req.body.attributes;
@@ -49,7 +57,10 @@ exports.createProduct = async (req, res) => {
     // Upload images to Cloudinary
     let imageUrls = [];
     if (req.files && req.files.length > 0) {
-      const cloudinaryResponses = await uploadToCloudinary(req.files, 'product-images');
+      const cloudinaryResponses = await uploadToCloudinary(
+        req.files,
+        "product-images"
+      );
       imageUrls = cloudinaryResponses.map((img) => ({ url: img.url }));
     }
 
@@ -60,6 +71,7 @@ exports.createProduct = async (req, res) => {
       category,
       stock,
       brand,
+      categoryId: categoryDoc._id,
       isFeatured,
       images: imageUrls,
       attributes: parsedAttributes,
@@ -67,10 +79,10 @@ exports.createProduct = async (req, res) => {
       location: {
         type: "Point",
         coordinates: [parseFloat(longitude), parseFloat(latitude)],
-        place: place
+        place: place,
       },
-      isVariant: isVariant === 'true' || isVariant === true, // handle string "true" from form-data
-      parentProduct: isVariant ? parentProduct : null
+      isVariant: isVariant === "true" || isVariant === true, // handle string "true" from form-data
+      parentProduct: isVariant ? parentProduct : null,
     };
 
     const newProduct = new Product(productData);
@@ -79,45 +91,65 @@ exports.createProduct = async (req, res) => {
     // If it's a variant, add to parent's variants array
     if (productData.isVariant && parentProduct) {
       await Product.findByIdAndUpdate(parentProduct, {
-        $addToSet: { variants: newProduct._id }
+        $addToSet: { variants: newProduct._id },
       });
     }
 
-    res.status(201).json({ message: 'Product created', product: newProduct });
-
+    res.status(201).json({ message: "Product created", product: newProduct });
   } catch (error) {
-    console.error('Create Product Error:', error.message);
-    res.status(500).json({ message: 'Failed to create product', error: error.message });
+    console.error("Create Product Error:", error.message);
+    res
+      .status(500)
+      .json({ message: "Failed to create product", error: error.message });
   }
 };
+exports.searchProducts = async (req, res) => {
+  try {
+    const { search } = req.query;
 
+    const query = search
+      ? { name: { $regex: search, $options: "i" } }
+      : {};
+
+    const products = await Product.find(query).limit(20);
+
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch products", details: err.message });
+  }
+};
 
 exports.updateProductStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  const allowedStatuses = ['Approved', 'DisabledByAdmin'];
+  const allowedStatuses = ["Approved", "DisabledByAdmin"];
   if (!allowedStatuses.includes(status)) {
-    return res.status(400).json({ message: 'Invalid status value.' });
+    return res.status(400).json({ message: "Invalid status value." });
   }
 
   try {
     // Find the product
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found.' });
+      return res.status(404).json({ message: "Product not found." });
     }
 
     // If trying to approve, check if brand is approved
-    if (status === 'Approved') {
+    if (status === "Approved") {
       const brand = await Brand.findOne({ name: product.brand });
 
       if (!brand) {
-        return res.status(400).json({ message: 'Associated brand not found.' });
+        return res.status(400).json({ message: "Associated brand not found." });
       }
 
-      if (brand.status !== 'approved') {
-        return res.status(400).json({ message: 'Product cannot be approved because the brand is not approved.' });
+      if (brand.status !== "approved") {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Product cannot be approved because the brand is not approved.",
+          });
       }
     }
 
@@ -130,8 +162,8 @@ exports.updateProductStatus = async (req, res) => {
       product: updatedProduct,
     });
   } catch (error) {
-    console.error('Error updating product status:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error updating product status:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -139,7 +171,7 @@ exports.updateIsSold = async (req, res) => {
   const { id } = req.params;
   const { isSold } = req.body;
 
-  if (typeof isSold !== 'boolean') {
+  if (typeof isSold !== "boolean") {
     return res.status(400).json({ message: "isSold must be a boolean value." });
   }
 
@@ -166,22 +198,29 @@ exports.updateIsSold = async (req, res) => {
 // Get all products
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate('seller', 'name email');
+    const products = await Product.find().populate("seller", "name email");
     res.status(200).json(products);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch products", error: error.message });
   }
 };
 
 // Get single product by ID
 exports.getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate('seller', 'name email');
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    const product = await Product.findById(req.params.id).populate(
+      "seller",
+      "name email"
+    );
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
     res.status(200).json(product);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch product', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch product", error: error.message });
   }
 };
 
@@ -191,29 +230,41 @@ exports.updateProduct = async (req, res) => {
     const sellerId = req.user._id;
     const product = await Product.findById(req.params.id);
 
-    if (!product) return res.status(404).json({ message: 'Product not found' });
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
     if (product.seller.toString() !== sellerId.toString()) {
-      return res.status(403).json({ message: 'You are not authorized to update this product' });
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to update this product" });
     }
 
     const seller = await Seller.findById(sellerId);
-    if (!seller || seller.status !== 'approved') {
-      return res.status(403).json({ message: 'Only approved sellers can update products' });
+    if (!seller || seller.status !== "approved") {
+      return res
+        .status(403)
+        .json({ message: "Only approved sellers can update products" });
     }
 
     const updates = req.body;
 
     if (req.files && req.files.length > 0) {
-      const urls = await uploadToCloudinary(req.files, 'product-images');
+      const urls = await uploadToCloudinary(req.files, "product-images");
       updates.images = urls.map((url) => ({ url }));
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updates, { new: true });
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true }
+    );
 
-    res.status(200).json({ message: 'Product updated', product: updatedProduct });
+    res
+      .status(200)
+      .json({ message: "Product updated", product: updatedProduct });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update product', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update product", error: error.message });
   }
 };
 
@@ -227,25 +278,26 @@ exports.deleteProduct = async (req, res) => {
     const product = await Product.findById(productId);
 
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     // Check if the product belongs to the current seller
     if (product.seller.toString() !== sellerId.toString()) {
-      return res.status(403).json({ message: 'Unauthorized: Not your product' });
+      return res
+        .status(403)
+        .json({ message: "Unauthorized: Not your product" });
     }
 
     await product.deleteOne();
-    res.status(200).json({ message: 'Product deleted successfully' });
+    res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      message: 'Failed to delete product',
+      message: "Failed to delete product",
       error: error.message,
     });
   }
 };
-
 
 exports.getProductBySeller = async (req, res) => {
   try {
@@ -255,7 +307,9 @@ exports.getProductBySeller = async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch products", error: error.message });
   }
 };
 exports.getParentProducts = async (req, res) => {
@@ -267,7 +321,9 @@ exports.getParentProducts = async (req, res) => {
     res.status(200).json(parentProducts);
   } catch (error) {
     console.error("Error fetching parent products:", error);
-    res.status(500).json({ message: "Server error while fetching parent products" });
+    res
+      .status(500)
+      .json({ message: "Server error while fetching parent products" });
   }
 };
 
@@ -287,7 +343,11 @@ exports.getParentProductsBySeller = async (req, res) => {
     res.status(200).json(parentProducts);
   } catch (error) {
     console.error("Error fetching parent products by seller:", error);
-    res.status(500).json({ message: "Server error while fetching parent products by seller" });
+    res
+      .status(500)
+      .json({
+        message: "Server error while fetching parent products by seller",
+      });
   }
 };
 
@@ -302,7 +362,10 @@ exports.getVariantsByParentProductId = async (req, res) => {
     }
 
     // Fetch variant products referencing this parent
-    const variants = await Product.find({ parentProduct: parentId, isVariant: true });
+    const variants = await Product.find({
+      parentProduct: parentId,
+      isVariant: true,
+    });
 
     return res.status(200).json({
       success: true,
