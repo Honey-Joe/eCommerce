@@ -69,7 +69,6 @@ export default function SearchBar() {
       return [];
     }
   };
-
   // Handle select suggestion
   const handleSelect = (selected) => {
     setSelectedOption(selected);
