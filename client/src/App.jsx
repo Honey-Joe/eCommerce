@@ -17,6 +17,7 @@ import SellerProfilePage from "./pages/seller/SellerProfilePage";
 import UserLogin from "./pages/auth/UserLogin";
 import SellerLogin from "./pages/auth/SellerLogin";
 import UserProfile from "./pages/user/UserProfile";
+import SearchPage from "./components/SearchPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -77,6 +78,8 @@ function App() {
         </Route>
          
         <Route path="/product/:id" element={<ProductDetails></ProductDetails>} />
+        <Route path="/search" element={<SearchPage />} />
+
       </Routes>
     </>
   );

@@ -43,7 +43,27 @@ exports.incrementSearchCount = async (req, res) => {
     res.status(500).json({ error: "Failed to increment search count", details: err.message });
   }
 };
+exports.getSuggestions = async (req, res) => {
+  const { query } = req.query;
+  if (!query || query.trim() === "") {
+    return res.status(400).json({ message: "Query parameter is required" });
+  }
 
+  try {
+    const regex = new RegExp(query, "i"); // case-insensitive
+
+    const products = await Product.find({ name: regex }).limit(5).select("name");
+    const categories = await Category.find({ name: regex }).limit(5).select("name");
+
+    res.json({
+      products,
+      categories,
+    });
+  } catch (error) {
+    console.error("Error fetching suggestions:", error);
+    res.status(500).json({ message: "Server error while fetching suggestions" });
+  }
+};
 // Get top searched items
 exports.getTopSearched = async (req, res) => {
   const { type, limit = 5 } = req.query;

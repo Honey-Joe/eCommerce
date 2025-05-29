@@ -59,12 +59,6 @@ export const fetchSearchResults = (keyword) => async (dispatch) => {
     );
 
     dispatch(setResults([...productRes.data, ...categoryRes.data]));
-
-    // Track most searched
-    await axiosInstance.post("/search/increment", {
-      name: keyword,
-      type: productRes.data.length ? "product" : "category",
-    });
   } catch (err) {
     dispatch(setError(err.message));
   } finally {
