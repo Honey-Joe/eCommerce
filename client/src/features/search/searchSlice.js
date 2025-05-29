@@ -71,8 +71,8 @@ export const fetchTopSearched = () => async (dispatch) => {
     const topProd = await axiosInstance.get("search/top?type=product");
     const topCat = await axiosInstance.get("search/top?type=category");
 
-    dispatch(setTopProducts(topProd.data));
-    dispatch(setTopCategories(topCat.data));
+    dispatch(setTopProducts(topProd.data.products));
+    dispatch(setTopCategories(topCat.data.categories));
   } catch (err) {
     dispatch(setError(err.message));
   }

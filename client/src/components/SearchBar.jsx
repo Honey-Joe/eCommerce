@@ -15,7 +15,7 @@ export default function SearchBar() {
   const { results, loading, topProducts, topCategories } = useSelector(
     (state) => state.search
   );
-  console.log("Search results:", results);
+  console.log(topProducts)
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [inputValue, setInputValue] = useState("");

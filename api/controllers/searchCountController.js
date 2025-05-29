@@ -65,41 +65,44 @@ exports.getSuggestions = async (req, res) => {
   }
 };
 // Get top searched items
-exports.getTopSearched = async (req, res) => {
-  const { type, limit = 5 } = req.query;
-
-  if (!type || !["product", "category"].includes(type)) {
-    return res.status(400).json({ message: "Invalid type query" });
-  }
-
+exports.getTopSearchedItems = async (req, res) => {
   try {
-    const topItems = await SearchCount.find({ type })
-      .sort({ count: -1 })
-      .limit(parseInt(limit));
+    const [productCounts, categoryCounts] = await Promise.all([
+      SearchCount.find({ type: "product" }).sort({ count: -1 }),
+      SearchCount.find({ type: "category" }).sort({ count: -1 }),
+    ]);
 
-    // Get names or IDs from topItems
-    const names = topItems.map((item) => item.name);
+    const productNames = productCounts.map((item) => item.name);
+    const categoryNames = categoryCounts.map((item) => item.name);
 
-    let detailedItems = [];
+    const [products, categories] = await Promise.all([
+      Product.find({ name: { $in: productNames }, status: "Approved" }),
+      Category.find({ name: { $in: categoryNames } }),
+    ]);
 
-    if (type === "product") {
-      detailedItems = await Product.find({ name: { $in: names }, status:"Approved" });
-    } else if (type === "category") {
-      detailedItems = await Category.find({ name: { $in: names } });
-    }
-
-    // Attach the count to each result (optional)
-    const detailedWithCount = detailedItems.map((item) => {
-      const countObj = topItems.find((e) => e.name === item.name);
+    const productsWithCount = products.map((item) => {
+      const countObj = productCounts.find((e) => e.name === item.name);
       return {
-        ...item._doc, // to include full document
+        ...item._doc,
         count: countObj?.count || 0,
       };
-    });
+    }).sort((a, b) => b.count - a.count);
 
-    res.status(200).json(detailedWithCount);
+    const categoriesWithCount = categories.map((item) => {
+      const countObj = categoryCounts.find((e) => e.name === item.name);
+      return {
+        ...item._doc,
+        count: countObj?.count || 0,
+      };
+    }).sort((a, b) => b.count - a.count);
+
+    res.status(200).json({
+      products: productsWithCount,
+      categories: categoriesWithCount,
+    });
   } catch (err) {
-    console.error("Error fetching top searched:", err);
+    console.error("Error fetching top searched items:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
