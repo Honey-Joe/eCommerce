@@ -74,14 +74,16 @@ const handleProductClick = (id) => {
 
       <div className="mt-6">
         <h2 className="text-lg font-semibold">Search Results</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
+        <div className="grid grid-cols-1 gap-6 mt-4">
           {results?.some((item) => item.price) && (
+            
             <div className="mt-8">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Products</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 {results
                   .filter((item) => item.price)
                   .map((item, i) => (
+                    <Link to={`/product/${item._id}`} key={i}>
                     <div
                       key={`product-${i}`}
                       onClick={() => handleResultClick(item)}
@@ -107,10 +109,13 @@ const handleProductClick = (id) => {
                           </p>
                         )}
                       </div>
-                    </div>
+                    </div>                    
+                    </Link>
                   ))}
               </div>
             </div>
+
+           
           )}
           {results?.some((item) => !item.price) && (
             <div className="mt-12">
@@ -140,10 +145,10 @@ const handleProductClick = (id) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 gap-6 mt-6">
         <div>
           <h3 className="font-semibold text-md text-gray-800">Top Products</h3>
-          <ul className="mt-2 list-decimal ml-5 text-sm text-gray-700 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <ul className="mt-2 list-decimal text-sm text-gray-700 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...topProducts]
               .sort((a, b) => b.count - a.count)
               .map((item, i) => (
@@ -187,7 +192,7 @@ const handleProductClick = (id) => {
           <h3 className="font-semibold text-md text-gray-800">
             Top Categories
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
             {[...topCategories]
               .sort((a, b) => b.count - a.count)
               .map((item, i) => (

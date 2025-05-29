@@ -6,7 +6,9 @@ const Home = () => {
   return (
     <div>
       <Layout>
+        <div className='w-[80%] mx-auto py-5'>
         <SearchBar />
+        </div>
       </Layout>
     </div>
   )

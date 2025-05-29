@@ -63,7 +63,7 @@ exports.getTopSearched = async (req, res) => {
     let detailedItems = [];
 
     if (type === "product") {
-      detailedItems = await Product.find({ name: { $in: names } });
+      detailedItems = await Product.find({ name: { $in: names }, status:"Approved" });
     } else if (type === "category") {
       detailedItems = await Category.find({ name: { $in: names } });
     }
