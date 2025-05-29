@@ -105,19 +105,73 @@ exports.createProduct = async (req, res) => {
 };
 exports.searchProducts = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search, categoryId } = req.query;
 
-    const query = search
-      ? { name: { $regex: search, $options: "i" } }
-      : {};
+    const query = {
+      status: "Approved",
+    };
 
-    const products = await Product.find(query).limit(20);
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    if (categoryId) {
+      query.categoryId = categoryId; // ✅ Use categoryId field (ObjectId)
+    }
+
+    // Step 1: Get searched products
+    const searchedProducts = await Product.find(query);
+
+    let relatedProducts = [];
+
+    // Step 2: Get related products in the same category, excluding searched ones
+    if (categoryId) {
+      const searchedIds = searchedProducts.map((p) => p._id);
+
+      relatedProducts = await Product.find({
+        categoryId, // ✅ Use categoryId for relation
+        status: "Approved",
+        _id: { $nin: searchedIds },
+      }).limit(10); // Optional limit
+    }
+    
+
+    res.status(200).json({
+      searched: searchedProducts,
+      related: relatedProducts,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: "Failed to fetch products",
+      details: err.message,
+    });
+  }
+};
+exports.getProductsByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    if (!categoryId) {
+      return res.status(400).json({ message: "Category ID is required" });
+    }
+
+    const products = await Product.find({
+      categoryId, // ✅ Correct field from schema
+      status: "Approved",
+    });
 
     res.status(200).json(products);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch products", details: err.message });
+    console.error("Error fetching products by category:", err);
+    res.status(500).json({
+      message: "Server error while fetching products by category",
+      error: err.message,
+    });
   }
 };
+
+
+
 
 exports.updateProductStatus = async (req, res) => {
   const { id } = req.params;

@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
+  fetchRelatedByCategoryId,
   fetchSearchResults,
   fetchTopSearched,
 } from "../features/search/searchSlice";
@@ -7,15 +8,19 @@ import { useEffect, useState } from "react";
 import AsyncSelect from "react-select/async";
 import axiosInstance from "../axios";
 import { fetchProductById } from "../features/products/productSlice";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function SearchBar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { results, loading, topProducts, topCategories } = useSelector(
+  const { results, loading, topProducts, topCategories, productByCategory } = useSelector(
     (state) => state.search
   );
-  console.log(topProducts)
+
+    console.log(productByCategory)
+  // Grab first categoryId safely
+  const categoryId = topCategories?.[0]?._id || "";
+  console.log(categoryId)
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [inputValue, setInputValue] = useState("");
@@ -26,6 +31,12 @@ export default function SearchBar() {
       dispatch(fetchProductById(topProducts[0].productId));
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    if (categoryId) {
+      dispatch(fetchRelatedByCategoryId(categoryId));
+    }
+  }, [dispatch, categoryId]);
 
   // Fetch suggestions from backend
   const loadOptions = async (inputValue) => {
@@ -60,7 +71,7 @@ export default function SearchBar() {
   };
 
   // Handle select suggestion
-  const handleSelect = async (selected) => {
+  const handleSelect = (selected) => {
     setSelectedOption(selected);
     if (!selected) return;
 
@@ -69,7 +80,7 @@ export default function SearchBar() {
     );
   };
 
-  const handleProductClick = async (productId) => {
+  const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
 
@@ -108,6 +119,7 @@ export default function SearchBar() {
 
       {/* === TOP SEARCHED === */}
       <div className="grid grid-cols-1 gap-6 mt-6">
+        {/* Top Products */}
         <div>
           <h3 className="font-semibold text-md text-gray-800">Top Products</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
@@ -144,6 +156,7 @@ export default function SearchBar() {
           </div>
         </div>
 
+        {/* Top Categories */}
         <div>
           <h3 className="font-semibold text-md text-gray-800">
             Top Categories
@@ -166,6 +179,45 @@ export default function SearchBar() {
               ))}
           </div>
         </div>
+
+        {/* Related Products by First Category */}
+        {productByCategory?.length > 0 && (
+          <div>
+            <h3 className="font-semibold text-md text-gray-800 mt-8">
+              Products in "{topCategories?.[0]?.name}"
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+              {productByCategory.map((product) => (
+                <div
+                  key={product._id}
+                  onClick={() => handleProductClick(product._id)}
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer p-4 border hover:border-blue-500"
+                >
+                  <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
+                    <img
+                      src={product?.images?.[0]?.url}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                    {product.name}
+                  </h3>
+                  {product.price && (
+                    <p className="text-blue-600 font-bold text-md">
+                      ₹{product.price}
+                    </p>
+                  )}
+                  {product.description && (
+                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">
+                      {product.description}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

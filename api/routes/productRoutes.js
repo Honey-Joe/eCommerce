@@ -14,6 +14,8 @@ router.get('/search', productController.searchProducts);
 router.get('/parents', productController.getParentProducts);
 router.get('/parents/:parentId/variants', productController.getVariantsByParentProductId);
 router.get("/parent-products/seller/:sellerId",sellerAuth, productController.getParentProductsBySeller);
+router.get("/category/:categoryId", productController.getProductsByCategory);
+
 
 
 // Get single product

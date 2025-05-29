@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import axiosInstance from "../../axios";
 
 const searchSlice = createSlice({
@@ -7,6 +6,8 @@ const searchSlice = createSlice({
   initialState: {
     keyword: "",
     results: [],
+    relatedResults: [],
+    productByCategory: [],
     topProducts: [],
     topCategories: [],
     loading: false,
@@ -18,6 +19,9 @@ const searchSlice = createSlice({
     },
     setResults(state, action) {
       state.results = action.payload;
+    },
+    setRelatedResults(state, action) {
+      state.productByCategory = action.payload;
     },
     setTopProducts(state, action) {
       state.topProducts = action.payload;
@@ -37,6 +41,7 @@ const searchSlice = createSlice({
 export const {
   setKeyword,
   setResults,
+  setRelatedResults,
   setTopProducts,
   setTopCategories,
   setLoading,
@@ -45,20 +50,22 @@ export const {
 
 export default searchSlice.reducer;
 
-// Custom non-asyncThunk fetchers
-export const fetchSearchResults = (keyword) => async (dispatch) => {
+//
+// 🔍 Async Logic
+//
+
+// Fetch search results + related products
+export const fetchSearchResults = (keyword, categoryId = "") => async (dispatch) => {
   try {
     dispatch(setLoading(true));
     dispatch(setKeyword(keyword));
 
-    const productRes = await axiosInstance.get(
-      `products/search?search=${keyword}`
-    );
-    const categoryRes = await axiosInstance.get(
-      `categories/search?search=${keyword}`
-    );
+    const [productRes, categoryRes] = await Promise.all([
+      axiosInstance.get(`/products/search?search=${keyword}&categoryId=${categoryId}`),
+      axiosInstance.get(`/categories/search?search=${keyword}`),
+    ]);
 
-    dispatch(setResults([...productRes.data, ...categoryRes.data]));
+    dispatch(setResults([...productRes.data.searched, ...categoryRes.data]));
   } catch (err) {
     dispatch(setError(err.message));
   } finally {
@@ -66,14 +73,31 @@ export const fetchSearchResults = (keyword) => async (dispatch) => {
   }
 };
 
+// Fetch top searched products & categories
 export const fetchTopSearched = () => async (dispatch) => {
   try {
-    const topProd = await axiosInstance.get("search/top?type=product");
-    const topCat = await axiosInstance.get("search/top?type=category");
+    const [topProd, topCat] = await Promise.all([
+      axiosInstance.get("/search/top?type=product"),
+      axiosInstance.get("/search/top?type=category"),
+    ]);
 
     dispatch(setTopProducts(topProd.data.products));
     dispatch(setTopCategories(topCat.data.categories));
   } catch (err) {
     dispatch(setError(err.message));
+  }
+};
+export const fetchRelatedByCategoryId = (categoryId) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+
+    const res = await axiosInstance.get(`/products/category/${categoryId}`);
+    dispatch(setRelatedResults(res.data));
+  } catch (err) {
+    dispatch(setError(err.message));
+    console.error("Error fetching related products:", err);
+  } finally {
+    dispatch(setLoading(false));
   }
 };

@@ -1,15 +1,20 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSearchResults } from "../features/search/searchSlice";
-import { useSearchParams, Link, useNavigate } from "react-router-dom";
+import {
+  fetchRelatedByCategoryId,
+  fetchSearchResults,
+} from "../features/search/searchSlice";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Layout from "../layouts/Layout";
 import axiosInstance from "../axios";
 
 export default function SearchPage() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
-  const { results, loading } = useSelector((state) => state.search);
-  console.log("Search results:", results);
+  const { results, productByCategory, loading } = useSelector(
+    (state) => state.search
+  );
+
   const navigate = useNavigate();
 
   const query = searchParams.get("query");
@@ -19,6 +24,12 @@ export default function SearchPage() {
     if (query) dispatch(fetchSearchResults(query));
   }, [dispatch, query]);
 
+  useEffect(() => {
+    if (results?.length > 0 && results[0]?.categoryId) {
+      dispatch(fetchRelatedByCategoryId(results[0].categoryId));
+    }
+  }, [dispatch, results]);
+
   const handleProductClick = async (productId, name) => {
     await axiosInstance.post("/search/increment", {
       name,
@@ -26,16 +37,26 @@ export default function SearchPage() {
     });
     navigate(`/product/${productId}`);
   };
+
   const handleCategoryClick = async (categoryId, name) => {
-  try {
-    await axiosInstance.post("/search/increment", {
-      name,
-      type: "category",
-    });
-  } catch (error) {
-    console.error("Failed to increment category search:", error);
-  }
-};
+    try {
+      await axiosInstance.post("/search/increment", {
+        name,
+        type: "category",
+      });
+    } catch (error) {
+      console.error("Failed to increment category search:", error);
+    }
+  };
+
+  // Filter out products that already appear in main results from relatedResults
+  const mainProductIds = new Set(
+    results.filter((item) => item.price).map((item) => item._id)
+  );
+  const filteredRelatedResults = productByCategory.filter(
+    (item) => !mainProductIds.has(item._id)
+  );
+
   return (
     <Layout>
       <div className="w-[80%] mx-auto py-5">
@@ -88,34 +109,63 @@ export default function SearchPage() {
           </>
         )}
 
-        {/* Categories */}
-        {/* Categories */}
-{results?.some((item) => !item.price) && (
-  <>
-    <h2 className="text-xl font-bold text-gray-800 mt-10 mb-4">
-      Categories
-    </h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {results
-        .filter((item) => !item.price)
-        .map((item, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer p-4 border hover:border-orange-500"
-            onClick={() => handleCategoryClick(item._id, item.name)} // ✅ FIXED
-          >
-            <div className="w-full h-32 bg-orange-100 rounded-xl flex items-center justify-center text-orange-700 font-semibold text-lg">
-              {item.name}
+        {/* Related Products */}
+        {filteredRelatedResults?.length > 0 && (
+          <>
+            <h2 className="text-xl font-bold text-gray-800 mt-10 mb-4">
+              Related Products
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {filteredRelatedResults.map((item, i) => (
+                <div
+                  key={i}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleProductClick(item._id, item.name);
+                  }}
+                  className="bg-white rounded-2xl shadow-md hover:shadow-xl p-4 border hover:border-green-500 transition-all cursor-pointer grid grid-cols-1"
+                >
+                  <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
+                    <img
+                      src={item?.images?.[0]?.url}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="text-lg font-semibold">{item.name}</h3>
+                  <p className="text-blue-600 font-bold">₹{item.price}</p>
+                </div>
+              ))}
             </div>
-            <p className="text-gray-500 text-sm mt-2 text-center">
-              Tap to explore products in this category
-            </p>
-          </div>
-        ))}
-    </div>
-  </>
-)}
+          </>
+        )}
 
+        {/* Categories */}
+        {results?.some((item) => !item.price) && (
+          <>
+            <h2 className="text-xl font-bold text-gray-800 mt-10 mb-4">
+              Categories
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {results
+                .filter((item) => !item.price)
+                .map((item, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer p-4 border hover:border-orange-500"
+                    onClick={() => handleCategoryClick(item._id, item.name)}
+                  >
+                    <div className="w-full h-32 bg-orange-100 rounded-xl flex items-center justify-center text-orange-700 font-semibold text-lg">
+                      {item.name}
+                    </div>
+                    <p className="text-gray-500 text-sm mt-2 text-center">
+                      Tap to explore products in this category
+                    </p>
+                  </div>
+                ))}
+            </div>
+          </>
+        )}
       </div>
     </Layout>
   );
