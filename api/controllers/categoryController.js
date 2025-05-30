@@ -1,17 +1,26 @@
 const Category = require('../models/Category');
 const Product = require('../models/Product');
+const slugify = require('slugify');
 
 // Create new category
 exports.createCategory = async (req, res) => {
   try {
-    const { name, attributes } = req.body;
+    const { name, attributes, aliases = [] } = req.body;
 
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
       return res.status(400).json({ message: 'Category already exists' });
     }
 
-    const category = new Category({ name, attributes });
+    const slug = slugify(name, { lower: true, strict: true });
+
+    const category = new Category({
+      name,
+      slug,
+      aliases,
+      attributes,
+    });
+
     await category.save();
     res.status(201).json({ message: 'Category created', category });
   } catch (error) {
@@ -40,44 +49,47 @@ exports.getCategoryById = async (req, res) => {
   }
 };
 
-
+// Search categories by name or alias
 exports.searchCategories = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search = '' } = req.query;
 
-    // Find categories matching the search keyword (case-insensitive)
     const categories = await Category.find({
-      name: { $regex: search || "", $options: "i" }
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        { aliases: { $regex: search, $options: 'i' } },
+      ],
     }).limit(20);
 
-    // For each category, find products related to that category
     const categoriesWithProducts = await Promise.all(
       categories.map(async (category) => {
-        const products = await Product.find({ categoryId: category._id }).limit(10); // limit products per category
-
+        const products = await Product.find({ categoryId: category._id }).limit(10);
         return {
           _id: category._id,
           name: category.name,
+          slug: category.slug,
+          aliases: category.aliases,
           attributes: category.attributes,
-          products, // embed related products
+          products,
         };
       })
     );
 
     res.status(200).json(categoriesWithProducts);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch categories", details: err.message });
+    res.status(500).json({ error: 'Failed to fetch categories', details: err.message });
   }
 };
-
 
 // Update category
 exports.updateCategory = async (req, res) => {
   try {
-    const { name, attributes } = req.body;
+    const { name, attributes, aliases = [] } = req.body;
+    const slug = slugify(name, { lower: true, strict: true });
+
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
-      { name, attributes },
+      { name, slug, aliases, attributes },
       { new: true }
     );
 

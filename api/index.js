@@ -12,6 +12,7 @@ const brandRoutes = require('./routes/brandRoutes');
 const userRoutes = require('./routes/userRoutes');
 const searchCountRoutes = require('./routes/searchCountRoutes');
 
+
 dotenv.config();
 
 const cookieParser = require('cookie-parser');
@@ -45,4 +46,5 @@ app.use("/api/search", searchCountRoutes);
 
 app.listen(port, () => {
   console.log('Server is running on '+port);
+
 });

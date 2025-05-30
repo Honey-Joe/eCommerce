@@ -1,3 +1,4 @@
+// utils/uploadToCloudinary.js
 const cloudinary = require('./cloudinary');
 
 const uploadToCloudinary = async (files, folder) => {
@@ -12,7 +13,6 @@ const uploadToCloudinary = async (files, folder) => {
           },
           (error, result) => {
             if (error) return reject(error);
-            // Return both url and originalname so expiry mapping works
             resolve({
               url: result.secure_url,
               originalname: file.originalname,
