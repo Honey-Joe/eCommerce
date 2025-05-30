@@ -14,7 +14,7 @@ const attributeSchema = new mongoose.Schema({
 const categorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
-    slug: { type: String, required: true, unique: true },
+    slug: { type: String },
     aliases: [{ type: String }], // ✅ New: Alternate names like 'sneakers'
     attributes: [attributeSchema],
   },

@@ -12,8 +12,10 @@ const brandRoutes = require('./routes/brandRoutes');
 const userRoutes = require('./routes/userRoutes');
 const searchCountRoutes = require('./routes/searchCountRoutes');
 
-
 dotenv.config();
+
+
+ // Seed categories if needed
 
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
@@ -32,6 +34,8 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
+
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users',userRoutes);
 app.use('/api/admin', adminRoutes);
@@ -40,7 +44,6 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/brands', brandRoutes);
 app.use("/api/search", searchCountRoutes);
-
 
 
 
