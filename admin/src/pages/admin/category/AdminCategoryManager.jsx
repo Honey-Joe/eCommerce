@@ -15,10 +15,11 @@ const AdminCategoryManager = () => {
   );
 
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");            // New slug state
-  const [aliases, setAliases] = useState([]);      // New aliases state (array)
+  const [slug, setSlug] = useState(""); // New slug state
+  const [aliases, setAliases] = useState([]); // New aliases state (array)
   const [attributes, setAttributes] = useState([]);
   const [editId, setEditId] = useState(null);
+  const [aliasesInput, setAliasesInput] = useState("");
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -29,6 +30,8 @@ const AdminCategoryManager = () => {
     setSlug("");
     setAliases([]);
     setAttributes([]);
+      setAliasesInput("");
+
     setEditId(null);
     setTimeout(() => dispatch(clearCategoryMessages()), 3000);
   };
@@ -58,25 +61,41 @@ const AdminCategoryManager = () => {
 
   // Handle aliases input as comma-separated string
   const handleAliasesChange = (value) => {
-    setAliases(value.split(",").map((alias) => alias.trim()).filter(Boolean));
+    setAliases(
+      value
+        .split(",")
+        .map((alias) => alias.trim())
+        .filter(Boolean)
+    );
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const categoryData = { name, slug, aliases, attributes };
-    if (editId) {
-      dispatch(updateCategoryById({ id: editId, data: categoryData }));
-    } else {
-      dispatch(createCategory(categoryData));
-    }
-    resetForm();
-  };
+  e.preventDefault();
+
+  const aliasesArray = aliasesInput
+    .split(",")
+    .map((alias) => alias.trim())
+    .filter(Boolean);
+
+  const categoryData = { name, slug, aliases: aliasesArray, attributes };
+
+  if (editId) {
+    dispatch(updateCategoryById(editId, categoryData));
+  } else {
+    dispatch(createCategory(categoryData));
+  }
+
+  resetForm();
+};
+
 
   const handleEdit = (cat) => {
     setEditId(cat._id);
     setName(cat.name);
     setSlug(cat.slug || "");
     setAliases(cat.aliases || []);
+      setAliasesInput((cat.aliases || []).join(", "));
+
     setAttributes(JSON.parse(JSON.stringify(cat.attributes || [])));
   };
 
@@ -88,7 +107,9 @@ const AdminCategoryManager = () => {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Category Manager</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+        Category Manager
+      </h1>
 
       {/* Form Section */}
       <form
@@ -100,7 +121,9 @@ const AdminCategoryManager = () => {
         </h2>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
-        {successMessage && <p className="text-green-600 text-sm">{successMessage}</p>}
+        {successMessage && (
+          <p className="text-green-600 text-sm">{successMessage}</p>
+        )}
 
         <input
           type="text"
@@ -124,8 +147,8 @@ const AdminCategoryManager = () => {
         {/* New Aliases input */}
         <input
           type="text"
-          value={aliases.join(", ")}
-          onChange={(e) => handleAliasesChange(e.target.value)}
+          value={aliasesInput}
+          onChange={(e) => setAliasesInput(e.target.value)}
           placeholder="Aliases (comma separated)"
           className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
@@ -141,12 +164,16 @@ const AdminCategoryManager = () => {
                 type="text"
                 placeholder="Attribute Name"
                 value={attr.name}
-                onChange={(e) => handleAttributeChange(index, "name", e.target.value)}
+                onChange={(e) =>
+                  handleAttributeChange(index, "name", e.target.value)
+                }
                 className="w-full p-2 mb-2 border rounded-md focus:ring-2 focus:ring-blue-300"
               />
               <select
                 value={attr.type}
-                onChange={(e) => handleAttributeChange(index, "type", e.target.value)}
+                onChange={(e) =>
+                  handleAttributeChange(index, "type", e.target.value)
+                }
                 className="w-full p-2 mb-2 border rounded-md"
               >
                 <option value="text">Text</option>
@@ -197,14 +224,20 @@ const AdminCategoryManager = () => {
             disabled={loading}
             className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
           >
-            {loading ? "Saving..." : editId ? "Update Category" : "Create Category"}
+            {loading
+              ? "Saving..."
+              : editId
+              ? "Update Category"
+              : "Create Category"}
           </button>
         </div>
       </form>
 
       {/* CATEGORY LIST */}
       <div className="bg-white mt-10 p-8 rounded-2xl shadow-xl border border-gray-100">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">All Categories</h2>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-6">
+          All Categories
+        </h2>
         <ul className="space-y-6">
           {categories.map((cat) => (
             <li
@@ -213,8 +246,12 @@ const AdminCategoryManager = () => {
             >
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                 <div className="flex-1 space-y-2">
-                  <p className="text-lg font-semibold text-gray-800">{cat.name}</p>
-                  <p className="text-sm text-gray-500">Slug: <em>{cat.slug}</em></p>
+                  <p className="text-lg font-semibold text-gray-800">
+                    {cat.name}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Slug: <em>{cat.slug}</em>
+                  </p>
                   {cat.aliases?.length > 0 && (
                     <p className="text-sm text-gray-600">
                       Aliases: {cat.aliases.join(", ")}
@@ -225,7 +262,10 @@ const AdminCategoryManager = () => {
                       {cat.attributes.map((attr, idx) => (
                         <li key={idx}>
                           <strong>{attr.name}</strong> ({attr.type}
-                          {attr.type === "dropdown" ? `: ${attr.options.join(", ")}` : ""})
+                          {attr.type === "dropdown"
+                            ? `: ${attr.options.join(", ")}`
+                            : ""}
+                          )
                         </li>
                       ))}
                     </ul>
