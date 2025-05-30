@@ -57,7 +57,7 @@ const SellerRegister = () => {
 
       dispatch(registerSuccess({ user: res.data.user, role: "seller" }));
       toast.success("Seller registered successfully!");
-      navigate("/login");
+      navigate("/seller/login");
     } catch (err) {
       dispatch(
         registerFailure(err.response?.data?.message || "Registration failed")
