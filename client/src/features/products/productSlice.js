@@ -122,20 +122,30 @@ export const fetchParentProducts = (sellerId) => async (dispatch) => {
     console.error("Error fetching parent products:", err);
   }
 };
-export const deleteProductById = async (productId) => {
-  const response = await axiosInstance.delete(`/products/${productId}`, {
-    withCredentials: true,
-  });
-  return response.data;
+export const deleteProductById = (productId) => async (dispatch) => {
+  try {
+    const response = await axiosInstance.delete(`/products/${productId}`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    throw error; // So .unwrap() works
+  }
 };
 
-export const isSoldProductById = async (productId) => {
-  const response = await axiosInstance.patch(`/products/${productId}/is-sold`,{isSold:true}, {
-    withCredentials: true,
-  });
-  return response.data;
-};
-
+// FIXED: Thunk version
+export const isSoldProductById = (productId) => async (dispatch) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/products/${productId}/is-sold`,
+      { isSold: true },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    throw error; // So .unwrap() works
+  }
+}
 export const fetchSellerProducts = (sellerId) => async (dispatch) => {
   try {
     dispatch(getProductsStart());

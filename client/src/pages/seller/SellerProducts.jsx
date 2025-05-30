@@ -49,7 +49,7 @@ const SellerProducts = ({ sellerId }) => {
               <h3 className="text-2xl font-bold mb-4 text-blue-700">
                 {status} Products
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {groupedProducts[status].map((product) => (
                   <motion.div
                     key={product._id}

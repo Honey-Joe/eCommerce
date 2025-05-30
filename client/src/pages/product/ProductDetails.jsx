@@ -43,7 +43,7 @@ const ProductDetails = () => {
 
     try {
       dispatch(setProductLoading(true));
-      await dispatch(deleteProductById(productId)).unwrap();
+      await dispatch(deleteProductById(productId))
       dispatch(removeSellerProduct(productId));
       toast.success("Product Deleted Successfully");
       navigate(-1); // Go back after deletion
@@ -61,7 +61,7 @@ const ProductDetails = () => {
 
     try {
       dispatch(setProductLoading(true));
-      await dispatch(isSoldProductById(productId)).unwrap();
+      await dispatch(isSoldProductById(productId))
       dispatch(setIssoldStatus(productId));
       toast.success("Product marked as Sold");
     } catch (err) {
@@ -214,19 +214,7 @@ const ProductDetails = () => {
                         <p className="text-blue-600 font-semibold text-sm">
                           ₹{variant.price}
                         </p>
-                        <p className="text-blue-600 font-semibold text-sm">
-                          {Object.entries(variant.attributes).map(
-                            ([key, value]) =>
-                              value && (
-                                <span
-                                  key={key}
-                                  className="text-sm text-gray-600 font-medium mr-2"
-                                >
-                                  {key}: {value}
-                                </span>
-                              )
-                          )}
-                        </p>
+                       
                       </div>
                     </div>
                   ))}
