@@ -58,6 +58,7 @@ exports.searchCategories = async (req, res) => {
       $or: [
         { name: { $regex: search, $options: 'i' } },
         { aliases: { $regex: search, $options: 'i' } },
+        { slug: { $regex: search, $options: 'i' } },  // added slug here
       ],
     }).limit(20);
 
@@ -80,6 +81,7 @@ exports.searchCategories = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch categories', details: err.message });
   }
 };
+
 
 // Update category
 exports.updateCategory = async (req, res) => {

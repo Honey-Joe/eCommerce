@@ -15,6 +15,8 @@ const AdminCategoryManager = () => {
   );
 
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");            // New slug state
+  const [aliases, setAliases] = useState([]);      // New aliases state (array)
   const [attributes, setAttributes] = useState([]);
   const [editId, setEditId] = useState(null);
 
@@ -24,6 +26,8 @@ const AdminCategoryManager = () => {
 
   const resetForm = () => {
     setName("");
+    setSlug("");
+    setAliases([]);
     setAttributes([]);
     setEditId(null);
     setTimeout(() => dispatch(clearCategoryMessages()), 3000);
@@ -52,12 +56,18 @@ const AdminCategoryManager = () => {
     setAttributes((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Handle aliases input as comma-separated string
+  const handleAliasesChange = (value) => {
+    setAliases(value.split(",").map((alias) => alias.trim()).filter(Boolean));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const categoryData = { name, slug, aliases, attributes };
     if (editId) {
-      dispatch(updateCategoryById(editId, { name, attributes }));
+      dispatch(updateCategoryById({ id: editId, data: categoryData }));
     } else {
-      dispatch(createCategory({ name, attributes }));
+      dispatch(createCategory(categoryData));
     }
     resetForm();
   };
@@ -65,6 +75,8 @@ const AdminCategoryManager = () => {
   const handleEdit = (cat) => {
     setEditId(cat._id);
     setName(cat.name);
+    setSlug(cat.slug || "");
+    setAliases(cat.aliases || []);
     setAttributes(JSON.parse(JSON.stringify(cat.attributes || [])));
   };
 
@@ -97,6 +109,25 @@ const AdminCategoryManager = () => {
           placeholder="Category Name"
           className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
           required
+        />
+
+        {/* New Slug input */}
+        <input
+          type="text"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          placeholder="Slug (e.g. category-name)"
+          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
+          required
+        />
+
+        {/* New Aliases input */}
+        <input
+          type="text"
+          value={aliases.join(", ")}
+          onChange={(e) => handleAliasesChange(e.target.value)}
+          placeholder="Aliases (comma separated)"
+          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
         {/* Attributes */}
@@ -183,6 +214,12 @@ const AdminCategoryManager = () => {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                 <div className="flex-1 space-y-2">
                   <p className="text-lg font-semibold text-gray-800">{cat.name}</p>
+                  <p className="text-sm text-gray-500">Slug: <em>{cat.slug}</em></p>
+                  {cat.aliases?.length > 0 && (
+                    <p className="text-sm text-gray-600">
+                      Aliases: {cat.aliases.join(", ")}
+                    </p>
+                  )}
                   {cat.attributes?.length > 0 && (
                     <ul className="list-disc list-inside text-sm text-gray-600 ml-2">
                       {cat.attributes.map((attr, idx) => (

@@ -20,8 +20,6 @@ import ApprovedProducts from "./pages/admin/products/ApprovedProducts";
 import PendingProducts from "./pages/admin/products/PendingProducts";
 import DisabledProducts from "./pages/admin/products/DisabledProducts";
 import { fetchProducts } from "./features/admin/productSlice";
-import AdminCreateCategory from "./pages/admin/category/AdminCreateCategory";
-import CategoryList from "./pages/admin/category/CategoryList";
 import AdminCategoryManager from "./pages/admin/category/AdminCategoryManager";
 import BrandManagement from "./pages/admin/brand/BrandManagement";
 import BrandList from "./pages/admin/brand/PendingBrand";
@@ -66,7 +64,6 @@ function App() {
           <Route path="site-settings" element={<SiteSettings />} />
           <Route path="others" element={<OtherSettings />} />
           <Route path="addcategory" element={<AdminCategoryManager />} />
-          <Route path="viewcategory" element={<CategoryList />} />
           <Route path="brand" element={<BrandManagement></BrandManagement>} />
           <Route path="pendingbrands" element={<BrandList></BrandList>} />
 
