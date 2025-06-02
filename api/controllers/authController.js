@@ -121,7 +121,7 @@ const userLogin = async (req, res) => {const { email, password } = req.body;
     );
 
     res.cookie("token", token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -161,7 +161,7 @@ const sellerLogin = async (req, res) => { const { email, password } = req.body;
     );
 
     res.cookie("token", token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
