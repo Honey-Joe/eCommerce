@@ -177,11 +177,8 @@ const getUserProfile = async (req, res) => {
 
 // Logout: Clear cookie
 const logout = (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: false,
-    sameSite: 'strict',
-    secure: process.env.NODE_ENV === 'production',
-  });
+      res.clearCookie('token');
+
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
