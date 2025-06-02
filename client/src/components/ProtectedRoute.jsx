@@ -8,7 +8,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   // If role is still null/undefined (i.e., auth check not finished), show loading
   if (role === null || role === undefined) {
-    return <div>Loading...</div>; // or a spinner
+    return <Navigate to="/unauthorized" replace />;
   }
 
   // If role is not authorized
