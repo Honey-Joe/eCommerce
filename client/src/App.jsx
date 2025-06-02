@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import UserRegister from "./pages/auth/UserRegister";
 import SellerRegister from "./pages/auth/SellerRegister";
 import axiosInstance from "./axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess, logout } from "./features/auth/authSlice";
 import { useEffect } from "react";
 import SellerProfile from "./pages/seller/SellerProfile";
@@ -21,22 +21,15 @@ import SearchPage from "./components/SearchPage";
 
 function App() {
   const dispatch = useDispatch();
+  const {role} = useSelector((state) => state.auth);
+  console.log("Role from App component:", role);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axiosInstance.get("auth/me");
-        const {
-          role,
-          status,
-          userId,
-          name,
-          email,
-          businessName,
-          location
-        } = res.data;
-        dispatch(
-          loginSuccess({
+    if(role){
+      const checkAuth = async () => {
+        try {
+          const res = await axiosInstance.get("auth/me");
+          const {
             role,
             status,
             userId,
@@ -44,14 +37,25 @@ function App() {
             email,
             businessName,
             location
-          })
-        );
-      } catch (err) {
-        dispatch(logout());
+          } = res.data;
+          dispatch(
+            loginSuccess({
+              role,
+              status,
+              userId,
+              name,
+              email,
+              businessName,
+              location
+            })
+          );
+        } catch (err) {
+          dispatch(logout());
+        }
+        checkAuth(); // Run on every refresh
       }
-    };
+    }
 
-    checkAuth(); // Run on every refresh
   }, [dispatch]);
   return (
     <>
