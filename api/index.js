@@ -24,7 +24,26 @@ require('./cron/documentExpiryChecker');
 
 connectDB();
 
-app.use(cors({ origin: true, credentials: true }));
+const allowedOrigins = [
+  'http://localhost:5174',
+  'http://localhost:5173',
+  'https://ecommerceintern25.vercel.app',
+  'https://ecommerce25025.vercel.app'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
 
 app.use(express.json());
 
