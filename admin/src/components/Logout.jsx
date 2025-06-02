@@ -13,7 +13,7 @@ const Logout = () => {
   
     dispatch(logout());
     try {
-      await axiosInstance.post('/admin/logout');
+      await axiosInstance.post('/admin/logout',{withCredentials: true});
       navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error.response ? error.response.data.message : error.message);

@@ -13,7 +13,7 @@ const Logout = () => {
   const handleLogout = async () => {
     dispatch(logout());
     try {
-      await axiosInstance.post("/auth/logout");
+      await axiosInstance.post("/auth/logout",{ withCredentials: true });
       navigate("/");
     } catch (error) {
       console.error(
