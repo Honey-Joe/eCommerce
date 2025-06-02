@@ -48,10 +48,10 @@ const loginAdmin = async (req, res) => {
 
     // Store JWT in HTTP-only cookie
     res.cookie("adminToken", token, {
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       sameSite: "None",
-      maxAge: 3600000 // 1 hour
+      maxAge: 7 * 24 * 60 * 60 * 1000// 1 hour
     });
 
     res.status(200).json({ message: "Login successful", role: admin.role });

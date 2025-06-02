@@ -54,52 +54,6 @@ const registerUser = async (req, res) => {
 
 
 
-// Login for both users and sellers
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = await Seller.findOne({ email });
-      if (!user) {
-        return res.status(404).json({ message: 'No account found with this email' });
-      }
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    // Set token as HttpOnly cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: true, // only over HTTPS in production
-      sameSite: 'None',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    res.status(200).json({
-      message: 'Login successful',
-      role: user.role,
-      status: user.status,
-      userId: user._id,
-      name: user.name,
-      email: user.email,
-      location : user?.location,
-      businessName: user?.businessName,
-    });
-  } catch (err) {
-    res.status(500).json({ message: 'Error logging in', error: err.message });
-  }
-};
 
 const userLogin = async (req, res) => {const { email, password } = req.body;
 
@@ -224,11 +178,11 @@ const getUserProfile = async (req, res) => {
 // Logout: Clear cookie
 const logout = (req, res) => {
   res.clearCookie('token', {
-    httpOnly: true,
+    httpOnly: false,
     sameSite: 'strict',
     secure: process.env.NODE_ENV === 'production',
   });
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-module.exports = { registerUser, login, logout ,getUserProfile, userLogin, sellerLogin};
+module.exports = { registerUser,  logout ,getUserProfile, userLogin, sellerLogin};

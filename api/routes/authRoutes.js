@@ -14,7 +14,6 @@ router.post('/register/seller', registerSeller); // Limit to 3 files
 router.get('/me',verifyToken, getUserProfile);
 
 // Login route (for both users and sellers)
-router.post('/login', login);
 router.post('/user/login', userLogin);
 router.post('/seller/login', sellerLogin);
 router.post('/logout', logout);
