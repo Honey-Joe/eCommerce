@@ -11,7 +11,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   if(role === "not") {
-    return <Navigate to="/user/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // If role is not authorized

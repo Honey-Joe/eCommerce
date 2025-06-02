@@ -11,7 +11,7 @@ import { fetchProductById } from "../../features/products/productSlice";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../../layouts/Layout";
 
-export default function UserHome() {
+export default function SellerHome() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { results, loading, topProducts, topCategories, productByCategory } = useSelector(
@@ -76,12 +76,12 @@ export default function UserHome() {
     if (!selected) return;
 
     navigate(
-      `/user/search?query=${encodeURIComponent(selected.name)}&type=${selected.type}`
+      `/seller/search?query=${encodeURIComponent(selected.name)}&type=${selected.type}`
     );
   };
 
   const handleProductClick = (productId) => {
-    navigate(`/user/productdetails/${productId}`);
+    navigate(`/product/${productId}`);
   };
 
   return (
@@ -102,7 +102,7 @@ export default function UserHome() {
               e.preventDefault();
               if (inputValue.trim()) {
                 navigate(
-                  `/user/search?query=${encodeURIComponent(
+                  `/seller/search?query=${encodeURIComponent(
                     inputValue.trim()
                   )}&type=all`
                 );

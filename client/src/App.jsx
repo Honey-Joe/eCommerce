@@ -20,6 +20,11 @@ import UserProfile from "./pages/user/UserProfile";
 import SearchPage from "./components/SearchPage";
 import UserProductDetails from "./pages/user/UserProductDetails";
 import UserHome from "./pages/user/UserHome";
+import SellerHome from "./pages/seller/SellerHome";
+import SellerProductMain from "./pages/seller/SellerProductMain";
+import UserProduct from "./pages/user/UserProduct";
+import UserSearch from "./pages/user/UserSearch";
+import SellerSearch from "./pages/seller/SellerSearch";
 
 function App() {
   const dispatch = useDispatch();
@@ -69,7 +74,10 @@ function App() {
           <Route path="/seller/profile" element={<SellerProfilePage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
-          <Route path="/seller/product" element={<SellerProfile />} />
+          <Route path="/seller/products" element={<SellerProductMain />} />
+        </Route>
+         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
+          <Route path="/seller/home" element={<SellerHome />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
           <Route
@@ -79,7 +87,7 @@ function App() {
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
           <Route
-            path="/user/home/productdetails/:id"
+            path="user/productdetails/:id"
             element={<UserProductDetails></UserProductDetails>}
           />
         </Route>
@@ -87,6 +95,24 @@ function App() {
           <Route
             path="user/home"
             element={<UserHome></UserHome>}
+          />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+          <Route
+            path="user/product"
+            element={<UserProduct></UserProduct>}
+          />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+          <Route
+            path="user/search"
+            element={<UserSearch></UserSearch>}
+          />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
+          <Route
+            path="seller/search"
+            element={<SellerSearch></SellerSearch>}
           />
         </Route>
 

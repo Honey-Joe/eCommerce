@@ -7,19 +7,19 @@ import SellerDocument from "./SellerDocument";
 import Logout from "../../components/Logout";
 
 const SellerProfilePage = () => {
-  const [activeTab, setActiveTab] = useState("account");
+  const [activeTab, setActiveTab] = useState("product");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const renderTab = () => {
     switch (activeTab) {
-      case "account":
-        return <SellerProfile></SellerProfile>;
       case "products":
         return <SellerDashboard></SellerDashboard>;
+      case "account":
+        return <SellerProfile></SellerProfile>;
       case "documents":
         return <SellerDocument></SellerDocument>;
       default:
-        return <SellerProfile />;
+        return <SellerDashboard />;
     }
   };
 
@@ -62,17 +62,6 @@ const SellerProfilePage = () => {
           {/* Nav */}
           <nav className="p-5 space-y-4">
             <button
-              onClick={() => setActiveTab("account")}
-              className={`flex items-center gap-3 px-4 py-2 rounded-xl w-full text-left transition-all duration-200 hover:bg-blue-100 hover:shadow ${
-                activeTab === "account"
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "text-gray-700"
-              }`}
-            >
-              <FiUser className="text-lg" /> Account
-            </button>
-
-            <button
               onClick={() => setActiveTab("products")}
               className={`flex items-center gap-3 px-4 py-2 rounded-xl w-full text-left transition-all duration-200 hover:bg-blue-100 hover:shadow ${
                 activeTab === "products"
@@ -81,6 +70,17 @@ const SellerProfilePage = () => {
               }`}
             >
               <FiBox className="text-lg" /> Products
+            </button>
+
+            <button
+              onClick={() => setActiveTab("account")}
+              className={`flex items-center gap-3 px-4 py-2 rounded-xl w-full text-left transition-all duration-200 hover:bg-blue-100 hover:shadow ${
+                activeTab === "account"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700"
+              }`}
+            >
+              <FiUser className="text-lg" /> Account
             </button>
 
             <button

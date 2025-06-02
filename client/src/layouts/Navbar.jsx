@@ -5,6 +5,7 @@ import Logout from "../components/Logout";
 
 const Navbar = () => {
   const { role } = useSelector((state) => state.auth);
+  console.log(role);
   const isLoggedIn = !!role;
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -13,41 +14,76 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
         <div>
-          {}
-          <Link
-            to="/"
-            className="text-3xl font-extrabold text-blue-600 tracking-tight"
-          >
-            ShopEase
-          </Link>
+          {isLoggedIn ? (
+            role === "seller" ? (
+              <>
+                {
+                  <Link
+                    to="/seller/home"
+                    className="text-3xl font-extrabold text-blue-600 tracking-tight"
+                  >
+                    ShopEase
+                  </Link>
+                }
+              </>
+            ) : role === "user" ? (
+              <>
+                <Link
+                  to="/user/home"
+                  className="text-3xl font-extrabold text-blue-600 tracking-tight"
+                >
+                  ShopEase
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/"
+                  className="text-3xl font-extrabold text-blue-600 tracking-tight"
+                >
+                  ShopEase
+                </Link>
+              </>
+            )
+          ) : (
+            <>
+              <Link
+                to="/"
+                className="text-3xl font-extrabold text-blue-600 tracking-tight"
+              >
+                ShopEase
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Desktop Nav Links */}
         <div className="hidden md:flex space-x-8 text-gray-700 font-medium text-base">
-          <Link
-            to="/user/home"
-            className="hover:text-blue-600 transition-colors duration-200"
-          >
-            Home
-          </Link>
-          {
-            isLoggedIn && role === "seller" ? (
+          
+          {isLoggedIn ? (
+            role === "seller" ? (
               <Link
                 to="/seller/products"
                 className="hover:text-blue-600 transition-colors duration-200"
               >
                 Products
               </Link>
-            ) : (
+            ) : role === "user" ? (
               <Link
                 to="/user/product"
                 className="hover:text-blue-600 transition-colors duration-200"
               >
                 Products
               </Link>
+            ) : (
+              <Link
+                to="/"
+                className="hover:text-blue-600 transition-colors duration-200"
+              >
+                Products
+              </Link>
             )
-          }
-          
+          ) : null}
         </div>
 
         {/* Right Side Desktop */}
@@ -67,7 +103,11 @@ const Navbar = () => {
           {/* Authenticated User */}
           {isLoggedIn ? (
             role === "seller" ? (
-              <Link to="/seller/profile" className="group" aria-label="Seller Profile">
+              <Link
+                to="/seller/profile"
+                className="group"
+                aria-label="Seller Profile"
+              >
                 <img
                   src="https://i.pravatar.cc/40"
                   alt="Avatar"
@@ -152,20 +192,31 @@ const Navbar = () => {
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-inner">
           <div className="px-4 pt-4 pb-5 space-y-4">
-            <Link
-              to="/"
-              onClick={() => setMenuOpen(false)}
-              className="block text-gray-700 hover:text-blue-600 font-medium text-lg"
-            >
-              Home
-            </Link>
-            <Link
-              to="/products"
-              onClick={() => setMenuOpen(false)}
-              className="block text-gray-700 hover:text-blue-600 font-medium text-lg"
-            >
-              Products
-            </Link>
+            
+             {isLoggedIn ? (
+            role === "seller" ? (
+              <Link
+                to="/seller/products"
+                className="hover:text-blue-600 transition-colors duration-200"
+              >
+                Products
+              </Link>
+            ) : role === "user" ? (
+              <Link
+                to="/user/product"
+                className="hover:text-blue-600 transition-colors duration-200"
+              >
+                Products
+              </Link>
+            ) : (
+              <Link
+                to="/"
+                className="hover:text-blue-600 transition-colors duration-200"
+              >
+                Products
+              </Link>
+            )
+          ) : null}
 
             <Link
               to="/cart"
@@ -191,7 +242,9 @@ const Navbar = () => {
                     alt="Avatar"
                     className="w-9 h-9 rounded-full border border-blue-500"
                   />
-                  <span className="text-blue-600 font-medium">Seller Profile</span>
+                  <span className="text-blue-600 font-medium">
+                    Seller Profile
+                  </span>
                 </Link>
               ) : (
                 <div className="space-y-3">
