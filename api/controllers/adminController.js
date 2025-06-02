@@ -73,10 +73,14 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-  const adminLogout = async (req, res) => {
-    res.clearCookie('adminToken');
-    res.status(200).json({ message: 'Admin logged out successfully' });
-  }
+  const adminLogout = (req, res) => {
+  res.clearCookie('adminToken', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+  });
+  res.status(200).json({ message: 'Admin logged out successfully' });
+};
 
 
 
