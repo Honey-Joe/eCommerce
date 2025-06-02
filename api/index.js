@@ -27,7 +27,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL,
   "https://ecommerce25025.vercel.app",
   process.env.ADMIN_URL,
-  "https://ecommerceintern25.vercel.app/",
+  "https://ecommerceintern25.vercel.app",
 ];
 
 app.use(
