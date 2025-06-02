@@ -1,28 +1,29 @@
-const Admin = require('../models/Admin');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const SiteSetting = require('../models/SiteSetting');
-const User = require('../models/User');
-const Seller = require('../models/Seller');
-
+const Admin = require("../models/Admin");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const SiteSetting = require("../models/SiteSetting");
+const User = require("../models/User");
+const Seller = require("../models/Seller");
 
 const registerAdmin = async (req, res) => {
-    const { name, email, phone, password } = req.body;
-  
-    try {
-      const existingAdmin = await Admin.findOne({ email });
-      if (existingAdmin) {
-        return res.status(400).json({ message: 'Admin already exists' });
-      }
-  
-      const admin = new Admin({ name, email, phone, password }); // Password hashed via schema
-      await admin.save();
-  
-      res.status(201).json({ message: 'Admin registered successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error registering admin', error: error.message });
+  const { name, email, phone, password } = req.body;
+
+  try {
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      return res.status(400).json({ message: "Admin already exists" });
     }
-  };
+
+    const admin = new Admin({ name, email, phone, password }); // Password hashed via schema
+    await admin.save();
+
+    res.status(201).json({ message: "Admin registered successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error registering admin", error: error.message });
+  }
+};
 
 // controller/adminController.js
 
@@ -51,7 +52,7 @@ const loginAdmin = async (req, res) => {
       httpOnly: false,
       secure: true,
       sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000// 1 hour
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 hour
     });
 
     res.status(200).json({ message: "Login successful", role: admin.role });
@@ -60,40 +61,34 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-
- const getAdminProfile = async (req, res) => {
+const getAdminProfile = async (req, res) => {
   try {
     res.status(200).json({
       userId: req.user.userId,
       role: req.user.role,
-      message: "Authenticated"
+      message: "Authenticated",
     });
   } catch (err) {
-    res.status(500).json({ message: "Failed to verify admin", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to verify admin", error: err.message });
   }
 };
 
-  const adminLogout = (req, res) => {
-  res.clearCookie('adminToken', {
+const adminLogout = (req, res) => {
+  res.clearCookie("adminToken", {
     httpOnly: false,
-    sameSite: 'None',
+    secure: true,
+    sameSite: "None",
   });
-  res.status(200).json({ message: 'Admin logged out successfully' });
+  res.status(200).json({ message: "Admin logged out successfully" });
 };
-
-
 
 // Get all sellers
 
-
-
-
-
-
-  module.exports = {
-    loginAdmin,
-    registerAdmin,
-    adminLogout,
-    getAdminProfile,
-  };
-  
+module.exports = {
+  loginAdmin,
+  registerAdmin,
+  adminLogout,
+  getAdminProfile,
+};
