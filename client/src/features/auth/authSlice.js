@@ -2,7 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  role: null, // Fetched from server if needed
+  role: "not", // Fetched from server if needed
   status: "idle",
   user: null,
   statusApproved: null,

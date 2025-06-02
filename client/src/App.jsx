@@ -18,6 +18,8 @@ import UserLogin from "./pages/auth/UserLogin";
 import SellerLogin from "./pages/auth/SellerLogin";
 import UserProfile from "./pages/user/UserProfile";
 import SearchPage from "./components/SearchPage";
+import UserProductDetails from "./pages/user/UserProductDetails";
+import UserHome from "./pages/user/UserHome";
 
 function App() {
   const dispatch = useDispatch();
@@ -71,10 +73,23 @@ function App() {
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
           <Route
-            path="/product/:id"
+            path="/product/:id"   
             element={<ProductDetails></ProductDetails>}
           />
         </Route>
+        <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+          <Route
+            path="/user/home/productdetails/:id"
+            element={<UserProductDetails></UserProductDetails>}
+          />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+          <Route
+            path="user/home"
+            element={<UserHome></UserHome>}
+          />
+        </Route>
+
 
         <Route path="/search" element={<SearchPage />} />
       </Routes>

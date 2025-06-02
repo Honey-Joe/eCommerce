@@ -1,5 +1,4 @@
 // src/components/ProtectedRoute.jsx
-import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -8,7 +7,11 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   // If role is still null/undefined (i.e., auth check not finished), show loading
   if (role === null || role === undefined) {
-    return <Navigate to="/unauthorized" replace />;
+    return <div>Loading...</div>;
+  }
+
+  if(role === "not") {
+    return <Navigate to="/user/login" replace />;
   }
 
   // If role is not authorized

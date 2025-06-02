@@ -13,6 +13,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
         <div>
+          {}
           <Link
             to="/"
             className="text-3xl font-extrabold text-blue-600 tracking-tight"
@@ -24,17 +25,29 @@ const Navbar = () => {
         {/* Desktop Nav Links */}
         <div className="hidden md:flex space-x-8 text-gray-700 font-medium text-base">
           <Link
-            to="/"
+            to="/user/home"
             className="hover:text-blue-600 transition-colors duration-200"
           >
             Home
           </Link>
-          <Link
-            to="/products"
-            className="hover:text-blue-600 transition-colors duration-200"
-          >
-            Products
-          </Link>
+          {
+            isLoggedIn && role === "seller" ? (
+              <Link
+                to="/seller/products"
+                className="hover:text-blue-600 transition-colors duration-200"
+              >
+                Products
+              </Link>
+            ) : (
+              <Link
+                to="/user/product"
+                className="hover:text-blue-600 transition-colors duration-200"
+              >
+                Products
+              </Link>
+            )
+          }
+          
         </div>
 
         {/* Right Side Desktop */}
