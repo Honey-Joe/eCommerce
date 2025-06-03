@@ -4,7 +4,7 @@ const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[#0000007c] flex justify-center items-center z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-[#0000007c] flex justify-center items-center z-50 overflow-y-auto ">
       {/* 
         Added max-h-screen and overflow-y-auto to make modal content scrollable 
         if it exceeds viewport height.
