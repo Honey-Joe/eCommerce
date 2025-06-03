@@ -25,8 +25,8 @@ const SellerLogin = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axiosInstance.post("/auth/seller/login", data);
-      const  {role,userId,name,email,location,businessName,status} = response.data;
-      dispatch(loginSuccess({role,userId,name,email,location,businessName,status}));
+      const  {role,userId,name,email,location,businessName,status ,profilePicture} = response.data;
+      dispatch(loginSuccess({role,userId,name,email,location,businessName,status, profilePicture})); // Dispatch login action
       navigate("/seller/profile") // short delay
 
       toast.success("Login successful!");

@@ -22,6 +22,14 @@ const registerSeller = async (req, res) => {
     if (existingSeller) {
       return res.status(400).json({ message: "Email already in use" });
     }
+    let profilePictureUrl = "";
+        if (req.file) {
+          const uploadedImage = await uploadToCloudinary(
+            [req.file],
+            "profile-pictures"
+          );
+          profilePictureUrl = uploadedImage[0]?.url || "";
+        }
 
     // Parse and validate location
     let geoLocation = null;
@@ -50,12 +58,14 @@ const registerSeller = async (req, res) => {
         return res.status(400).json({ message: "Invalid location format" });
       }
     }
+    
 
     const newSeller = new Seller({
       name,
       email,
       password,
       businessName,
+      profilePicture: profilePictureUrl,
       location: geoLocation,
       documents: [],
     });

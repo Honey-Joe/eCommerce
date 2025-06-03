@@ -5,8 +5,8 @@ import Logout from "../components/Logout";
 
 const Navbar = () => {
   const { user, role } = useSelector((state) => state.auth);
-  console.log(user);
   const isLoggedIn = !!role;
+  console.log(user);
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -109,9 +109,9 @@ const Navbar = () => {
                 aria-label="Seller Profile"
               >
                 <img
-                  src="https://i.pravatar.cc/40"
+                  src={user?.profilePicture || "https://i.pravatar.cc/40"}
                   alt="Avatar"
-                  className="w-9 h-9 rounded-full border border-blue-500 group-hover:scale-110 transition-transform duration-200"
+                  className=" w-[50px] h-[50px] rounded-full border border-blue-500 group-hover:scale-110 transition-transform duration-200"
                 />
               </Link>
             ) : (

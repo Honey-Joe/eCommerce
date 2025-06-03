@@ -19,7 +19,9 @@ const SellerRegister = () => {
   const { loading, error, success, user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null);
 
+  
   const handlePlaceChange = (e) => {
     const place = places.find((p) => p.name === e.target.value);
     setSelectedPlace(place);
@@ -47,11 +49,12 @@ const SellerRegister = () => {
       if (selectedPlace) {
         formData.append("location", JSON.stringify(selectedPlace));
       }
+      if (profilePicture) {
+        formData.append("profilePicture", profilePicture);
+      }
 
       const res = await axiosInstance.post("/auth/register/seller", formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
 
@@ -133,6 +136,18 @@ const SellerRegister = () => {
             </option>
           ))}
         </select>
+
+        <div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setProfilePicture(e.target.files[0])}
+            className="w-full text-gray-700 text-sm"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Upload profile picture (optional)
+          </p>
+        </div>
 
         {/* Submit Button */}
         <button

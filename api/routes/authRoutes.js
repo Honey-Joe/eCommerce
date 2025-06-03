@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/register/user',upload.single('profilePicture'), registerUser);
 
 // Seller registration route
-router.post('/register/seller', registerSeller); // Limit to 3 files
+router.post('/register/seller',upload.single('profilePicture'), registerSeller); // Limit to 3 files
 router.get('/me',verifyToken, getUserProfile);
 
 // Login route (for both users and sellers)

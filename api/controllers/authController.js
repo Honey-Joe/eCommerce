@@ -186,6 +186,7 @@ const sellerLogin = async (req, res) => {
       email: seller.email,
       location: seller.location,
       businessName: seller.businessName,
+      profilePicture: seller.profilePicture,
     });
   } catch (err) {
     res
@@ -227,7 +228,7 @@ const getUserProfile = async (req, res) => {
       return res.status(200).json({
         userId,
         role,
-        profilePicture: user.profilePicture, // Include profile picture if available
+        profilePicture: seller.profilePicture, // Include profile picture if available
         status: seller.status,
         name: seller.name,
         email: seller.email,

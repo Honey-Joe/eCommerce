@@ -18,7 +18,6 @@ const UserCategory = () => {
   const handleProductClick = (productId) => {
     navigate(`/user/productdetails/${productId}`);
   };
-  console.log(productByCategory);
   const categoryName = productByCategory?.[0]?.category || "";
 
   useEffect(() => {

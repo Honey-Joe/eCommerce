@@ -41,6 +41,10 @@ const sellerSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    profilePicture: {
+      type: String,
+      default: "", // URL to the profile picture
+    },
     location: {
       type: {
         type: String,
