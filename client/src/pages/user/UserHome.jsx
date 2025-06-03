@@ -124,7 +124,7 @@ export default function UserHome() {
         {loading && <p className="text-center mt-4">Loading...</p>}
 
         <div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-9 gap-4 mt-4 cursor-pointer">
+          <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-9 gap-4 mt-4 cursor-pointer">
             {[...topCategories]
               .sort((a, b) => b.count - a.count)
               .map((item, i) => (

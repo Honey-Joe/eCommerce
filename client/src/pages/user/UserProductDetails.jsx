@@ -201,7 +201,7 @@ const UserProductDetails = () => {
                   {variant.map((variant) => (
                     <div
                       key={variant._id}
-                      onClick={() => navigate(`/product/${variant._id}`)}
+                      onClick={() => navigate(`/user/productdetails/${variant._id}`)}
                       className="cursor-pointer border rounded-lg overflow-hidden hover:shadow-lg transition"
                     >
                       <img
