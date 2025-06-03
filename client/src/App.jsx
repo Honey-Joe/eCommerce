@@ -35,7 +35,7 @@ function App() {
     const checkAuth = async () => {
       try {
         const res = await axiosInstance.get("auth/me");
-        const { role, status, userId, name, email, businessName, location } =
+        const { role, status, userId, name, email, businessName, location, profilePicture } =
           res.data;
         dispatch(
           loginSuccess({
@@ -46,6 +46,7 @@ function App() {
             email,
             businessName,
             location,
+            profilePicture,
           })
         );
       } catch (err) {

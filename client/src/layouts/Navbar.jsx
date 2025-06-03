@@ -4,8 +4,8 @@ import { useSelector } from "react-redux";
 import Logout from "../components/Logout";
 
 const Navbar = () => {
-  const { role } = useSelector((state) => state.auth);
-  console.log(role);
+  const { user, role } = useSelector((state) => state.auth);
+  console.log(user);
   const isLoggedIn = !!role;
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -118,9 +118,13 @@ const Navbar = () => {
               <div className="flex items-center space-x-3">
                 <Link
                   to="/user/dashboard"
-                  className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
+                  className="p-2 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 transition"
                 >
-                  Profile
+                  <img
+                  src={user?.profilePicture || "https://i.pravatar.cc/40"}
+                  alt="Avatar"
+                  className=" w-[70px] h-[40px] rounded-full border border-blue-500 group-hover:scale-110 transition-transform duration-200"
+                />
                 </Link>
                 <Logout />
               </div>

@@ -25,8 +25,8 @@ const UserLogin = () => {
   const onSubmit = async (data) => {
     try {
       const response = await axiosInstance.post("/auth/user/login", data);
-      const  {role,userId,name,email,location} = response.data;
-      dispatch(loginSuccess({role,userId,name,email,location}));
+      const  {role,userId,name,email,location,profilePicture} = response.data;
+      dispatch(loginSuccess({role,userId,name,email,location, profilePicture})); // Dispatch login action
       navigate("/user/dashboard") // short delay
 
       toast.success("Login successful!");
