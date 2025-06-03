@@ -12,7 +12,6 @@ import { Link } from "react-router-dom";
 const CartPage = () => {
   const { items } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
-  console.log(items);
 
   return (
     <Layout>

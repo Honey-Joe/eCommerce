@@ -17,11 +17,8 @@ export default function SearchBar() {
   const { results, loading, topProducts, topCategories, productByCategory } = useSelector(
     (state) => state.search
   );
-
-    console.log(productByCategory)
   // Grab first categoryId safely
   const categoryId = topCategories?.[0]?._id || "";
-  console.log(categoryId)
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [inputValue, setInputValue] = useState("");

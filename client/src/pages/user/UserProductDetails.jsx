@@ -28,7 +28,6 @@ const UserProductDetails = () => {
   const { product, loading, error, variants } = useSelector(
     (state) => state.products
   );
-  console.log(product);
   useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
@@ -40,40 +39,7 @@ const UserProductDetails = () => {
   }, [dispatch, product?._id]);
   const variant = variants?.variants || [];
 
-  const handleDelete = async (productId) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
-
-    try {
-      dispatch(setProductLoading(true));
-      await dispatch(deleteProductById(productId));
-      dispatch(removeSellerProduct(productId));
-      toast.success("Product Deleted Successfully");
-      navigate(-1); // Go back after deletion
-    } catch (err) {
-      dispatch(setProductError(err.message || "Delete failed"));
-      toast.error("Delete failed");
-    } finally {
-      dispatch(setProductLoading(false));
-    }
-  };
-
-  const handleIsSoldStatus = async (productId) => {
-    if (!window.confirm("Are you sure you want to mark this product as sold?"))
-      return;
-
-    try {
-      dispatch(setProductLoading(true));
-      await dispatch(isSoldProductById(productId));
-      dispatch(setIssoldStatus(productId));
-      toast.success("Product marked as Sold");
-    } catch (err) {
-      dispatch(setProductError(err.message || "Mark as sold failed"));
-      toast.error("Mark as sold failed");
-    } finally {
-      dispatch(setProductLoading(false));
-    }
-  };
+  
 
   if (loading) {
     return (
@@ -241,7 +207,7 @@ const UserProductDetails = () => {
             <div className="text-sm text-gray-500 mt-4 space-y-1">
               <p>
                 <span className="font-medium">Seller:</span>{" "}
-                {user?.name || "Unknown"}
+                {product?.seller?.name || "Unknown"}
               </p>
               <p>
                 <span className="font-medium">Posted:</span>{" "}
