@@ -1,16 +1,11 @@
-import mongoose from "mongoose";
+
+const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
   {
     buyer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
-    },
-
-    seller: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Seller",
       required: true,
     },
 
@@ -27,7 +22,11 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
-        image: String,
+        seller: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Seller",
+            required: true,
+        },
       },
     ],
 
@@ -71,4 +70,4 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Order", orderSchema);
+module.exports = mongoose.model("Order", orderSchema);

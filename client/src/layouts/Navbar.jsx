@@ -90,7 +90,7 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-5">
           {/* Cart */}
           <Link
-            to="/cart"
+            to="/user/cart"
             className="relative text-gray-700 hover:text-blue-600 text-xl"
             aria-label="Cart"
           >
@@ -223,7 +223,7 @@ const Navbar = () => {
           ) : null}
 
             <Link
-              to="/cart"
+              to="/user/cart"
               onClick={() => setMenuOpen(false)}
               className="block relative text-gray-700 hover:text-blue-600 text-xl"
               aria-label="Cart"

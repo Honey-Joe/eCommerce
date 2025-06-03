@@ -1,4 +1,4 @@
-const Order = require("../models/orderModel");
+const Order = require("../models/Order");
 
 // Create a new order
 exports.createOrder = async function (req, res) {
@@ -8,7 +8,6 @@ exports.createOrder = async function (req, res) {
       shippingInfo,
       paymentMethod,
       totalPrice,
-      seller,
     } = req.body;
 
     if (!orderItems || orderItems.length === 0) {
@@ -16,8 +15,7 @@ exports.createOrder = async function (req, res) {
     }
 
     const order = new Order({
-      buyer: req.user._id,
-      seller,
+      buyer: req.user.userId,
       orderItems,
       shippingInfo,
       paymentMethod,

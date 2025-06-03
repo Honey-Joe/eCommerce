@@ -5,6 +5,8 @@ import { Carousel } from "react-responsive-carousel";
 import { motion } from "framer-motion";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import Layout from "../../layouts/Layout";
+import { addToCart } from "../../features/cart/cartSlice";
+
 import {
   deleteProductById,
   fetchProductById,
@@ -16,6 +18,7 @@ import {
   setProductLoading,
 } from "../../features/products/productSlice";
 import { toast } from "react-toastify";
+import { FiShoppingCart } from "react-icons/fi";
 
 const UserProductDetails = () => {
   const { id } = useParams();
@@ -43,7 +46,7 @@ const UserProductDetails = () => {
 
     try {
       dispatch(setProductLoading(true));
-      await dispatch(deleteProductById(productId))
+      await dispatch(deleteProductById(productId));
       dispatch(removeSellerProduct(productId));
       toast.success("Product Deleted Successfully");
       navigate(-1); // Go back after deletion
@@ -61,7 +64,7 @@ const UserProductDetails = () => {
 
     try {
       dispatch(setProductLoading(true));
-      await dispatch(isSoldProductById(productId))
+      await dispatch(isSoldProductById(productId));
       dispatch(setIssoldStatus(productId));
       toast.success("Product marked as Sold");
     } catch (err) {
@@ -93,6 +96,10 @@ const UserProductDetails = () => {
       <div className="text-center mt-10 text-gray-500">Product not found.</div>
     );
   }
+  const handleAddToCart = () => {
+    dispatch(addToCart(product));
+    toast.success("Added to cart");
+  };
 
   return (
     <Layout>
@@ -201,7 +208,9 @@ const UserProductDetails = () => {
                   {variant.map((variant) => (
                     <div
                       key={variant._id}
-                      onClick={() => navigate(`/user/productdetails/${variant._id}`)}
+                      onClick={() =>
+                        navigate(`/user/productdetails/${variant._id}`)
+                      }
                       className="cursor-pointer border rounded-lg overflow-hidden hover:shadow-lg transition"
                     >
                       <img
@@ -214,15 +223,19 @@ const UserProductDetails = () => {
                         <p className="text-blue-600 font-semibold text-sm">
                           ₹{variant.price}
                         </p>
-                       
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+            <button
+              onClick={handleAddToCart}
+              className="mt-4 bg-orange-500 items-center flex gap-2 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm transition"
+            >
+              Add to Cart <FiShoppingCart></FiShoppingCart>
+            </button>
 
-            
             {/* Delete button */}
 
             <div className="text-sm text-gray-500 mt-4 space-y-1">

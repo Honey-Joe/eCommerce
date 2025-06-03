@@ -27,6 +27,8 @@ import UserSearch from "./pages/user/UserSearch";
 import SellerSearch from "./pages/seller/SellerSearch";
 import UserCategory from "./pages/user/UserCategory";
 import SellerResults from "./pages/seller/SellerResults";
+import CartPage from "./pages/user/CartPage";
+import PlaceOrderPage from "./pages/user/PlaceOrderPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -116,6 +118,18 @@ function App() {
           <Route
             path="user/category/:categoryId"
             element={<UserCategory></UserCategory>}
+          />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+          <Route
+            path="user/cart"
+            element={<CartPage></CartPage>}
+          />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={["user"]} />}>
+          <Route
+            path="user/checkout"
+            element={<PlaceOrderPage></PlaceOrderPage>}
           />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>

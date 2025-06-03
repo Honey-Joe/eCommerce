@@ -11,6 +11,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const brandRoutes = require("./routes/brandRoutes");
 const userRoutes = require("./routes/userRoutes");
 const searchCountRoutes = require("./routes/searchCountRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/search", searchCountRoutes);
+app.use("/api/orders", orderRoutes );
 
 app.listen(port, () => {
   console.log("Server is running on " + port);
