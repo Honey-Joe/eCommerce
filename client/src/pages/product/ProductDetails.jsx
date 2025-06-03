@@ -255,7 +255,7 @@ const ProductDetails = () => {
             <div className="text-sm text-gray-500 mt-4 space-y-1">
               <p>
                 <span className="font-medium">Seller:</span>{" "}
-                {user?.name || "Unknown"}
+                {product?.seller?.name || "Unknown"}
               </p>
               <p>
                 <span className="font-medium">Posted:</span>{" "}
