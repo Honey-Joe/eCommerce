@@ -14,14 +14,13 @@ import Layout from "../../layouts/Layout";
 export default function UserHome() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { results, loading, topProducts, topCategories, productByCategory } = useSelector(
-    (state) => state.search
-  );
+  const { results, loading, topProducts, topCategories, productByCategory } =
+    useSelector((state) => state.search);
 
-    console.log(productByCategory)
+  console.log(productByCategory);
   // Grab first categoryId safely
   const categoryId = topCategories?.[0]?._id || "";
-  console.log(categoryId)
+  console.log(categoryId);
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [inputValue, setInputValue] = useState("");
@@ -70,13 +69,19 @@ export default function UserHome() {
       return [];
     }
   };
+  const handleCategoryClick = (categoryId) => {
+    dispatch(fetchRelatedByCategoryId(categoryId));
+    navigate(`/user/category/${categoryId}`);
+  };
   // Handle select suggestion
   const handleSelect = (selected) => {
     setSelectedOption(selected);
     if (!selected) return;
 
     navigate(
-      `/user/search?query=${encodeURIComponent(selected.name)}&type=${selected.type}`
+      `/user/search?query=${encodeURIComponent(selected.name)}&type=${
+        selected.type
+      }`
     );
   };
 
@@ -86,142 +91,139 @@ export default function UserHome() {
 
   return (
     <Layout>
-    <div className="w-[80%] mx-auto">
-      <div className="max-w-md mx-auto">
-        <AsyncSelect
-          cacheOptions
-          loadOptions={loadOptions}
-          defaultOptions
-          value={selectedOption}
-          onChange={handleSelect}
-          placeholder="Search products or categories..."
-          inputValue={inputValue}
-          onInputChange={(value) => setInputValue(value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              if (inputValue.trim()) {
-                navigate(
-                  `/user/search?query=${encodeURIComponent(
-                    inputValue.trim()
-                  )}&type=all`
-                );
+      <div className="w-[80%] mx-auto py-5">
+        <div className="max-w-md mx-auto">
+          <AsyncSelect
+            cacheOptions
+            loadOptions={loadOptions}
+            defaultOptions
+            value={selectedOption}
+            onChange={handleSelect}
+            placeholder="Search products or categories..."
+            inputValue={inputValue}
+            onInputChange={(value) => setInputValue(value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (inputValue.trim()) {
+                  navigate(
+                    `/user/search?query=${encodeURIComponent(
+                      inputValue.trim()
+                    )}&type=all`
+                  );
+                }
               }
-            }
-          }}
-          classNames={{
-            control: () => "rounded-xl border px-2 py-1",
-            input: () => "py-1",
-          }}
-        />
-      </div>
-
-      {loading && <p className="text-center mt-4">Loading...</p>}
-
-      {/* === TOP SEARCHED === */}
-      <div className="grid grid-cols-1 gap-6 mt-6">
-        {/* Top Products */}
-        <div>
-          <h3 className="font-semibold text-md text-gray-800">Top Products</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
-            {[...topProducts]
-              .sort((a, b) => b.count - a.count)
-              .map((item, i) => (
-                <div
-                    onClick={() => handleProductClick(item._id)}
-                  key={i}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer p-4 border hover:border-blue-500"
-                >
-                  <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
-                    <img
-                      src={item?.images?.[0]?.url}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                    {item.name}
-                  </h3>
-                  {item.price && (
-                    <p className="text-blue-600 font-bold text-md">
-                      ₹{item.price}
-                    </p>
-                  )}
-                  {item.description && (
-                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">
-                      {item.description}
-                    </p>
-                  )}
-                </div>
-              ))}
-          </div>
+            }}
+            classNames={{
+              control: () => "rounded-xl border px-2 py-1",
+              input: () => "py-1",
+            }}
+          />
         </div>
 
-        {/* Top Categories */}
+        {loading && <p className="text-center mt-4">Loading...</p>}
+
         <div>
-          <h3 className="font-semibold text-md text-gray-800">
-            Top Categories
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-9 gap-4 mt-4 cursor-pointer">
             {[...topCategories]
               .sort((a, b) => b.count - a.count)
               .map((item, i) => (
                 <div
                   key={i}
-                  className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg border hover:border-blue-500 transition-all"
+                  onClick={() => handleCategoryClick(item._id)}
+                  className="bg-white shadow-md rounded-xl p-2 hover:shadow-lg border hover:border-blue-500 transition-all"
                 >
-                  <h4 className="text-lg font-semibold text-gray-800">
+                  <h4 className="text-[12px] text-center font-semibold text-gray-800">
                     {item.name}
                   </h4>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Searches: {item.count}
-                  </p>
                 </div>
               ))}
           </div>
         </div>
 
-        {/* Related Products by First Category */}
-        {productByCategory?.length > 0 && (
+        {/* === TOP SEARCHED === */}
+        <div className="grid grid-cols-1 gap-6 mt-6">
+          {/* Top Products */}
           <div>
-            <h3 className="font-semibold text-md text-gray-800 mt-8">
-              Products in "{topCategories?.[0]?.name}"
+            <h3 className="font-semibold text-md text-gray-800">
+              Top Products
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-              {productByCategory.map((product) => (
-                <div
-                  key={product._id}
-                  onClick={() => handleProductClick(product._id)}
-                  className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer p-4 border hover:border-blue-500"
-                >
-                  <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
-                    <img
-                      src={product?.images?.[0]?.url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
+              {[...topProducts]
+                .sort((a, b) => b.count - a.count)
+                .map((item, i) => (
+                  <div
+                    onClick={() => handleProductClick(item._id)}
+                    key={i}
+                    className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer p-4 border hover:border-blue-500"
+                  >
+                    <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
+                      <img
+                        src={item?.images?.[0]?.url}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                      {item.name}
+                    </h3>
+                    {item.price && (
+                      <p className="text-blue-600 font-bold text-md">
+                        ₹{item.price}
+                      </p>
+                    )}
+                    {item.description && (
+                      <p className="text-gray-600 text-sm mt-1 line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                    {product.name}
-                  </h3>
-                  {product.price && (
-                    <p className="text-blue-600 font-bold text-md">
-                      ₹{product.price}
-                    </p>
-                  )}
-                  {product.description && (
-                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">
-                      {product.description}
-                    </p>
-                  )}
-                </div>
-              ))}
+                ))}
             </div>
           </div>
-        )}
-      </div>
-    </div>
 
+          {/* Top Categories */}
+
+          {/* Related Products by First Category */}
+          {productByCategory?.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-md text-gray-800 mt-8">
+                Products in "{topCategories?.[0]?.name}"
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                {productByCategory.map((product) => (
+                  <div
+                    key={product._id}
+                    onClick={() => handleProductClick(product._id)}
+                    className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all cursor-pointer p-4 border hover:border-blue-500"
+                  >
+                    <div className="w-full h-40 bg-gray-100 rounded-xl overflow-hidden mb-3">
+                      <img
+                        src={product?.images?.[0]?.url}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                      {product.name}
+                    </h3>
+                    {product.price && (
+                      <p className="text-blue-600 font-bold text-md">
+                        ₹{product.price}
+                      </p>
+                    )}
+                    {product.description && (
+                      <p className="text-gray-600 text-sm mt-1 line-clamp-2">
+                        {product.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </Layout>
   );
 }

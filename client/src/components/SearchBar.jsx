@@ -9,6 +9,7 @@ import AsyncSelect from "react-select/async";
 import axiosInstance from "../axios";
 import { fetchProductById } from "../features/products/productSlice";
 import { useNavigate } from "react-router-dom";
+import { FiArrowRight } from "react-icons/fi";
 
 export default function SearchBar() {
   const dispatch = useDispatch();
@@ -78,6 +79,10 @@ export default function SearchBar() {
       `/search?query=${encodeURIComponent(selected.name)}&type=${selected.type}`
     );
   };
+  const handleCategoryClick = (categoryId) => {
+    dispatch(fetchRelatedByCategoryId(categoryId));
+    navigate(`/user/category/${categoryId}`);
+  };
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
@@ -85,6 +90,7 @@ export default function SearchBar() {
 
   return (
     <div className="p-4">
+      
       <div className="max-w-md mx-auto">
         <AsyncSelect
           cacheOptions
@@ -115,6 +121,24 @@ export default function SearchBar() {
       </div>
 
       {loading && <p className="text-center mt-4">Loading...</p>}
+
+      <div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-9 gap-4 mt-4" onClick={() => {handleCategoryClick(categoryId)}}>
+            {[...topCategories]
+              .sort((a, b) => b.count - a.count)
+              .map((item, i) => (
+                <div
+                  key={i}
+                  className="bg-white px-5 py-2 shadow-md rounded-xl hover:shadow-lg border hover:border-blue-500 transition-all"
+                >
+                  <h4 className="text-[12px] text-center font-semibold text-gray-800">
+                    {item.name}
+                  </h4>
+                  
+                </div>
+              ))}
+          </div>
+        </div>
 
       {/* === TOP SEARCHED === */}
       <div className="grid grid-cols-1 gap-6 mt-6">
@@ -156,28 +180,7 @@ export default function SearchBar() {
         </div>
 
         {/* Top Categories */}
-        <div>
-          <h3 className="font-semibold text-md text-gray-800">
-            Top Categories
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-            {[...topCategories]
-              .sort((a, b) => b.count - a.count)
-              .map((item, i) => (
-                <div
-                  key={i}
-                  className="bg-white shadow-md rounded-xl p-4 hover:shadow-lg border hover:border-blue-500 transition-all"
-                >
-                  <h4 className="text-lg font-semibold text-gray-800">
-                    {item.name}
-                  </h4>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Searches: {item.count}
-                  </p>
-                </div>
-              ))}
-          </div>
-        </div>
+        
 
         {/* Related Products by First Category */}
         {productByCategory?.length > 0 && (

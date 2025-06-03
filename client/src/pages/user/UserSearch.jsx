@@ -44,6 +44,7 @@ export default function UserSearch() {
         name,
         type: "category",
       });
+      navigate(`/user/category/${categoryId}`);
     } catch (error) {
       console.error("Failed to increment category search:", error);
     }

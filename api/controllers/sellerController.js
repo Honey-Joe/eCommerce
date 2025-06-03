@@ -172,7 +172,31 @@ const updateSellerApproval = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+const searchSellerProduct = async (req, res) => {
+  try {
+    const { query, sellerId } = req.query;
 
+    if (!query || !sellerId) {
+      return res.status(400).json({ message: "Query and sellerId are required." });
+    }
+
+    const regex = new RegExp(query, "i"); // case-insensitive search
+
+    const products = await Product.find({
+      seller: sellerId,
+      $or: [
+        { name: regex },
+        { description: regex },
+        { category: regex },
+      ],
+    });
+
+    res.status(200).json({ products });
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ message: "Server error while searching seller products." });
+  }
+};
 const updateSellerDisable = async (req, res) => {
   try {
     const { id } = req.params;
@@ -239,4 +263,5 @@ module.exports = {
   uploadSellerDocuments,
   updateSellerDisable,
   updateSellerProfile,
+  searchSellerProduct
 };

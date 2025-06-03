@@ -169,7 +169,40 @@ exports.getProductsByCategory = async (req, res) => {
     });
   }
 };
+exports.searchSellerProducts = async (req, res) => {
+  try {
+    const { query, sellerId } = req.query;
 
+    if (!query || !sellerId) {
+      return res.status(400).json({
+        message: "Both query and sellerId are required",
+      });
+    }
+
+    // Find seller's products matching the query
+    const products = await Product.find({
+      seller: sellerId,
+      name: { $regex: query, $options: "i" },
+    })
+      .limit(10)
+      .select("name _id"); // Select only necessary fields
+
+    // Optional: You can also fetch categories for seller-specific filtering
+    const categories = await Category.find({
+      name: { $regex: query, $options: "i" },
+    }).limit(5);
+
+    res.status(200).json({
+      products,
+      categories,
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: "Failed to fetch seller suggestions",
+      details: err.message,
+    });
+  }
+};
 
 
 

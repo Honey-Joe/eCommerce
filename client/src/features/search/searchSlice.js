@@ -72,6 +72,25 @@ export const fetchSearchResults = (keyword, categoryId = "") => async (dispatch)
     dispatch(setLoading(false));
   }
 };
+// Search only seller-specific products
+export const fetchSellerSearchResults = (query, sellerId) => async (dispatch) => {
+  try {
+    dispatch(setLoading(true));
+    dispatch(setKeyword(query));
+    dispatch(setError(null));
+
+    const res = await axiosInstance.get(
+      `/search/seller?query=${query}&sellerId=${sellerId}`
+    );
+    console.log("Seller search results:", res.data.products);
+    dispatch(setResults(res.data.products));
+  } catch (err) {
+    dispatch(setError(err.message));
+    console.error("Error fetching seller search results:", err);
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
 
 // Fetch top searched products & categories
 export const fetchTopSearched = () => async (dispatch) => {
