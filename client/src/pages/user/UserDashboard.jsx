@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Layout from '../../layouts/Layout';
 import UserProfile from './UserProfile';
+import MyOrders from './MyOrders';
 
 const tabs = ['Account', 'Orders', 'Update Profile'];
 
@@ -12,7 +13,7 @@ const UserDashboard = () => {
       case 'Account':
         return <UserProfile />;
       case 'Orders':
-        return <p className="text-lg">Your recent orders will appear here.</p>;
+        return <MyOrders />;
       case 'Update Profile':
         return <p className="text-lg">Update your profile information here.</p>;
       default:

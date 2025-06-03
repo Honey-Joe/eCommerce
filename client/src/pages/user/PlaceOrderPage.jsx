@@ -5,7 +5,8 @@ import Layout from "../../layouts/Layout";
 import axios from "axios";
 import { clearCart } from "../../features/cart/cartSlice";
 import axiosInstance from "../../axios";
-import { placeOrderFail, placeOrderRequest, placeOrderSuccess } from "../orders/orderSlice";
+import { placeOrderFail, placeOrderRequest, placeOrderSuccess } from "../../features/orders/orderSlice";
+import { toast } from "react-toastify";
 
 const PlaceOrderPage = () => {
   const { items } = useSelector((state) => state.cart);
@@ -57,11 +58,15 @@ const PlaceOrderPage = () => {
 
     dispatch(placeOrderSuccess(data));
     dispatch(clearCart());
+    toast.success("Order placed successfully!");
   } catch (error) {
     dispatch(
       placeOrderFail(
         error.response?.data?.message || error.message || "Order failed"
       )
+    );
+    toast.error(
+      error.response?.data?.message || error.message || "Order failed"
     );
   }
 };

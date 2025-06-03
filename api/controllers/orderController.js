@@ -34,7 +34,7 @@ exports.createOrder = async function (req, res) {
 // Get all orders of the logged-in buyer
 exports.getMyOrders = async function (req, res) {
   try {
-    const orders = await Order.find({ buyer: req.user._id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ buyer: req.user.userId }).sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch buyer orders" });
@@ -44,7 +44,7 @@ exports.getMyOrders = async function (req, res) {
 // Get all orders of the logged-in seller
 exports.getSellerOrders = async function (req, res) {
   try {
-    const orders = await Order.find({ seller: req.user._id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ seller: req.user.userId }).sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch seller orders" });
@@ -55,7 +55,7 @@ exports.getSellerOrders = async function (req, res) {
 exports.markOrderDelivered = async function (req, res) {
   try {
     const order = await Order.findById(req.params.id);
-    if (!order || order.seller.toString() !== req.user._id.toString()) {
+    if (!order || order.seller.toString() !== req.user.userId.toString()) {
       return res.status(404).json({ message: "Order not found or unauthorized" });
     }
 

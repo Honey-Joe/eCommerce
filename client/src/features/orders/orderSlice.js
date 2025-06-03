@@ -7,6 +7,9 @@ const orderSlice = createSlice({
     error: null,
     success: false,
     order: null,
+    myOrders: [],
+    myOrdersLoading: false,
+    myOrdersError: null,
   },
   reducers: {
     placeOrderRequest: (state) => {
@@ -29,6 +32,18 @@ const orderSlice = createSlice({
       state.success = false;
       state.order = null;
     },
+    getMyOrdersRequest: (state) => {
+      state.myOrdersLoading = true;
+      state.myOrdersError = null;
+    },
+    getMyOrdersSuccess: (state, action) => {
+      state.myOrdersLoading = false;
+      state.myOrders = action.payload;
+    },
+    getMyOrdersFail: (state, action) => {
+      state.myOrdersLoading = false;
+      state.myOrdersError = action.payload;
+    },
   },
 });
 
@@ -37,6 +52,9 @@ export const {
   placeOrderSuccess,
   placeOrderFail,
   clearOrderState,
+  getMyOrdersRequest,
+  getMyOrdersSuccess,
+  getMyOrdersFail,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
