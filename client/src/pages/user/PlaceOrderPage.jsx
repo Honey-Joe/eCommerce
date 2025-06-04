@@ -42,6 +42,7 @@ const PlaceOrderPage = () => {
       quantity: item.quantity,
       image: item.image,
       seller: item.seller._id,
+      sellerEmail: item.seller.email
     }));
 
 

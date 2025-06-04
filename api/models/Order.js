@@ -8,6 +8,9 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    buyerEmail :{
+      type: String
+    },
 
     orderItems: [
       {
@@ -26,6 +29,10 @@ const orderSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Seller",
             required: true,
+            
+        },
+        sellerEmail : {
+          type:String
         },
       },
     ],

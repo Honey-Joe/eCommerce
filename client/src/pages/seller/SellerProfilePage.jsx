@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { FiMenu, FiUser, FiBox, FiFileText, FiLogOut } from "react-icons/fi";
+import { FiMenu, FiUser, FiBox, FiFileText, FiLogOut, FiShoppingCart } from "react-icons/fi";
 import SellerProfile from "./SellerProfile";
 import SellerDashboard from "./SellerDashboard";
 import Layout from "../../layouts/Layout";
 import SellerDocument from "./SellerDocument";
 import Logout from "../../components/Logout";
+import SellerOrder from "./SellerOrder";
 
 const SellerProfilePage = () => {
   const [activeTab, setActiveTab] = useState("product");
@@ -18,6 +19,8 @@ const SellerProfilePage = () => {
         return <SellerProfile></SellerProfile>;
       case "documents":
         return <SellerDocument></SellerDocument>;
+      case "orders" :
+        return <SellerOrder />
       default:
         return <SellerDashboard />;
     }
@@ -70,6 +73,16 @@ const SellerProfilePage = () => {
               }`}
             >
               <FiBox className="text-lg" /> Products
+            </button>
+             <button
+              onClick={() => setActiveTab("orders")}
+              className={`flex items-center gap-3 px-4 py-2 rounded-xl w-full text-left transition-all duration-200 hover:bg-blue-100 hover:shadow ${
+                activeTab === "orders"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700"
+              }`}
+            >
+              <FiShoppingCart className="text-lg" /> Orders
             </button>
 
             <button
