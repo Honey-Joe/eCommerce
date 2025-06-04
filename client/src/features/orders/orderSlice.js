@@ -6,6 +6,7 @@ const orderSlice = createSlice({
     loading: false,
     error: null,
     success: false,
+    isDelivered: false,
     order: null,
     myOrders: [],
     myOrdersLoading: false,
@@ -44,6 +45,9 @@ const orderSlice = createSlice({
       state.myOrdersLoading = false;
       state.myOrdersError = action.payload;
     },
+    updateDeliveryStatus: (state,action)=>{
+      state.isDelivered = true
+    }
   },
 });
 

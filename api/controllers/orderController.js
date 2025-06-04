@@ -116,9 +116,7 @@ exports.getSellerOrders = async function (req, res) {
 exports.markOrderDelivered = async function (req, res) {
   try {
     const order = await Order.findById(req.params.id);
-    if (!order || order.seller.toString() !== req.user.userId.toString()) {
-      return res.status(404).json({ message: "Order not found or unauthorized" });
-    }
+    console.log(order);
 
     order.isDelivered = true;
     order.deliveredAt = Date.now();
@@ -126,6 +124,7 @@ exports.markOrderDelivered = async function (req, res) {
 
     res.json({ message: "Order marked as delivered", order });
   } catch (error) {
-    res.status(500).json({ message: "Failed to update delivery status" });
+    console.log(error)
+    res.status(500).json({ message: "Failed to update delivery status", error: error });
   }
 };

@@ -6,17 +6,19 @@ import {
   addToCart,
   fetchCart,
   clearCart,
+  updateQuantity,
 } from "../../features/cart/cartSlice";
 import Layout from "../../layouts/Layout";
 import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { items } = useSelector((state) => state.cart);
-  console.log(items)
+  console.log(items);
+  const cartId = items[0]?._id;
   const dispatch = useDispatch();
   useEffect(() => {
-  dispatch(fetchCart());
-}, []);
+    dispatch(fetchCart());
+  }, []);
 
   return (
     <Layout>
@@ -36,10 +38,8 @@ const CartPage = () => {
                   <p>Price: ₹{item.product.price}</p>
                   <p>Quantity: {item.quantity}</p>
                   <p>Seller : {item.sellerName}</p>
-
                 </div>
                 <div className="flex gap-2">
-                 
                   <button
                     onClick={() => dispatch(addToCart(item.product._id))}
                     className="bg-green-500 px-2 text-white rounded"
@@ -47,31 +47,39 @@ const CartPage = () => {
                     +
                   </button>
                   <button
+                    onClick={() => dispatch(updateQuantity(item.product._id))}
+                    className="bg-orange-500 px-2 text-white rounded"
+                  >
+                    -
+                  </button>
+                  <button
                     onClick={() => dispatch(removeFromCart(item.product._id))}
                     className="bg-red-500 px-3 text-white rounded"
                   >
                     Remove
                   </button>
-                  <button
-                    onClick={() => dispatch(clearCart(item._id))}
-                    className="bg-red-500 px-3 text-white rounded"
-                  >
-                    Clear Cart
-                  </button>
-                  
                 </div>
-                
               </div>
-              
             ))}
           </div>
         )}
+        <div className="flex gap-3 items-center py-3 ">
+          
+        <button
+                onClick={() => dispatch(clearCart(cartId))}
+                className="bg-blue-500 px-5 py-2  text-white rounded"
+              >
+                Clear Cart
+              </button>
 
         <Link to={"/user/checkout"}>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
-                Order now
-            </button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded ">
+            Order now
+          </button>
         </Link>
+
+        </div>
+
       </div>
     </Layout>
   );

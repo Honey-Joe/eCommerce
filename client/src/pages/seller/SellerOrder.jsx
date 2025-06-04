@@ -14,6 +14,7 @@ const SellerOrder = () => {
   const { myOrders, myOrdersLoading, myOrdersError } = useSelector(
     (state) => state.order
   );
+  console.log(myOrders);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -26,7 +27,9 @@ const SellerOrder = () => {
       } catch (error) {
         dispatch(
           getMyOrdersFail(
-            error.response?.data?.message || error.message || "Failed to fetch orders"
+            error.response?.data?.message ||
+              error.message ||
+              "Failed to fetch orders"
           )
         );
         console.error("Error fetching orders:", error);
@@ -35,41 +38,70 @@ const SellerOrder = () => {
 
     fetchOrders();
   }, [dispatch]);
+  const updateDeliveryStatus = async (orderId) => {
+    try {
+      const res = await axiosInstance.put("/orders/" + orderId + "/deliver");
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
+    <div className="max-w-[100%] mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">My Orders</h2>
 
-      <div className="max-w-[100%] mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">My Orders</h2>
-
-        {myOrdersLoading ? (
-          <p>Loading...</p>
-        ) : myOrdersError ? (
-          <p className="text-red-500">{myOrdersError}</p>
-        ) : myOrders.length === 0 ? (
-          <p>No orders found.</p>
-        ) : (
-          <div className="space-y-4">
-            {myOrders.map((order) => (
-              <div key={order._id} className="border p-4 rounded shadow-sm">
-                <p><strong>Order ID:</strong> {order._id}</p>
-                <p><strong>Buyer Email Id:</strong> {order.buyerEmail}</p>
-                <p><strong>Status:</strong> {order.paymentStatus}</p>
-                <p><strong>Total:</strong> ₹{order.totalPrice}</p>
-                <p><strong>Items:</strong></p>
-                <ul className="ml-4 list-disc">
-                  {order.orderItems.map((item, idx) => (
-                    <li key={idx}>
-                      {item.name} x {item.quantity}
-                    </li>
-                  ))}
-                </ul>
-                <p>Delivery Status : {order.isDelivered ? ("Delivered") : ("Pending")}</p>
-                <p></p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {myOrdersLoading ? (
+        <p>Loading...</p>
+      ) : myOrdersError ? (
+        <p className="text-red-500">{myOrdersError}</p>
+      ) : myOrders.length === 0 ? (
+        <p>No orders found.</p>
+      ) : (
+        <div className="space-y-4">
+          {myOrders.map((order) => (
+            <div key={order._id} className="border p-4 rounded shadow-sm">
+              <p>
+                <strong>Order ID:</strong> {order._id}
+              </p>
+              <p>
+                <strong>Buyer Email Id:</strong> {order.buyerEmail}
+              </p>
+              <p>
+                <strong>Status:</strong> {order.paymentStatus}
+              </p>
+              <p>
+                <strong>Total:</strong> ₹{order.totalPrice}
+              </p>
+              <p>
+                <strong>Items:</strong>
+              </p>
+              <ul className="ml-4 list-disc">
+                {order.orderItems.map((item, idx) => (
+                  <li key={idx}>
+                    {item.name} x {item.quantity}
+                  </li>
+                ))}
+              </ul>
+              <p>
+                {order.isDelivered ? (
+                  "Already Delivered"
+                ) : (
+                  <>
+                    <button
+                      className="bg-red-500 px-5 py-2 rounded-lg text-white"
+                      onClick={() => updateDeliveryStatus(order?._id)}
+                    >
+                      Delivered
+                    </button>
+                  </>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

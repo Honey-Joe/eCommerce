@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Logout from "../components/Logout";
+import { FiShoppingCart } from "react-icons/fi";
 
 const Navbar = () => {
   const { user, role } = useSelector((state) => state.auth);
@@ -93,10 +94,7 @@ const Navbar = () => {
             className="relative text-gray-700 hover:text-blue-600 text-xl"
             aria-label="Cart"
           >
-            🛒
-            <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white rounded-full px-1 animate-pulse">
-              3
-            </span>
+            <FiShoppingCart></FiShoppingCart>
           </Link>
 
           {/* Authenticated User */}
@@ -227,10 +225,8 @@ const Navbar = () => {
               className="block relative text-gray-700 hover:text-blue-600 text-xl"
               aria-label="Cart"
             >
-              🛒
-              <span className="absolute top-0 right-0 mt-0.5 -mr-2 text-xs bg-red-500 text-white rounded-full px-1 animate-pulse">
-                3
-              </span>
+              <FiShoppingCart></FiShoppingCart>
+              
             </Link>
 
             {isLoggedIn ? (
@@ -241,7 +237,7 @@ const Navbar = () => {
                   className="flex items-center space-x-3"
                 >
                   <img
-                    src="https://i.pravatar.cc/40"
+                    src={user?.profilePicture || "https://i.pravatar.cc/40"}
                     alt="Avatar"
                     className="w-9 h-9 rounded-full border border-blue-500"
                   />
