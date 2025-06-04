@@ -116,7 +116,6 @@ exports.getSellerOrders = async function (req, res) {
 exports.markOrderDelivered = async function (req, res) {
   try {
     const order = await Order.findById(req.params.id);
-    console.log(order);
 
     order.isDelivered = true;
     order.deliveredAt = Date.now();
