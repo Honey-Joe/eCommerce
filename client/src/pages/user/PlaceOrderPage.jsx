@@ -26,7 +26,7 @@ const PlaceOrderPage = () => {
 
   const [paymentMethod, setPaymentMethod] = useState("COD");
 
-  const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalPrice = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
   const handleChange = (e) => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
@@ -36,13 +36,13 @@ const PlaceOrderPage = () => {
   dispatch(placeOrderRequest());
   try {
     const orderItems = items.map((item) => ({
-      product: item._id,
-      name: item.name,
-      price: item.price,
+      product: item.product._id,
+      name: item.productName,
+      price: item.product.price,
       quantity: item.quantity,
-      image: item.image,
-      seller: item.seller._id,
-      sellerEmail: item.seller.email
+      image: item?.image,
+      seller: item.product.seller,
+      sellerEmail: item.sellerEmail
     }));
 
 

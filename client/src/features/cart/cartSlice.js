@@ -1,38 +1,71 @@
 // src/features/cart/cartSlice.js
 import { createSlice } from "@reduxjs/toolkit";
+import axiosInstance from "../../axios";
 
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
-    items: [], // { product, quantity }
+    items: [],
   },
   reducers: {
-    addToCart: (state, action) => {
-      const item = action.payload;
-      const existingItem = state.items.find((i) => i._id === item._id);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        state.items.push({ ...item, quantity: 1 });
-      }
+    setCart: (state, action) => {
+      state.items = action.payload;
     },
-    removeFromCart: (state, action) => {
-      state.items = state.items.filter((i) => i._id !== action.payload);
-    },
-    clearCart: (state) => {
+    clearCartState: (state) => {
       state.items = [];
-    },
-    decreaseQuantity: (state, action) => {
-      const item = state.items.find((i) => i._id === action.payload);
-      if (item) {
-        item.quantity -= 1;
-        if (item.quantity <= 0) {
-          state.items = state.items.filter((i) => i._id !== action.payload);
-        }
-      }
     },
   },
 });
 
-export const { addToCart, removeFromCart, clearCart, decreaseQuantity } = cartSlice.actions;
+export const { setCart, clearCartState } = cartSlice.actions;
 export default cartSlice.reducer;
+
+// ✅ Fetch cart items (GET /cart)
+export const fetchCart = () => async (dispatch) => {
+  try {
+    const res = await axiosInstance.get("/cart");
+    dispatch(setCart(res.data.items));
+  } catch (err) {
+    console.error("Failed to fetch cart:", err.message);
+  }
+};
+
+// ✅ Add item to cart (POST /cart)
+export const addToCart = (productId) => async (dispatch) => {
+  try {
+    const res = await axiosInstance.post("/cart", { productId });
+    dispatch(setCart(res.data.items));
+  } catch (err) {
+    console.error("Failed to add to cart:", err.message);
+  }
+};
+
+// ✅ Update quantity (PUT /cart/quantity)
+export const updateQuantity = (productId, type) => async (dispatch) => {
+  try {
+    const res = await axiosInstance.put("/cart/quantity", { productId, type });
+    dispatch(setCart(res.data.items));
+  } catch (err) {
+    console.error("Failed to update quantity:", err.message);
+  }
+};
+
+// ✅ Remove item from cart (DELETE /cart/:productId)
+export const removeFromCart = (productId) => async (dispatch) => {
+  try {
+    const res = await axiosInstance.delete(`/cart/${productId}`);
+    dispatch(setCart(res.data.items));
+  } catch (err) {
+    console.error("Failed to remove item:", err.message);
+  }
+};
+
+// ✅ Clear entire cart (DELETE /cart)
+export const clearCart = () => async (dispatch) => {
+  try {
+    await axiosInstance.delete("/cart");
+    dispatch(clearCartState());
+  } catch (err) {
+    console.error("Failed to clear cart:", err.message);
+  }
+};

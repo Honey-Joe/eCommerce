@@ -6,6 +6,13 @@ const cartItemSchema = new mongoose.Schema({
     ref: "Product",
     required: true,
   },
+  productName: String,
+  seller: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Seller",
+  },
+  sellerName: String,
+  sellerEmail: String,
   quantity: {
     type: Number,
     default: 1,
@@ -23,9 +30,7 @@ const cartSchema = new mongoose.Schema(
     },
     items: [cartItemSchema],
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 module.exports = mongoose.model("Cart", cartSchema);

@@ -1,17 +1,22 @@
 // src/pages/CartPage.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   removeFromCart,
-  decreaseQuantity,
   addToCart,
+  fetchCart,
+  clearCart,
 } from "../../features/cart/cartSlice";
 import Layout from "../../layouts/Layout";
 import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { items } = useSelector((state) => state.cart);
+  console.log(items)
   const dispatch = useDispatch();
+  useEffect(() => {
+  dispatch(fetchCart());
+}, []);
 
   return (
     <Layout>
@@ -24,35 +29,40 @@ const CartPage = () => {
             {items.map((item) => (
               <div
                 key={item._id}
-                className="flex justify-between items-center border p-4 rounded-md"
+                className="flex flex-wrap justify-between items-center border p-4 rounded-md"
               >
                 <div>
-                  <p className="font-semibold">{item.name}</p>
-                  <p>Price: ₹{item.price}</p>
+                  <p className="font-semibold">{item.productName}</p>
+                  <p>Price: ₹{item.product.price}</p>
                   <p>Quantity: {item.quantity}</p>
-                  <p>Seller: {item?.seller.name}</p>
+                  <p>Seller : {item.sellerName}</p>
+
                 </div>
                 <div className="flex gap-2">
+                 
                   <button
-                    onClick={() => dispatch(decreaseQuantity(item._id))}
-                    className="bg-yellow-500 px-2 text-white rounded"
-                  >
-                    -
-                  </button>
-                  <button
-                    onClick={() => dispatch(addToCart(item))}
+                    onClick={() => dispatch(addToCart(item.product._id))}
                     className="bg-green-500 px-2 text-white rounded"
                   >
                     +
                   </button>
                   <button
-                    onClick={() => dispatch(removeFromCart(item._id))}
+                    onClick={() => dispatch(removeFromCart(item.product._id))}
                     className="bg-red-500 px-3 text-white rounded"
                   >
                     Remove
                   </button>
+                  <button
+                    onClick={() => dispatch(clearCart(item._id))}
+                    className="bg-red-500 px-3 text-white rounded"
+                  >
+                    Clear Cart
+                  </button>
+                  
                 </div>
+                
               </div>
+              
             ))}
           </div>
         )}
