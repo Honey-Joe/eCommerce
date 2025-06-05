@@ -257,18 +257,7 @@ const ProductDetails = () => {
                 </Modal>
               )}
 
-              {/* Mark-as-Sold button or Sold badge */}
-              {product.isSold ? (
-                <p className="text-green-600 font-semibold text-center">Sold</p>
-              ) : (
-                <button
-                  className="w-full py-2 text-sm bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition disabled:opacity-60"
-                  onClick={() => handleIsSoldStatus(product._id)}
-                  disabled={loading}
-                >
-                  {loading ? "Marking as Sold…" : "Mark as Sold"}
-                </button>
-              )}
+              
             </div>
             {/* Delete button */}
 
