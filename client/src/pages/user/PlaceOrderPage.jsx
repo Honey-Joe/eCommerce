@@ -107,7 +107,10 @@ const PlaceOrderPage = () => {
         <div className="mb-4">
           <h3 className="font-semibold text-lg">Order Summary</h3>
           <p>Total Items: {items.length}</p>
-          <p>Name : {items.name}</p>
+          <p>Name : {items.map((e)=> {return (<>
+              <div>{e.productName},</div>
+          
+          </>)})}</p>
           <p>Total Price: ₹{totalPrice}</p>
         </div>
 

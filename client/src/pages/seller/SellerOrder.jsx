@@ -1,29 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import Layout from "../../layouts/Layout";
 import {
   getMyOrdersRequest,
   getMyOrdersSuccess,
   getMyOrdersFail,
 } from "../../features/orders/orderSlice";
 import axiosInstance from "../../axios";
+import {toast} from "react-toastify";
 
 const SellerOrder = () => {
   const dispatch = useDispatch();
+  const [otpSentToOrder, setOtpSentToOrder] = useState(null);
+  const [otpInputs, setOtpInputs] = useState({}); // Store OTPs per order
   const { myOrders, myOrdersLoading, myOrdersError } = useSelector(
     (state) => state.order
   );
-  console.log(myOrders);
 
   useEffect(() => {
     const fetchOrders = async () => {
       dispatch(getMyOrdersRequest());
       try {
         const { data } = await axiosInstance.get("/orders/seller");
-        console.log(data);
         dispatch(getMyOrdersSuccess(data));
-        console.log("Fetched orders:", data);
       } catch (error) {
         dispatch(
           getMyOrdersFail(
@@ -32,19 +30,45 @@ const SellerOrder = () => {
               "Failed to fetch orders"
           )
         );
-        console.error("Error fetching orders:", error);
       }
     };
 
     fetchOrders();
   }, [dispatch]);
-  const updateDeliveryStatus = async (orderId) => {
+
+  const sendOtp = async (orderId) => {
     try {
-      const res = await axiosInstance.put("/orders/" + orderId + "/deliver");
-      console.log(res.data);
+      const res = await axiosInstance.put(`/orders/${orderId}/send-otp`);
+      toast.success("OTP sent to buyer's email.");
+      setOtpSentToOrder(orderId);
     } catch (err) {
-      console.log(err);
+      console.error("Send OTP Error:", err.message);
+      toast.error("Failed to send OTP.");
     }
+  };
+
+  const verifyOtp = async (orderId) => {
+    try {
+      const otp = otpInputs[orderId];
+      if (!otp) return alert("Enter OTP before submitting.");
+
+      const res = await axiosInstance.put(`/orders/${orderId}/verify-otp`, {
+        otp,
+      });
+      toast.success(res.data.message || "Order marked as delivered");
+      setOtpSentToOrder(null);
+      setOtpInputs((prev) => ({ ...prev, [orderId]: "" }));
+      // Refetch orders
+      const { data } = await axiosInstance.get("/orders/seller");
+      dispatch(getMyOrdersSuccess(data));
+    } catch (err) {
+      console.error("Verify OTP Error:", err.message);
+      toast.error(err.response?.data?.message || "OTP verification failed");
+    }
+  };
+
+  const handleOtpChange = (orderId, value) => {
+    setOtpInputs((prev) => ({ ...prev, [orderId]: value }));
   };
 
   return (
@@ -84,17 +108,34 @@ const SellerOrder = () => {
                 ))}
               </ul>
               <p>
+                <strong>Delivery Status:</strong>{" "}
                 {order.isDelivered ? (
-                  "Already Delivered"
-                ) : (
-                  <>
+                  <span className="text-green-600 font-semibold">Delivered</span>
+                ) : otpSentToOrder === order._id ? (
+                  <div className="flex gap-2 mt-2">
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={otpInputs[order._id] || ""}
+                      onChange={(e) =>
+                        handleOtpChange(order._id, e.target.value)
+                      }
+                      className="border px-2 py-1 rounded"
+                    />
                     <button
-                      className="bg-red-500 px-5 py-2 rounded-lg text-white"
-                      onClick={() => updateDeliveryStatus(order?._id)}
+                      className="bg-blue-600 text-white px-4 py-1 rounded"
+                      onClick={() => verifyOtp(order._id)}
                     >
-                      Delivered
+                      Submit OTP
                     </button>
-                  </>
+                  </div>
+                ) : (
+                  <button
+                    className="bg-red-600 text-white px-5 py-2 mt-2 rounded"
+                    onClick={() => sendOtp(order._id)}
+                  >
+                    Send OTP
+                  </button>
                 )}
               </p>
             </div>

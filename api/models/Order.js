@@ -11,6 +11,11 @@ const orderSchema = new mongoose.Schema(
     buyerEmail :{
       type: String
     },
+    buyerName : {
+      type:String
+    },
+    otp:String,
+    otpExpiresAt : Date,
 
     orderItems: [
       {

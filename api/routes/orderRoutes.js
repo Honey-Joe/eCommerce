@@ -10,5 +10,8 @@ router.get("/my", userAuth, orderController.getMyOrders);
 // Seller routes
 router.get("/seller", sellerAuth, orderController.getSellerOrders);
 router.put("/:id/deliver", sellerAuth, orderController.markOrderDelivered);
+router.put("/:id/send-otp",sellerAuth, orderController.sendDeliveryOtp);
+router.put("/:id/verify-otp",sellerAuth, orderController.verifyOtpAndDeliver);
+
 
 module.exports = router;
