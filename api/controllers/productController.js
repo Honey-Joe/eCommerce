@@ -134,7 +134,6 @@ exports.searchProducts = async (req, res) => {
         _id: { $nin: searchedIds },
       }).limit(10); // Optional limit
     }
-    
 
     res.status(200).json({
       searched: searchedProducts,
@@ -204,8 +203,6 @@ exports.searchSellerProducts = async (req, res) => {
   }
 };
 
-
-
 exports.updateProductStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -231,12 +228,10 @@ exports.updateProductStatus = async (req, res) => {
       }
 
       if (brand.status !== "approved") {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Product cannot be approved because the brand is not approved.",
-          });
+        return res.status(400).json({
+          message:
+            "Product cannot be approved because the brand is not approved.",
+        });
       }
     }
 
@@ -314,12 +309,14 @@ exports.getProductById = async (req, res) => {
 // Update product (Only the original approved seller)
 exports.updateProduct = async (req, res) => {
   try {
-    const sellerId = req.user._id;
+    const sellerId = req.user.userId;
     const product = await Product.findById(req.params.id);
 
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
 
-    if (product.seller.toString() !== sellerId.toString()) {
+    if (!product.seller || product.seller.toString() !== sellerId.toString()) {
       return res
         .status(403)
         .json({ message: "You are not authorized to update this product" });
@@ -333,10 +330,21 @@ exports.updateProduct = async (req, res) => {
     }
 
     const updates = req.body;
-
+    console.log(req.body);
+    // If images are uploaded, upload them to Cloudinary and include in updates
     if (req.files && req.files.length > 0) {
-      const urls = await uploadToCloudinary(req.files, "product-images");
-      updates.images = urls.map((url) => ({ url }));
+      const cloudinaryResponses = await uploadToCloudinary(
+        req.files,
+        "product-images"
+      );
+
+      const imageUrls = cloudinaryResponses.map((img) => ({
+        url: img.url,
+        alt: img.originalname,
+      }));
+
+      updates.images = imageUrls; // ✅ correct field name
+      console.log(imageUrls);
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -349,11 +357,13 @@ exports.updateProduct = async (req, res) => {
       .status(200)
       .json({ message: "Product updated", product: updatedProduct });
   } catch (error) {
+    console.error("Update error:", error);
     res
       .status(500)
       .json({ message: "Failed to update product", error: error.message });
   }
 };
+
 
 // Delete product (Only the original seller)
 // controllers/productController.js
@@ -430,11 +440,9 @@ exports.getParentProductsBySeller = async (req, res) => {
     res.status(200).json(parentProducts);
   } catch (error) {
     console.error("Error fetching parent products by seller:", error);
-    res
-      .status(500)
-      .json({
-        message: "Server error while fetching parent products by seller",
-      });
+    res.status(500).json({
+      message: "Server error while fetching parent products by seller",
+    });
   }
 };
 

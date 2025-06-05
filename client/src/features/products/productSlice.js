@@ -165,5 +165,17 @@ export const fetchVariantsByParentProductId = (parentId) => async (dispatch) => 
     console.error("Error fetching variants:", error);
   }
 };
+export const updateProductById = (payload) => async (dispatch) => {
+  const { id, data } = payload;
+  try {
+    const res = await axiosInstance.put(`/products/${id}`, data,{headers:{
+      "Content-Type": "multipart/form-data"
+    }});
+    dispatch(setProduct(res.data)) ;
+  } catch (err) {
+    throw err.response?.data || new Error("Update failed");
+  }
+};
+
 
 export default productSlice.reducer;

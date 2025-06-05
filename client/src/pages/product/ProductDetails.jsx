@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Carousel } from "react-responsive-carousel";
@@ -16,6 +16,8 @@ import {
   setProductLoading,
 } from "../../features/products/productSlice";
 import { toast } from "react-toastify";
+import Modal from "../../components/Modal";
+import UpdateProductForm from "../seller/UpdateProductFrom";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -43,7 +45,7 @@ const ProductDetails = () => {
 
     try {
       dispatch(setProductLoading(true));
-      await dispatch(deleteProductById(productId))
+      await dispatch(deleteProductById(productId));
       dispatch(removeSellerProduct(productId));
       toast.success("Product Deleted Successfully");
       navigate(-1); // Go back after deletion
@@ -54,6 +56,9 @@ const ProductDetails = () => {
       dispatch(setProductLoading(false));
     }
   };
+  const [showForm, setShowForm] = useState(false);
+  
+    const handleToggleForm = () => setShowForm(!showForm);
 
   const handleIsSoldStatus = async (productId) => {
     if (!window.confirm("Are you sure you want to mark this product as sold?"))
@@ -61,7 +66,7 @@ const ProductDetails = () => {
 
     try {
       dispatch(setProductLoading(true));
-      await dispatch(isSoldProductById(productId))
+      await dispatch(isSoldProductById(productId));
       dispatch(setIssoldStatus(productId));
       toast.success("Product marked as Sold");
     } catch (err) {
@@ -214,7 +219,6 @@ const ProductDetails = () => {
                         <p className="text-blue-600 font-semibold text-sm">
                           ₹{variant.price}
                         </p>
-                       
                       </div>
                     </div>
                   ))}
@@ -236,6 +240,23 @@ const ProductDetails = () => {
               >
                 {loading ? "Deleting…" : "Delete"}
               </button>
+              {/* Update Product Button */}
+              <button
+                className="w-full py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-medium transition disabled:opacity-60"
+                onClick={handleToggleForm}
+              >
+                Edit Product
+              </button>
+
+              {/* Modal with Update Form */}
+              {showForm && (
+                <Modal isOpen={showForm} onClose={handleToggleForm}>
+                  <UpdateProductForm
+                    product={product}
+                    onClose={handleToggleForm}
+                  />
+                </Modal>
+              )}
 
               {/* Mark-as-Sold button or Sold badge */}
               {product.isSold ? (
@@ -263,6 +284,9 @@ const ProductDetails = () => {
               </p>
               <p>
                 <span className="font-medium">Brand:</span> {product.brand}
+              </p>
+              <p>
+                <span className="font-medium">Stock:</span> {product.stock}
               </p>
               <p>
                 <span className="font-medium">Product ID:</span> {product._id}
