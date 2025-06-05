@@ -178,6 +178,13 @@ exports.verifyOtpAndDeliver = async (req, res) => {
     order.otpExpiresAt = undefined;
 
     await order.save();
+    for (const item of order.orderItems) {
+      const product = await Product.findById(item.product._id);
+      if (product) {
+        product.isSold = true;
+        await product.save();
+      }
+    }
     res.json({ message: "Order marked as delivered", order });
   } catch (error) {
     console.error(error);
