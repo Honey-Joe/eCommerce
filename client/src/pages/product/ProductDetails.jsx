@@ -27,7 +27,6 @@ const ProductDetails = () => {
   const { product, loading, error, variants } = useSelector(
     (state) => state.products
   );
-  console.log(product);
   useEffect(() => {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);

@@ -171,7 +171,7 @@ export const updateProductById = (payload) => async (dispatch) => {
     const res = await axiosInstance.put(`/products/${id}`, data,{headers:{
       "Content-Type": "multipart/form-data"
     }});
-    dispatch(setProduct(res.data)) ;
+    dispatch(setProduct(res.data.product)) ;
   } catch (err) {
     throw err.response?.data || new Error("Update failed");
   }
