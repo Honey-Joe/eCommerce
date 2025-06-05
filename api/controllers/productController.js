@@ -330,7 +330,6 @@ exports.updateProduct = async (req, res) => {
     }
 
     const updates = req.body;
-    console.log(req.body);
     // If images are uploaded, upload them to Cloudinary and include in updates
     if (req.files && req.files.length > 0) {
       const cloudinaryResponses = await uploadToCloudinary(
@@ -344,7 +343,6 @@ exports.updateProduct = async (req, res) => {
       }));
 
       updates.images = imageUrls; // ✅ correct field name
-      console.log(imageUrls);
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
