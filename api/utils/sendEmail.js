@@ -22,12 +22,11 @@ const sendMail = async (to, buyerName, subject, otp) => {
       .replace("{{BuyerName}}", buyerName);
 
     const mailOptions = {
-      from: `"Seller Team" <${process.env.EMAIL_USER}>`, // Custom sender name
+      from: `"ShopEase" <${process.env.EMAIL_USER}>`, // Custom sender name
       to,
       subject,
       html: htmlContent,
     };
-
     // Send the email
     await transporter.sendMail(mailOptions);
   } catch (error) {

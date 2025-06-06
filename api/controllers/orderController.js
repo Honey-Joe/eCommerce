@@ -1,7 +1,12 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const generateInvoicePDF = require("../utils/generateInvoics");
 const sendMail = require("../utils/sendEmail");
+const sendInvoiceEmail = require("../utils/sendInvoiceEmail");
+const fs = require("fs");
+
+
 
 // Create a new order
 exports.createOrder = async function (req, res) {
@@ -185,6 +190,14 @@ exports.verifyOtpAndDeliver = async (req, res) => {
         await product.save();
       }
     }
+
+    const pdfPath = await generateInvoicePDF(order);
+
+    // Send email with invoice
+    await sendInvoiceEmail(order, pdfPath);
+
+    // Delete temp PDF file
+    fs.unlinkSync(pdfPath);
     res.json({ message: "Order marked as delivered", order });
   } catch (error) {
     console.error(error);
