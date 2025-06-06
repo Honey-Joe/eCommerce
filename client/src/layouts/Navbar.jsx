@@ -1,13 +1,23 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Logout from "../components/Logout";
 import { FiShoppingCart } from "react-icons/fi";
+import { useEffect } from "react";
+import { fetchSiteSettings } from "../features/siteSetting/siteSettingSlice";
 
 const Navbar = () => {
   const { user, role } = useSelector((state) => state.auth);
+  const {settings} = useSelector((state)=> state.siteSetting)
+  console.log(settings);
+  
   const isLoggedIn = !!role;
   const [menuOpen, setMenuOpen] = useState(false);
+  const dispatch = useDispatch()
+
+  useEffect(()=>{
+    dispatch(fetchSiteSettings());
+  },[dispatch])
   
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
@@ -20,9 +30,10 @@ const Navbar = () => {
                 {
                   <Link
                     to="/seller/home"
-                    className="text-3xl font-extrabold text-blue-600 tracking-tight"
+                    className="text-3xl font-extrabold text-blue-600 tracking-tight flex gap-3 items-center"
                   >
-                    ShopEase
+                    <img src={settings.logoUrl} alt="logourl" className="w-[50px] h-[50px]" />
+                    {settings?.siteName}
                   </Link>
                 }
               </>
@@ -32,7 +43,7 @@ const Navbar = () => {
                   to="/user/home"
                   className="text-3xl font-extrabold text-blue-600 tracking-tight"
                 >
-                  ShopEase
+                  {settings.siteName}
                 </Link>
               </>
             ) : (
@@ -41,7 +52,7 @@ const Navbar = () => {
                   to="/"
                   className="text-3xl font-extrabold text-blue-600 tracking-tight"
                 >
-                  ShopEase
+                  {settings?.siteName}
                 </Link>
               </>
             )

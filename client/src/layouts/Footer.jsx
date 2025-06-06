@@ -1,15 +1,19 @@
 // src/components/Footer.jsx
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
+
+  const {settings} = useSelector((state)=>state.siteSetting)
+
   return (
     <footer className="bg-gray-100 text-gray-700 mt-10 border-t">
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         
         {/* Brand Info */}
         <div>
-          <h3 className="text-xl font-bold text-blue-600 mb-2">ShopEase</h3>
+          <h3 className="text-xl font-bold text-blue-600 mb-2">{settings?.siteName}</h3>
           <p className="text-sm">
             Your one-stop shop for all things fashion, tech, and lifestyle.
           </p>
