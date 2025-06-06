@@ -9,7 +9,6 @@ import { fetchSiteSettings } from "../features/siteSetting/siteSettingSlice";
 const Navbar = () => {
   const { user, role } = useSelector((state) => state.auth);
   const {settings} = useSelector((state)=> state.siteSetting)
-  console.log(settings);
   
   const isLoggedIn = !!role;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -43,7 +42,7 @@ const Navbar = () => {
                   to="/user/home"
                   className="text-3xl font-extrabold text-blue-600 tracking-tight"
                 >
-                  {settings.siteName}
+                  {settings?.siteName}
                 </Link>
               </>
             ) : (

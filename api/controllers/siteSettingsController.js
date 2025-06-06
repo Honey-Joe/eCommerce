@@ -1,4 +1,5 @@
 const SiteSetting = require("../models/SiteSettings");
+const uploadToCloudinary = require("../utils/uploadToCloudinary");
 
 // Get current site settings
 exports.getSiteSettings = async (req, res) => {
@@ -14,6 +15,21 @@ exports.getSiteSettings = async (req, res) => {
 exports.updateSiteSettings = async (req, res) => {
   try {
     const data = req.body;
+
+        // If images are uploaded, upload them to Cloudinary and include in updates
+        if (req.files && req.files.length > 0) {
+          const cloudinaryResponses = await uploadToCloudinary(
+            req.files,
+            "product-images"
+          );
+    
+          const imageUrls = cloudinaryResponses.map((img) => ({
+            url: img.url,
+            alt: img.originalname,
+          }));
+    
+          data.logoUrl = imageUrls; // ✅ correct field name
+        }
 
     let settings = await SiteSetting.findOne();
     if (settings) {
