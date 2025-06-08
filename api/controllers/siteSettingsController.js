@@ -16,20 +16,12 @@ exports.updateSiteSettings = async (req, res) => {
   try {
     const data = req.body;
 
-        // If images are uploaded, upload them to Cloudinary and include in updates
-        if (req.files && req.files.length > 0) {
-          const cloudinaryResponses = await uploadToCloudinary(
-            req.files,
-            "product-images"
-          );
-    
-          const imageUrls = cloudinaryResponses.map((img) => ({
-            url: img.url,
-            alt: img.originalname,
-          }));
-    
-          data.logoUrl = imageUrls; // ✅ correct field name
-        }
+    // Handle logo upload
+    if (req.file) {
+      const uploaded = await uploadToCloudinary([req.file], "site-settings");
+      data.logoUrl = uploaded[0]?.url;
+    }
+    console.log(data);
 
     let settings = await SiteSetting.findOne();
     if (settings) {
@@ -37,10 +29,12 @@ exports.updateSiteSettings = async (req, res) => {
     } else {
       settings = await SiteSetting.create(data);
     }
-    await settings.save()
 
     res.json({ message: "Site settings updated", settings });
   } catch (error) {
+    console.error("Site settings update error:", error);
     res.status(500).json({ message: "Error updating settings", error });
   }
 };
+
+

@@ -7,6 +7,7 @@ import sellersReducer from "../features/admin/sellersSlice"
 import productReducer from "../features/admin/productSlice";
 import categoryReducer from '../features/admin/categorySlice';
 import brandReducer from "../features/admin/brandSlice"
+import siteSettingReducer from "../features/siteSetting/siteSettingSlice"
 const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -15,7 +16,8 @@ const store = configureStore({
     sellers: sellersReducer,
     products: productReducer,
     category  : categoryReducer,
-    brand : brandReducer
+    brand : brandReducer,
+    siteSetting: siteSettingReducer
   },
 });
 

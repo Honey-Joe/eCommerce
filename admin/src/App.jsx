@@ -14,7 +14,6 @@ import UserList from "./pages/admin/users/UserList";
 import ApprovedSellers from "./pages/admin/seller/ApprovedSellers";
 import PendingSellers from "./pages/admin/seller/PendingSellers";
 import DisabledSellers from "./pages/admin/seller/DisabledSellers";
-import SiteSettings from "./pages/admin/sitesettings/SiteSettings";
 import OtherSettings from "./pages/admin/sitesettings/OtherSettings";
 import ApprovedProducts from "./pages/admin/products/ApprovedProducts";
 import PendingProducts from "./pages/admin/products/PendingProducts";
@@ -23,6 +22,7 @@ import { fetchProducts } from "./features/admin/productSlice";
 import AdminCategoryManager from "./pages/admin/category/AdminCategoryManager";
 import BrandManagement from "./pages/admin/brand/BrandManagement";
 import BrandList from "./pages/admin/brand/PendingBrand";
+import SiteSettingForm from "./pages/admin/sitesettings/SiteSettingForm";
 
 function App() {
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ function App() {
           <Route path="products/approved" element={<ApprovedProducts />} />
           <Route path="products/pending" element={<PendingProducts />} />
           <Route path="products/disabled" element={<DisabledProducts />} />
-          <Route path="site-settings" element={<SiteSettings />} />
+          <Route path="site-settings" element={<SiteSettingForm />} />
           <Route path="others" element={<OtherSettings />} />
           <Route path="addcategory" element={<AdminCategoryManager />} />
           <Route path="brand" element={<BrandManagement></BrandManagement>} />
