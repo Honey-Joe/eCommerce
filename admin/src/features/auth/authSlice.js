@@ -1,15 +1,10 @@
-// src/features/auth/authSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  role: null,        // Fetched from server if needed
-  status: 'idle',
+  role: null,
   user: null,
-    isAuthenticated: false,
-
-  error: null,
-  loading: false,
-  success: false,
+  isAuthenticated: false,
+  permissions: [], // NEW
 };
 
 const authSlice = createSlice({
@@ -18,26 +13,23 @@ const authSlice = createSlice({
   reducers: {
     loginSuccess: (state, action) => {
       state.role = action.payload.role;
+      state.permissions = action.payload.permissions || []; // NEW
       state.isAuthenticated = true;
     },
     logout: (state) => {
       state.role = null;
       state.isAuthenticated = false;
+      state.permissions = [];
     },
-    
     setAdmin: (state, action) => {
       state.user = action.payload;
     },
   },
 });
 
-export const {
-  loginSuccess,
-  logout,
-  setAdmin,
-} = authSlice.actions;
+export const { loginSuccess, logout, setAdmin } = authSlice.actions;
 
 export const selectAuthRole = (state) => state.auth.role;
-export const selectAuthStatus = (state) => state.auth.status;
+export const selectPermissions = (state) => state.auth.permissions;
 
 export default authSlice.reducer;

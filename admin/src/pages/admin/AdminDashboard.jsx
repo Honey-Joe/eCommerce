@@ -13,17 +13,81 @@ import axiosInstance from "../../axios";
 import Layout from "../../layouts/Layout";
 import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 
+// Sidebar config with permission keys and a super admin exclusive section
+const sidebarSections = [
+  {
+    label: "User Management",
+    icon: "👥",
+    sectionKey: "user",
+    links: [{ path: "/admin/users", label: "View Users", perm: "user-management" }],
+  },
+  {
+    label: "Seller Management",
+    icon: "🛍️",
+    sectionKey: "seller",
+    links: [
+      { path: "/admin/sellers/approved", label: "Approved Sellers", perm: "seller-management" },
+      { path: "/admin/sellers/pending", label: "Pending Sellers", perm: "seller-management" },
+      { path: "/admin/sellers/disabled", label: "Disabled Sellers", perm: "seller-management" },
+    ],
+  },
+  {
+    label: "Product Management",
+    icon: "📦",
+    sectionKey: "product",
+    links: [
+      { path: "/admin/products/approved", label: "Approved Products", perm: "product-management" },
+      { path: "/admin/products/pending", label: "Pending Products", perm: "product-management" },
+      { path: "/admin/products/disabled", label: "Disabled Products", perm: "product-management" },
+    ],
+  },
+  {
+    label: "Category Management",
+    icon: "📁",
+    sectionKey: "category",
+    links: [{ path: "/admin/addcategory", label: "Add Category", perm: "category-management" }],
+  },
+  {
+    label: "Brand Management",
+    icon: "📁",
+    sectionKey: "brand",
+    links: [
+      { path: "/admin/brand", label: "Manage Brand", perm: "brand-management" },
+      { path: "/admin/pendingbrands", label: "Pending Brands", perm: "brand-management" },
+    ],
+  },
+  {
+    label: "Site Settings",
+    icon: "⚙️",
+    sectionKey: "site",
+    links: [{ path: "/admin/site-settings", label: "General Settings", perm: "site-settings" }],
+  },
+  {
+    label: "Other Settings",
+    icon: "🔧",
+    sectionKey: "other",
+    links: [{ path: "/admin/others", label: "Misc Settings", perm: "other-settings" }],
+  },
+  // Super Admin Exclusive section
+  {
+    label: "Role Management",
+    icon: "🛡️",
+    sectionKey: "role",
+    links: [{ path: "/admin/roles", label: "Manage Roles", perm: "role-management" }],
+    superAdminOnly: true,
+  },
+];
+
 const AdminDashboard = () => {
   const dispatch = useDispatch();
   const users = useSelector(selectUsers);
   const sellers = useSelector(selectSellers);
+  const user = useSelector((state) => state.auth); // Current user with role & permissions
   const location = useLocation();
-
   const [openSection, setOpenSection] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sidebarWidth, setSidebarWidth] = useState(260);
   const [isDragging, setIsDragging] = useState(false);
-
   const sidebarRef = useRef();
 
   useEffect(() => {
@@ -49,19 +113,13 @@ const AdminDashboard = () => {
     setOpenSection((prev) => (prev === section ? null : section));
   };
 
-  const handleMouseDown = () => {
-    setIsDragging(true);
-  };
-
+  const handleMouseDown = () => setIsDragging(true);
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    const newWidth = Math.max(200, e.clientX);
+    const newWidth = Math.min(Math.max(200, e.clientX), 400);
     setSidebarWidth(newWidth);
   };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseUp = () => setIsDragging(false);
 
   useEffect(() => {
     if (isDragging) {
@@ -79,34 +137,63 @@ const AdminDashboard = () => {
 
   const showDashboardStats = location.pathname === "/admin/dashboard";
 
-  const AccordionSection = ({ label, icon, sectionKey, links }) => (
-    <div>
-      <button
-        onClick={() => toggleAccordion(sectionKey)}
-        className="w-full flex justify-between items-center px-2 py-2 hover:text-blue-600 font-medium"
-      >
-        <span>{icon} {label}</span>
-        <span>{openSection === sectionKey ? <ChevronUp size={"16px"} /> : <ChevronDown size={"16px"} />}</span>
-      </button>
-      {openSection === sectionKey && (
-        <div className="ml-4 mt-1 space-y-1 transition-all duration-300">
-          {links.map(({ path, label }) => (
-            <NavLink
-              key={path}
-              to={path}
-              className={({ isActive }) =>
-                `block px-2 py-1 rounded hover:bg-blue-100 ${
-                  isActive ? "text-blue-600 font-semibold" : ""
-                }`
-              }
+  const renderSidebarSections = () => {
+    if (!user) return null;
+    return sidebarSections
+      .filter((section) => {
+        // Show if super-admin or permission exists
+        if (user.role === "super-admin") return true;
+        // Skip superAdminOnly sections for non super-admins
+        if (section.superAdminOnly) return false;
+        // Otherwise, check permissions on links
+        return section.links.some((link) => user.permissions.includes(link.perm));
+      })
+      .map(({ label, icon, sectionKey, links }) => {
+        const allowedLinks =
+          user.role === "super-admin"
+            ? links
+            : links.filter((link) => user.permissions.includes(link.perm));
+        if (allowedLinks.length === 0) return null;
+
+        return (
+          <div key={sectionKey}>
+            <button
+              onClick={() => toggleAccordion(sectionKey)}
+              className="w-full flex justify-between items-center px-2 py-2 hover:text-blue-600 font-medium"
+              type="button"
             >
-              {label}
-            </NavLink>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+              <span>
+                {icon} {label}
+              </span>
+              <span>
+                {openSection === sectionKey ? (
+                  <ChevronUp size={"16px"} />
+                ) : (
+                  <ChevronDown size={"16px"} />
+                )}
+              </span>
+            </button>
+            {openSection === sectionKey && (
+              <div className="ml-4 mt-1 space-y-1 transition-all duration-300">
+                {allowedLinks.map(({ path, label }) => (
+                  <NavLink
+                    key={path}
+                    to={path}
+                    className={({ isActive }) =>
+                      `block px-2 py-1 rounded hover:bg-blue-100 ${
+                        isActive ? "text-blue-600 font-semibold" : ""
+                      }`
+                    }
+                  >
+                    {label}
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      });
+  };
 
   return (
     <Layout>
@@ -115,6 +202,7 @@ const AdminDashboard = () => {
         <button
           className="absolute top-4 left-4 z-50 md:hidden bg-white p-2 rounded shadow"
           onClick={() => setIsSidebarOpen((prev) => !prev)}
+          aria-label="Toggle sidebar"
         >
           {isSidebarOpen ? <X /> : <Menu />}
         </button>
@@ -127,7 +215,21 @@ const AdminDashboard = () => {
           } md:block`}
           style={{ width: sidebarWidth }}
         >
-          <div className="p-6 text-lg font-bold text-blue-600">Admin Panel</div>
+          <div className="p-6 text-lg font-bold text-blue-600">
+            Admin Panel
+            <div className="text-xs font-normal text-gray-500 mt-1">
+              {/* Show role */}
+              Role:{" "}
+              <span
+                className={`font-semibold ${
+                  user?.role === "super-admin" ? "text-red-600" : "text-green-600"
+                }`}
+              >
+                {user?.role?.toUpperCase() || "UNKNOWN"}
+              </span>
+            </div>
+          </div>
+
           <nav className="p-4 space-y-3 text-gray-700 text-sm">
             <NavLink
               to="/admin/dashboard"
@@ -140,73 +242,16 @@ const AdminDashboard = () => {
               🏠 Dashboard
             </NavLink>
 
-            <AccordionSection
-              label="User Management"
-              icon="👥"
-              sectionKey="user"
-              links={[{ path: "/admin/users", label: "View Users" }]}
-            />
-
-            <AccordionSection
-              label="Seller Management"
-              icon="🛍️"
-              sectionKey="seller"
-              links={[
-                { path: "/admin/sellers/approved", label: "Approved Sellers" },
-                { path: "/admin/sellers/pending", label: "Pending Sellers" },
-                { path: "/admin/sellers/disabled", label: "Disabled Sellers" },
-              ]}
-            />
-
-            <AccordionSection
-              label="Product Management"
-              icon="📦"
-              sectionKey="product"
-              links={[
-                { path: "/admin/products/approved", label: "Approved Products" },
-                { path: "/admin/products/pending", label: "Pending Products" },
-                { path: "/admin/products/disabled", label: "Disabled Products" },
-              ]}
-            />
-
-            <AccordionSection
-              label="Category Management"
-              icon="📁"
-              sectionKey="category"
-              links={[
-                { path: "/admin/addcategory", label: "Add Category" },
-              ]}
-            />
-
-            <AccordionSection
-              label="Brand Management"
-              icon="📁"
-              sectionKey="brand"
-              links={[
-                { path: "/admin/brand", label: "Manage Brand" },
-                {path: "/admin/pendingbrands" ,label: "Pending Brands"}
-              ]}
-            />
-
-            <AccordionSection
-              label="Site Settings"
-              icon="⚙️"
-              sectionKey="site"
-              links={[{ path: "/admin/site-settings", label: "General Settings" }]}
-            />
-
-            <AccordionSection
-              label="Other Settings"
-              icon="🔧"
-              sectionKey="other"
-              links={[{ path: "/admin/others", label: "Misc Settings" }]}
-            />
+            {/* Render dynamic sidebar */}
+            {renderSidebarSections()}
           </nav>
 
           {/* Drag Handle */}
           <div
             className="absolute top-0 right-0 h-full w-2 cursor-col-resize"
             onMouseDown={handleMouseDown}
+            role="separator"
+            aria-orientation="vertical"
           />
         </aside>
 
@@ -220,9 +265,7 @@ const AdminDashboard = () => {
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-sm text-gray-500">Total Sellers</h3>
-                <p className="text-2xl font-bold text-orange-600">
-                  {sellers.length}
-                </p>
+                <p className="text-2xl font-bold text-orange-600">{sellers.length}</p>
               </div>
             </div>
           ) : (

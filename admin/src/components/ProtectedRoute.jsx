@@ -1,22 +1,18 @@
-// src/components/ProtectedRoute.jsx
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { Navigate, Outlet } from 'react-router-dom';
+// src/components/ProtectedRoute.js
+import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ allowedRoles }) => {
-  const { role } = useSelector((state) => state.auth);
+const ProtectedRoute = ({ element, requiredPermission }) => {
+  const { role, permissions } = useSelector((state) => state.auth);
 
-  // If role is still null/undefined (i.e., auth check not finished), show loading
-  if (role === null || role === undefined) {
-    return <div>Loading...</div>; // or a spinner
+  const isSuperAdmin = role === "super-admin";
+  const hasPermission = permissions?.includes(requiredPermission);
+
+  if (isSuperAdmin || hasPermission) {
+    return element;
   }
 
-  // If role is not authorized
-  if (!allowedRoles.includes(role)) {
-    return <Navigate to="/unauthorized" replace />;
-  }
-
-  return <Outlet />;
+  return <Navigate to="/unauthorized" replace />;
 };
 
 export default ProtectedRoute;

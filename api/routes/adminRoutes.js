@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { loginAdmin, registerAdmin, adminLogout, getAdminProfile} = require('../controllers/adminController');
+const { loginAdmin, adminLogout, getAdminProfile, updateAdminPermissions, getAllAdmins, createAdmin} = require('../controllers/adminController');
 const adminMiddleware = require('../middleware/adminMiddleware');
 const { getAllUsers } = require('../controllers/userController');
 const { getAllSellers, updateSellerApproval, deleteSeller, updateSellerDisable } = require('../controllers/sellerController');
+const authorizePermissions = require('../middleware/authorizePermissions');
 
 // Admin login route
 router.post('/login', loginAdmin);
-router.post('/register', adminMiddleware, registerAdmin);
 router.post('/logout', adminMiddleware, adminLogout);
 
 // Protected admin-only route
@@ -24,6 +24,28 @@ router.put("/seller/:id/approve", adminMiddleware, updateSellerApproval);
 router.put("/seller/:id/disable", adminMiddleware, updateSellerDisable);
 
 router.delete("/seller/:id",adminMiddleware, deleteSeller);
+router.post(
+  "/create-admin",
+  adminMiddleware,
+  authorizePermissions(["role:manage"]),
+  createAdmin
+);
+
+// GET ALL ADMINS
+router.get(
+  "/admins",
+  adminMiddleware,
+  authorizePermissions(["role:manage"]),
+  getAllAdmins
+);
+
+// UPDATE ADMIN PERMISSIONS
+router.put(
+  "/admins/:adminId/permissions",
+  adminMiddleware,
+  authorizePermissions(["role:manage"]),
+  updateAdminPermissions
+);
 
 
 
