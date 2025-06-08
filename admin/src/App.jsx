@@ -62,15 +62,15 @@ function App() {
       <Routes>
         {/* Admin routes */}
         <Route path="/admin" element={<AdminDashboard />}>
-        <Route
-          path="roles"
-          element={
-            <ProtectedRoute
-              element={<CreateAdminForm />}
-              requiredPermission="role-management"
-            />
-          }
-        />
+          <Route
+            path="roles"
+            element={
+              <ProtectedRoute
+                element={<CreateAdminForm />}
+                requiredPermission="role-management"
+              />
+            }
+          />
           {/* Default admin dashboard page, e.g. stats */}
           <Route index element={<Navigate to="dashboard" replace />} />
 
@@ -104,35 +104,34 @@ function App() {
             }
           >
             {/* Nested seller sub-routes */}
-            <Route
-              path="approved"
-              element={
-                <ProtectedRoute
-                  element={<ApprovedSellers />}
-                  requiredPermission="seller-management"
-                />
-              }
-            />
-            <Route
-              path="pending"
-              element={
-                <ProtectedRoute
-                  element={<PendingSellers />}
-                  requiredPermission="seller-management"
-                />
-              }
-            />
-            <Route
-              path="disabled"
-              element={
-                <ProtectedRoute
-                  element={<DisabledSellers />}
-                  requiredPermission="seller-management"
-                />
-              }
-            />
           </Route>
-
+          <Route
+            path="sellers/approved"
+            element={
+              <ProtectedRoute
+                element={<ApprovedSellers />}
+                requiredPermission="seller-management"
+              />
+            }
+          />
+          <Route
+            path="sellers/pending"
+            element={
+              <ProtectedRoute
+                element={<PendingSellers />}
+                requiredPermission="seller-management"
+              />
+            }
+          />
+          <Route
+            path="sellers/disabled"
+            element={
+              <ProtectedRoute
+                element={<DisabledSellers />}
+                requiredPermission="seller-management"
+              />
+            }
+          />
           {/* Products management */}
           <Route
             path="products/approved"
@@ -215,7 +214,6 @@ function App() {
             }
           />
         </Route>
-        
 
         {/* Public routes */}
         <Route path="login" element={<Login />} />
