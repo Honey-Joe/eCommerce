@@ -45,11 +45,10 @@ function App() {
     const checkAuth = async () => {
       try {
         const res = await axiosInstance.get("/admin/me");
-        const { role } = res.data;
         dispatch(loginSuccess(res.data));
         console.log(res.data);
       } catch (err) {
-        dispatch(logout());
+        console.log(err);
       }
     };
     checkAuth();

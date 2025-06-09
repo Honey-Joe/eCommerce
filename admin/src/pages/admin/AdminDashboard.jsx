@@ -11,7 +11,7 @@ import {
 } from "../../features/admin/adminSlice";
 import axiosInstance from "../../axios";
 import Layout from "../../layouts/Layout";
-import { ChevronDown, ChevronUp, Menu, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Menu, Shield, X } from "lucide-react";
 
 // Sidebar config with permission keys and a super admin exclusive section
 const sidebarSections = [
@@ -26,9 +26,21 @@ const sidebarSections = [
     icon: "🛍️",
     sectionKey: "seller",
     links: [
-      { path: "/admin/sellers/approved", label: "Approved Sellers", perm: "page:seller" },
-      { path: "/admin/sellers/pending", label: "Pending Sellers", perm: "page:seller" },
-      { path: "/admin/sellers/disabled", label: "Disabled Sellers", perm: "page:seller" },
+      {
+        path: "/admin/sellers/approved",
+        label: "Approved Sellers",
+        perm: "page:seller",
+      },
+      {
+        path: "/admin/sellers/pending",
+        label: "Pending Sellers",
+        perm: "page:seller",
+      },
+      {
+        path: "/admin/sellers/disabled",
+        label: "Disabled Sellers",
+        perm: "page:seller",
+      },
     ],
   },
   {
@@ -36,16 +48,34 @@ const sidebarSections = [
     icon: "📦",
     sectionKey: "product",
     links: [
-      { path: "/admin/products/approved", label: "Approved Products", perm: "page:product" },
-      { path: "/admin/products/pending", label: "Pending Products", perm: "page:product" },
-      { path: "/admin/products/disabled", label: "Disabled Products", perm: "page:product" },
+      {
+        path: "/admin/products/approved",
+        label: "Approved Products",
+        perm: "page:product",
+      },
+      {
+        path: "/admin/products/pending",
+        label: "Pending Products",
+        perm: "page:product",
+      },
+      {
+        path: "/admin/products/disabled",
+        label: "Disabled Products",
+        perm: "page:product",
+      },
     ],
   },
   {
     label: "Category Management",
     icon: "📁",
     sectionKey: "category",
-    links: [{ path: "/admin/addcategory", label: "Add Category", perm: "page:category" }],
+    links: [
+      {
+        path: "/admin/addcategory",
+        label: "Add Category",
+        perm: "page:category",
+      },
+    ],
   },
   {
     label: "Brand Management",
@@ -53,28 +83,50 @@ const sidebarSections = [
     sectionKey: "brand",
     links: [
       { path: "/admin/brand", label: "Manage Brand", perm: "brand-management" },
-      { path: "/admin/pendingbrands", label: "Pending Brands", perm: "page:brand" },
+      {
+        path: "/admin/pendingbrands",
+        label: "Pending Brands",
+        perm: "page:brand",
+      },
     ],
   },
   {
     label: "Site Settings",
     icon: "⚙️",
     sectionKey: "site",
-    links: [{ path: "/admin/site-settings", label: "General Settings", perm: "page:settings" }],
+    links: [
+      {
+        path: "/admin/site-settings",
+        label: "General Settings",
+        perm: "page:settings",
+      },
+    ],
   },
   {
     label: "Other Settings",
     icon: "🔧",
     sectionKey: "other",
-    links: [{ path: "/admin/others", label: "Misc Settings", perm: "other-settings" }],
+    links: [
+      { path: "/admin/others", label: "Misc Settings", perm: "other-settings" },
+    ],
   },
   // Super Admin Exclusive section
   {
     label: "Role Management",
     icon: "🛡️",
     sectionKey: "role",
-    links: [{ path: "/admin/roles", label: "Manage Roles", perm: "page:roles" },
-      {path:"/admin/create", label: "Create Admin" , perm:"page:roles"}
+    links: [
+      { path: "/admin/roles", label: "Manage Roles", perm: "page:roles" },
+    ],
+    superAdminOnly: true,
+  },
+  {
+    label: "Admin Management",
+    icon: "🛡️",
+    sectionKey: "admin",
+    links: [
+      { path: "/admin/get", label: "All Admins", perm: "page:roles" },
+      { path: "/admin/create", label: "Create Admin", perm: "page:roles" },
     ],
     superAdminOnly: true,
   },
@@ -100,11 +152,13 @@ const AdminDashboard = () => {
           axiosInstance.get("/admin/users", { withCredentials: true }),
           axiosInstance.get("/admin/sellers", { withCredentials: true }),
         ]);
-        dispatch(setUsers(usersRes.data));  
+        dispatch(setUsers(usersRes.data));
         dispatch(setSellers(sellersRes.data));
       } catch (error) {
         dispatch(
-          setError(error.response?.data?.message || "Failed to fetch admin data")
+          setError(
+            error.response?.data?.message || "Failed to fetch admin data"
+          )
         );
       }
     };
@@ -148,7 +202,9 @@ const AdminDashboard = () => {
         // Skip superAdminOnly sections for non super-admins
         if (section.superAdminOnly) return false;
         // Otherwise, check permissions on links
-        return section.links.some((link) => user.permissions.includes(link.perm));
+        return section.links.some((link) =>
+          user.permissions.includes(link.perm)
+        );
       })
       .map(({ label, icon, sectionKey, links }) => {
         const allowedLinks =
@@ -224,7 +280,9 @@ const AdminDashboard = () => {
               Role:{" "}
               <span
                 className={`font-semibold ${
-                  user?.role === "super-admin" ? "text-red-600" : "text-green-600"
+                  user?.role === "super-admin"
+                    ? "text-red-600"
+                    : "text-green-600"
                 }`}
               >
                 {user?.role?.toUpperCase() || "UNKNOWN"}
@@ -263,11 +321,15 @@ const AdminDashboard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-sm text-gray-500">Total Users</h3>
-                <p className="text-2xl font-bold text-blue-600">{users.length}</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {users.length}
+                </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-sm text-gray-500">Total Sellers</h3>
-                <p className="text-2xl font-bold text-orange-600">{sellers.length}</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {sellers.length}
+                </p>
               </div>
             </div>
           ) : (

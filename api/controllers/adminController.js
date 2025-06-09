@@ -61,6 +61,7 @@ const getAdminProfile = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized: No user info found" });
     }
+    console.log(req.user)
 
     res.status(200).json({
       userId: req.user.userId,
