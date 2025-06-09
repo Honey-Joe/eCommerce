@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { loginAdmin, adminLogout, getAdminProfile, updateAdminPermissions, getAllAdmins, createAdmin} = require('../controllers/adminController');
 const adminMiddleware = require('../middleware/adminMiddleware');
-const { getAllUsers } = require('../controllers/userController');
 const { getAllSellers, updateSellerApproval, deleteSeller, updateSellerDisable } = require('../controllers/sellerController');
 const authorizePermissions = require('../middleware/authorizePermissions');
+const {getAllUsers} = require("../controllers/userController");
 
 // Admin login route
 router.post('/login', loginAdmin);
