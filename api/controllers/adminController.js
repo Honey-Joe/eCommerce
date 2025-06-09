@@ -34,33 +34,33 @@ const loginAdmin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res
-      .cookie("adminToken", token, {
-        secure: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      })
-      .json({
-        message: "Login successful",
-        role: {
-          _id: admin.role._id,
-          name: admin.role.name,
-        },
-        permissions,
-      });
+    res.cookie("adminToken", token, {
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
+    res.json({
+      message: "Login successful",
+      role: {
+        _id: admin.role._id,
+        name: admin.role.name,
+      },
+      permissions,
+    });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-
 const getAdminProfile = async (req, res) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized: No user info found" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: No user info found" });
     }
-    console.log(req.user)
+    console.log(req.user);
 
     res.status(200).json({
       userId: req.user.userId,
@@ -79,8 +79,6 @@ const getAdminProfile = async (req, res) => {
     });
   }
 };
-
-
 
 const adminLogout = (req, res) => {
   res.clearCookie("adminToken", {
@@ -141,7 +139,6 @@ const createAdmin = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
 
 // ✅ Get All Admins (Super Admin Only)
 const getAllAdmins = async (req, res) => {
