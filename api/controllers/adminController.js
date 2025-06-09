@@ -36,6 +36,7 @@ const loginAdmin = async (req, res) => {
 
     res.cookie("adminToken", token, {
       secure: true,
+      sameSite:"None",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
