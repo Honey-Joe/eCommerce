@@ -14,6 +14,7 @@ const searchCountRoutes = require("./routes/searchCountRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const cartRoutes = require('./routes/cartRoutes');
 const siteSettingsRoutes = require("./routes/siteSettingsRoutes");
+const roleRoutes = require("./routes/roleRoutes");
 
 
 dotenv.config();
@@ -66,6 +67,7 @@ app.use("/api/search", searchCountRoutes);
 app.use("/api/orders", orderRoutes );
 app.use("/api/cart",cartRoutes)
 app.use("/api/site-settings", siteSettingsRoutes);
+app.use("/api/roles",roleRoutes);
 
 
 app.listen(port, () => {

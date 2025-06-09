@@ -10,7 +10,7 @@ const Navbar = () => {
 
   // Dashboard path by role (customize as needed)
   const dashboardPath =
-    role === 'admin' || role === 'super-admin'
+    role  || role === 'super-admin'
       ? '/admin/dashboard'
       : '/';
 

@@ -1,8 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const sidebarLinks = [
-  { label: "Users", path: "/admin/users", perm: "page:user" },
+  { label: "Users", path: "/admin/users", perm: "user:manage" },
   { label: "Sellers", path: "/admin/sellers", perm: "page:seller" },
   { label: "Products", path: "/admin/products", perm: "page:product" },
   { label: "Categories", path: "/admin/categories", perm: "page:category" },
@@ -12,20 +12,32 @@ const sidebarLinks = [
 ];
 
 const AdminSidebar = ({ user }) => {
-  if (!user || !user.permissions) return null;
+  const location = useLocation();
 
-  const allowed = sidebarLinks.filter(link =>
-    user.role === "super-admin" || user.permissions.includes(link.perm)
+  if (!user || !user.role || !user.permissions) return null;
+
+  const allowedLinks = sidebarLinks.filter(
+    (link) =>
+      user.role === "super-admin" || user.permissions.includes(link.perm)
   );
 
   return (
-    <aside className="sidebar">
-      {allowed.map(link => (
-        <Link to={link.path} key={link.path}>
-          {link.label}
-        </Link>
-      ))}
-    </aside>
+    <nav className="w-64 bg-gray-100 p-4 h-full" aria-label="Admin Sidebar">
+      <ul className="space-y-2">
+        {allowedLinks.map((link) => (
+          <li key={link.path}>
+            <Link
+              to={link.path}
+              className={`block px-3 py-2 rounded hover:bg-gray-200 ${
+                location.pathname === link.path ? "bg-gray-300 font-semibold" : ""
+              }`}
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 };
 

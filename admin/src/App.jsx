@@ -36,6 +36,7 @@ import SiteSettingForm from "./pages/admin/sitesettings/SiteSettingForm";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateAdminForm from "./components/CreateAdmin";
+import CreateRoleForm from "./components/CreateRoleForm";
 
 function App() {
   const dispatch = useDispatch();
@@ -51,7 +52,6 @@ function App() {
         dispatch(logout());
       }
     };
-
     checkAuth();
     dispatch(fetchProducts());
   }, [dispatch]);
@@ -64,6 +64,15 @@ function App() {
         <Route path="/admin" element={<AdminDashboard />}>
           <Route
             path="roles"
+            element={
+              <ProtectedRoute
+                element={<CreateRoleForm />}
+                requiredPermission="role-management"
+              />
+            }
+          />
+          <Route
+            path="create"
             element={
               <ProtectedRoute
                 element={<CreateAdminForm />}
@@ -88,7 +97,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<UsersManagement />}
-                requiredPermission="user-management"
+                requiredPermission="page:user"
               />
             }
           />
@@ -99,7 +108,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<SellersManagement />}
-                requiredPermission="seller-management"
+                requiredPermission="page:seller"
               />
             }
           >
@@ -110,7 +119,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<ApprovedSellers />}
-                requiredPermission="seller-management"
+                requiredPermission="page:seller"
               />
             }
           />
@@ -119,7 +128,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<PendingSellers />}
-                requiredPermission="seller-management"
+                requiredPermission="page:seller"
               />
             }
           />
@@ -128,7 +137,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<DisabledSellers />}
-                requiredPermission="seller-management"
+                requiredPermission="page:seller"
               />
             }
           />
@@ -138,7 +147,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<ApprovedProducts />}
-                requiredPermission="product-management"
+                requiredPermission="page:product"
               />
             }
           />
@@ -147,7 +156,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<PendingProducts />}
-                requiredPermission="product-management"
+                requiredPermission="page:product"
               />
             }
           />
@@ -156,7 +165,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<DisabledProducts />}
-                requiredPermission="product-management"
+                requiredPermission="page:product"
               />
             }
           />
@@ -167,7 +176,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<AdminCategoryManager />}
-                requiredPermission="category-management"
+                requiredPermission="page:category"
               />
             }
           />
@@ -178,7 +187,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<BrandManagement />}
-                requiredPermission="brand-management"
+                requiredPermission="page:brand"
               />
             }
           />
@@ -187,7 +196,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<BrandList />}
-                requiredPermission="brand-management"
+                requiredPermission="page:brand"
               />
             }
           />
@@ -198,7 +207,7 @@ function App() {
             element={
               <ProtectedRoute
                 element={<SiteSettingForm />}
-                requiredPermission="site-settings"
+                requiredPermission="page:settings"
               />
             }
           />

@@ -32,18 +32,17 @@ const Login = () => {
       // Assuming backend sends user object with role and permissions
       const user = response.data.user || response.data; 
       // Example user shape: { role: 'super-admin', permissions: ['user-management', ...], name: 'John' }
-
+      console.log(user);
       dispatch(loginSuccess(user));
 
       // Redirect based on role
-      if (user.role === "super-admin") {
+      if (user.role.name === "super-admin") {
         navigate("/admin/dashboard");
-      } else if (user.role === "admin") {
+      } else if (user.role.name) {
         navigate("/admin/dashboard");
       } else {
         navigate("/unauthorized");
         toast.error("Unauthorized role");
-        setLoading(false);
         return;
       }
 

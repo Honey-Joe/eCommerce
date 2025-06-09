@@ -19,16 +19,16 @@ const sidebarSections = [
     label: "User Management",
     icon: "👥",
     sectionKey: "user",
-    links: [{ path: "/admin/users", label: "View Users", perm: "user-management" }],
+    links: [{ path: "/admin/users", label: "View Users", perm: "page:user" }],
   },
   {
     label: "Seller Management",
     icon: "🛍️",
     sectionKey: "seller",
     links: [
-      { path: "/admin/sellers/approved", label: "Approved Sellers", perm: "seller-management" },
-      { path: "/admin/sellers/pending", label: "Pending Sellers", perm: "seller-management" },
-      { path: "/admin/sellers/disabled", label: "Disabled Sellers", perm: "seller-management" },
+      { path: "/admin/sellers/approved", label: "Approved Sellers", perm: "page:seller" },
+      { path: "/admin/sellers/pending", label: "Pending Sellers", perm: "page:seller" },
+      { path: "/admin/sellers/disabled", label: "Disabled Sellers", perm: "page:seller" },
     ],
   },
   {
@@ -36,16 +36,16 @@ const sidebarSections = [
     icon: "📦",
     sectionKey: "product",
     links: [
-      { path: "/admin/products/approved", label: "Approved Products", perm: "product-management" },
-      { path: "/admin/products/pending", label: "Pending Products", perm: "product-management" },
-      { path: "/admin/products/disabled", label: "Disabled Products", perm: "product-management" },
+      { path: "/admin/products/approved", label: "Approved Products", perm: "page:product" },
+      { path: "/admin/products/pending", label: "Pending Products", perm: "page:product" },
+      { path: "/admin/products/disabled", label: "Disabled Products", perm: "page:product" },
     ],
   },
   {
     label: "Category Management",
     icon: "📁",
     sectionKey: "category",
-    links: [{ path: "/admin/addcategory", label: "Add Category", perm: "category-management" }],
+    links: [{ path: "/admin/addcategory", label: "Add Category", perm: "page:category" }],
   },
   {
     label: "Brand Management",
@@ -53,14 +53,14 @@ const sidebarSections = [
     sectionKey: "brand",
     links: [
       { path: "/admin/brand", label: "Manage Brand", perm: "brand-management" },
-      { path: "/admin/pendingbrands", label: "Pending Brands", perm: "brand-management" },
+      { path: "/admin/pendingbrands", label: "Pending Brands", perm: "page:brand" },
     ],
   },
   {
     label: "Site Settings",
     icon: "⚙️",
     sectionKey: "site",
-    links: [{ path: "/admin/site-settings", label: "General Settings", perm: "site-settings" }],
+    links: [{ path: "/admin/site-settings", label: "General Settings", perm: "page:settings" }],
   },
   {
     label: "Other Settings",
@@ -73,7 +73,9 @@ const sidebarSections = [
     label: "Role Management",
     icon: "🛡️",
     sectionKey: "role",
-    links: [{ path: "/admin/roles", label: "Manage Roles", perm: "role-management" }],
+    links: [{ path: "/admin/roles", label: "Manage Roles", perm: "page:roles" },
+      {path:"/admin/create", label: "Create Admin" , perm:"page:roles"}
+    ],
     superAdminOnly: true,
   },
 ];
@@ -98,7 +100,7 @@ const AdminDashboard = () => {
           axiosInstance.get("/admin/users", { withCredentials: true }),
           axiosInstance.get("/admin/sellers", { withCredentials: true }),
         ]);
-        dispatch(setUsers(usersRes.data));
+        dispatch(setUsers(usersRes.data));  
         dispatch(setSellers(sellersRes.data));
       } catch (error) {
         dispatch(

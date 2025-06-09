@@ -3,50 +3,58 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Seller = require("../models/Seller");
+const Role = require("../models/Role");
 
 // controller/adminController.js
 
 const loginAdmin = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-    const admin = await Admin.findOne({ email });
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
+    const { email, password } = req.body;
+
+    const admin = await Admin.findOne({ email }).populate("role");
+
+    if (!admin || !(await admin.comparePassword(password))) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await admin.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!admin.role) {
+      return res.status(403).json({ message: "No role assigned to admin" });
     }
+
+    const permissions = admin.role.permissions || [];
 
     const token = jwt.sign(
       {
         userId: admin._id,
-        role: admin.role,
-        permissions: admin.permissions,
+        roleId: admin.role._id, // role ID in token
+        roleName: admin.role.name, // optional if needed later
+        permissions, // include permissions directly
       },
       process.env.ADMIN_JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // Store JWT in HTTP-only cookie
-    res.cookie("adminToken", token, {
-      httpOnly: false,
-      secure: true,
-      sameSite: "None",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 hour
-    });
+    res
+      .cookie("adminToken", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      })
+      .json({
+        message: "Login successful",
+        role: {
+          _id: admin.role._id,
+          name: admin.role.name,
+        },
+        permissions,
+      });
 
-    // Sample response
-    res.json({
-      role: admin.role,
-      permissions: admin.permissions || [], // e.g., ['user-management', 'product-management']
-    });
   } catch (err) {
-    res.status(500).json({ message: "Login error", error: err.message });
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
 const getAdminProfile = async (req, res) => {
   try {
@@ -54,23 +62,24 @@ const getAdminProfile = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized: No user info found" });
     }
 
-    // Example structure of permissions could be:
-    // req.user.permissions = ['user_management', 'product_management', 'category_management']
-
     res.status(200).json({
       userId: req.user.userId,
-      role: req.user.role,
-      permissions: req.user.permissions || [],  // send permissions here
+      role: {
+        _id: req.user.roleId || null,
+        name: req.user.roleName || "N/A",
+      },
+      permissions: req.user.permissions || [],
       message: "Authenticated",
     });
   } catch (err) {
     console.error("Error in getAdminProfile:", err);
     res.status(500).json({
-      message: "Failed to verify admin",
+      message: "Failed to fetch profile",
       error: err.message,
     });
   }
 };
+
 
 
 const adminLogout = (req, res) => {
@@ -85,42 +94,59 @@ const adminLogout = (req, res) => {
 // ✅ Create Admin with specific permissions
 const createAdmin = async (req, res) => {
   try {
-    const { name, email, phone, password, role, permissions } = req.body;
+    const { name, email, phone, password, roleId } = req.body;
 
-    // Only super-admin can create other admins
-    if (req.user.role !== "super-admin") {
+    // Ensure only super-admin can create other admins
+    if (req.user.roleName !== "super-admin") {
       return res
         .status(403)
         .json({ message: "Only Super Admin can create new admins." });
     }
 
+    // Check if admin with email already exists
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
       return res.status(400).json({ message: "Email already registered." });
     }
 
+    // Fetch and validate role
+    const role = await Role.findById(roleId);
+    if (!role) {
+      return res.status(400).json({ message: "Invalid role selected." });
+    }
+
+    // Create new admin using role's permissions
     const newAdmin = new Admin({
       name,
       email,
       phone,
       password,
-      role,
-      permissions,
+      role: role._id,
+      permissions: role.permissions,
     });
+
     await newAdmin.save();
 
-    res
-      .status(201)
-      .json({ message: "Admin created successfully", admin: newAdmin });
+    res.status(201).json({
+      message: "Admin created successfully",
+      admin: {
+        id: newAdmin._id,
+        name: newAdmin.name,
+        email: newAdmin.email,
+        phone: newAdmin.phone,
+        role: role.name,
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
+
 // ✅ Get All Admins (Super Admin Only)
 const getAllAdmins = async (req, res) => {
   try {
-    if (req.user.role !== "super-admin") {
+    if (req.user.roleName !== "super-admin") {
       return res.status(403).json({ message: "Access denied" });
     }
 

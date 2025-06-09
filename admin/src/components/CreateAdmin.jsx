@@ -1,15 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axiosInstance from "../axios";
 import { toast } from "react-toastify";
-
-const permissionsList = [
-  { key: "user-management", label: "User Management" },
-  { key: "seller-management", label: "Seller Management" },
-  { key: "product-management", label: "Product Management" },
-  { key: "category-management", label: "Category Management" },
-  { key: "brand-management", label: "Brand Management" },
-  { key: "site-settings", label: "Site Settings" },
-];
 
 const CreateAdminForm = () => {
   const [formData, setFormData] = useState({
@@ -17,43 +8,38 @@ const CreateAdminForm = () => {
     email: "",
     phone: "",
     password: "",
-    permissions: [],
+    roleId: "",
   });
 
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Fetch roles on component mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const res = await axiosInstance.get("/roles");
+        setRoles(res.data || []);
+        console.log(res.data)
+      } catch (err) {
+        toast.error("Failed to fetch roles");
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePermissionToggle = (permissionKey) => {
-    setFormData((prev) => {
-      const hasPermission = prev.permissions.includes(permissionKey);
-      if (hasPermission) {
-        return {
-          ...prev,
-          permissions: prev.permissions.filter((p) => p !== permissionKey),
-        };
-      } else {
-        return {
-          ...prev,
-          permissions: [...prev.permissions, permissionKey],
-        };
-      }
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.password ||
-      formData.permissions.length === 0
-    ) {
-      toast.error("Please fill all required fields and select at least one permission.");
+    const { name, email, password, roleId } = formData;
+    if (!name || !email || !password || !roleId) {
+      toast.error("Please fill all required fields.");
       return;
     }
 
@@ -67,12 +53,13 @@ const CreateAdminForm = () => {
         email: "",
         phone: "",
         password: "",
-        permissions: [],
+        roleId: "",
       });
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to create admin."
       );
+      console.log(error)
     } finally {
       setLoading(false);
     }
@@ -149,27 +136,26 @@ const CreateAdminForm = () => {
           />
         </div>
 
-        {/* Permissions */}
+        {/* Role Dropdown */}
         <div className="mb-3">
-          <label className="block font-medium mb-1">
-            Permissions <span className="text-red-600">*</span>
+          <label className="block font-medium mb-1" htmlFor="roleId">
+            Select Role <span className="text-red-600">*</span>
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            {permissionsList.map(({ key, label }) => (
-              <label
-                key={key}
-                className="inline-flex items-center cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={formData.permissions.includes(key)}
-                  onChange={() => handlePermissionToggle(key)}
-                  className="mr-2"
-                />
-                {label}
-              </label>
+          <select
+            id="roleId"
+            name="roleId"
+            value={formData.roleId}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded"
+            required
+          >
+            <option value="">-- Select Role --</option>
+            {roles.map((role) => (
+              <option key={role._id} value={role._id}>
+                {role.name}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
         {/* Submit */}
