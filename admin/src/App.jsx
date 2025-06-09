@@ -44,7 +44,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axiosInstance.get("/admin/me");
+        const res = await axiosInstance.get("/admin/me",{withCredentials:true});
         dispatch(loginSuccess(res.data));
         console.log(res.data);
       } catch (err) {
