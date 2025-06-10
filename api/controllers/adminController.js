@@ -256,7 +256,7 @@ const getDashboardStats = async (req, res) => {
 
     const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const salesData = dayMap.map((day, index) => {
-      const found = sales.find((s) => s._id === ((index + 1) % 7) + 1); // Map Mon=0 to Mongo Sun=1
+      const found = sales.find((s) => s._id === ((index + 1) % 7)); // Map Mon=0 to Mongo Sun=1
       return { name: day, sales: found ? found.total : 0 };
     });
 
