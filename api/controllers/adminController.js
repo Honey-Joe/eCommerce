@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Seller = require("../models/Seller");
 const Role = require("../models/Role");
+const Order = require("../models/Order");
+const Product = require("../models/Product");
 
 // controller/adminController.js
 
@@ -232,6 +234,111 @@ const getAdminById = async (req, res) => {
   }
 };
 
+
+const getDashboardStats = async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+    // 1. Weekly Sales (Mon - Sun)
+    const sales = await Order.aggregate([
+      {
+        $match: { createdAt: { $gte: new Date(now.getFullYear(), 0, 1) } }, // filter current year
+      },
+      {
+        $group: {
+          _id: { $dayOfWeek: "$createdAt" }, // 1 (Sun) to 7 (Sat)
+          total: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { "_id": 1 } },
+    ]);
+
+    const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const salesData = dayMap.map((day, index) => {
+      const found = sales.find((s) => s._id === ((index + 1) % 7) + 1); // Map Mon=0 to Mongo Sun=1
+      return { name: day, sales: found ? found.total : 0 };
+    });
+
+    // 2. Monthly User Growth (Jan - Dec, current year only)
+    const userGrowth = await User.aggregate([
+      {
+        $match: { createdAt: { $gte: startOfYear } },
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          users: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id": 1 } },
+    ]);
+
+    const monthMap = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    const userGrowthData = monthMap.map((month, index) => {
+      const found = userGrowth.find((m) => m._id === index + 1);
+      return { month, users: found ? found.users : 0 };
+    });
+
+    // 3. Revenue Breakdown (by product name or category if available)
+    const revenueAgg = await Order.aggregate([
+      { $unwind: "$orderItems" },
+      {
+        $group: {
+          _id: "$orderItems.name", // Change to productCategory if you store it
+          value: { $sum: { $multiply: ["$orderItems.price", "$orderItems.quantity"] } },
+        },
+      },
+      { $sort: { value: -1 } },
+      { $limit: 5 },
+    ]);
+
+    const revenueData = revenueAgg.map((item) => ({
+      name: item._id,
+      value: item.value,
+    }));
+
+    // 4. Total Counts
+    const [ordersCount, usersCount, productsCount, revenueSum] = await Promise.all([
+      Order.countDocuments(),
+      User.countDocuments(),
+      Product.countDocuments(),
+      Order.aggregate([
+        {
+          $group: {
+            _id: null,
+            total: { $sum: "$totalPrice" },
+          },
+        },
+      ]),
+    ]);
+
+    const stats = {
+      orders: ordersCount,
+      users: usersCount,
+      products: productsCount,
+      revenue: revenueSum[0]?.total || 0,
+    };
+
+    // Final Response
+    res.json({
+      salesData,
+      userGrowthData,
+      revenueData,
+      stats,
+    });
+
+  } catch (error) {
+    console.error("Dashboard Stats Error:", error);
+    res.status(500).json({ error: "Failed to fetch dashboard stats." });
+  }
+};
+
+
+
 // Get all sellers
 
 module.exports = {
@@ -242,5 +349,6 @@ module.exports = {
   createAdmin,
   updateAdmin,
   deleteAdmin,
-  getAdminById
+  getAdminById,
+  getDashboardStats
 };

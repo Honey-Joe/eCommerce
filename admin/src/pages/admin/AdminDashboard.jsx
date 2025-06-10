@@ -12,6 +12,7 @@ import {
 import axiosInstance from "../../axios";
 import Layout from "../../layouts/Layout";
 import { ChevronDown, ChevronUp, Menu, Shield, X } from "lucide-react";
+import Dashboard from "./Dashboard";
 
 // Sidebar config with permission keys and a super admin exclusive section
 const sidebarSections = [
@@ -318,6 +319,7 @@ const AdminDashboard = () => {
         {/* Main Content */}
         <main className="flex-1 p-6 overflow-y-auto">
           {showDashboardStats ? (
+            <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-sm text-gray-500">Total Users</h3>
@@ -331,6 +333,9 @@ const AdminDashboard = () => {
                   {sellers.length}
                 </p>
               </div>
+
+            </div>
+            <Dashboard></Dashboard>
             </div>
           ) : (
             <Outlet />

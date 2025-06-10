@@ -30,13 +30,7 @@ const Navbar = () => {
 
         {/* Right Side Actions */}
         <div className="flex items-center space-x-4">
-          <Link to="/cart" className="relative text-gray-700 hover:text-blue-600 text-xl">
-            🛒
-            {/* Optional: dynamic cart count */}
-            <span className="absolute -top-2 -right-2 text-xs bg-red-500 text-white rounded-full px-1">
-              3
-            </span>
-          </Link>
+         
 
           {isLoggedIn ? (
             <>

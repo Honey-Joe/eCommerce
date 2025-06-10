@@ -9,6 +9,7 @@ const {
   deleteAdmin,
   updateAdmin,
   getAdminById,
+  getDashboardStats,
 } = require("../controllers/adminController");
 const adminMiddleware = require("../middleware/adminMiddleware");
 const {
@@ -55,6 +56,7 @@ router.get(
   authorizePermissions(["role:manage"]),
   getAllAdmins
 );
+router.get("/get-dashboard-stats", adminMiddleware, getDashboardStats);
 
 // UPDATE ADMIN PERMISSIONS
 router.put(
