@@ -233,34 +233,56 @@ const getAdminById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
-
 const getDashboardStats = async (req, res) => {
   try {
     const now = new Date();
     const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-    // 1. Weekly Sales (Mon - Sun)
-    const sales = await Order.aggregate([
-      {
-        $match: { createdAt: { $gte: new Date(now.getFullYear(), 0, 1) } }, // filter current year
-      },
+    // 1. Location-based User Count (by state or city)
+    const userLocations = await User.aggregate([
       {
         $group: {
-          _id: { $dayOfWeek: "$createdAt" }, // 1 (Sun) to 7 (Sat)
-          total: { $sum: "$totalPrice" },
+          _id: "$location", // This assumes "location" is { type, coordinates }
+          count: { $sum: 1 },
         },
       },
-      { $sort: { "_id": 1 } },
     ]);
 
-    const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const salesData = dayMap.map((day, index) => {
-      const found = sales.find((s) => s._id === ((index + 1) % 7)); // Map Mon=0 to Mongo Sun=1
-      return { name: day, sales: found ? found.total : 0 };
-    });
+    const sellerLocation = await Seller.aggregate([
+      {
+        $group:{
+          _id:"$location",
+          count:{$sum : 1},
+        }
+      }
+    ])
 
-    // 2. Monthly User Growth (Jan - Dec, current year only)
+    // 2. Orders by Shipping City
+    const ordersByCity = await Order.aggregate([
+      {
+        $group: {
+          _id: "$shippingInfo.city",
+          orders: { $sum: 1 },
+          totalRevenue: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { orders: -1 } },
+      { $limit: 10 },
+    ]);
+
+    // 3. Revenue by State
+    const revenueByState = await Order.aggregate([
+      {
+        $group: {
+          _id: "$shippingInfo.state",
+          totalRevenue: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { totalRevenue: -1 } },
+      { $limit: 10 },
+    ]);
+
+    // 4. User Growth
     const userGrowth = await User.aggregate([
       {
         $match: { createdAt: { $gte: startOfYear } },
@@ -271,73 +293,80 @@ const getDashboardStats = async (req, res) => {
           users: { $sum: 1 },
         },
       },
-      { $sort: { "_id": 1 } },
     ]);
 
     const monthMap = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ];
-    const userGrowthData = monthMap.map((month, index) => {
-      const found = userGrowth.find((m) => m._id === index + 1);
-      return { month, users: found ? found.users : 0 };
+    const userGrowthData = monthMap.map((month, i) => {
+      const entry = userGrowth.find((e) => e._id === i + 1);
+      return { month, users: entry?.users || 0 };
     });
 
-    // 3. Revenue Breakdown (by product name or category if available)
-    const revenueAgg = await Order.aggregate([
-      { $unwind: "$orderItems" },
+    // 5. Sales by Day of Week
+    const salesAgg = await Order.aggregate([
+      {
+        $match: { createdAt: { $gte: startOfYear } },
+      },
       {
         $group: {
-          _id: "$orderItems.name", // Change to productCategory if you store it
-          value: { $sum: { $multiply: ["$orderItems.price", "$orderItems.quantity"] } },
+          _id: { $dayOfWeek: "$createdAt" },
+          total: { $sum: "$totalPrice" },
         },
       },
-      { $sort: { value: -1 } },
-      { $limit: 5 },
     ]);
+    const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const salesData = dayMap.map((day, i) => {
+      const entry = salesAgg.find((e) => e._id === ((i + 1) % 7));
+      return { name: day, sales: entry?.total || 0 };
+    });
 
-    const revenueData = revenueAgg.map((item) => ({
-      name: item._id,
-      value: item.value,
-    }));
-
-    // 4. Total Counts
-    const [ordersCount, usersCount, productsCount, revenueSum] = await Promise.all([
-      Order.countDocuments(),
-      User.countDocuments(),
-      Product.countDocuments(),
-      Order.aggregate([
-        {
-          $group: {
-            _id: null,
-            total: { $sum: "$totalPrice" },
-          },
-        },
-      ]),
-    ]);
+    // 6. Totals
+    const [ordersCount, usersCount, productsCount, totalRevenueAgg] =
+      await Promise.all([
+        Order.countDocuments(),
+        User.countDocuments(),
+        Product.countDocuments(),
+        Order.aggregate([
+          { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+        ]),
+      ]);
 
     const stats = {
       orders: ordersCount,
       users: usersCount,
       products: productsCount,
-      revenue: revenueSum[0]?.total || 0,
+      revenue: totalRevenueAgg[0]?.total || 0,
     };
 
-    // Final Response
+    // Response
     res.json({
+      stats,
       salesData,
       userGrowthData,
-      revenueData,
-      stats,
+      locationStats: {
+        usersByCoordinates: userLocations,
+        ordersByCity,
+        revenueByState,
+        sellersByCoordinates: sellerLocation
+      },
     });
-
-  } catch (error) {
-    console.error("Dashboard Stats Error:", error);
-    res.status(500).json({ error: "Failed to fetch dashboard stats." });
+  } catch (err) {
+    console.error("Dashboard Stats Error:", err);
+    res.status(500).json({ error: "Failed to fetch dashboard stats" });
   }
 };
-
-
 
 // Get all sellers
 
@@ -350,5 +379,5 @@ module.exports = {
   updateAdmin,
   deleteAdmin,
   getAdminById,
-  getDashboardStats
+  getDashboardStats,
 };
