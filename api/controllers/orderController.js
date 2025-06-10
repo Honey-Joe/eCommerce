@@ -177,6 +177,15 @@ exports.verifyOtpAndDeliver = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
+    
+
+    const pdfPath = await generateInvoicePDF(order);
+
+    // Send email with invoice
+    await sendInvoiceEmail(order, pdfPath);
+
+    // Delete temp PDF file
+    fs.unlinkSync(pdfPath);
     order.isDelivered = true;
     order.deliveredAt = Date.now();
     order.otp = undefined;
@@ -190,14 +199,6 @@ exports.verifyOtpAndDeliver = async (req, res) => {
         await product.save();
       }
     }
-
-    const pdfPath = await generateInvoicePDF(order);
-
-    // Send email with invoice
-    await sendInvoiceEmail(order, pdfPath);
-
-    // Delete temp PDF file
-    fs.unlinkSync(pdfPath);
     res.json({ message: "Order marked as delivered", order });
   } catch (error) {
     console.error(error);

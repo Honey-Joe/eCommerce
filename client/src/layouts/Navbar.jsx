@@ -31,7 +31,7 @@ const Navbar = () => {
                     to="/seller/home"
                     className="text-3xl font-extrabold text-blue-600 tracking-tight flex gap-3 items-center"
                   >
-                    <img src={settings.logoUrl} alt="logourl" className="w-[50px] h-[50px]" />
+                    <img src={settings?.logoUrl} alt="logourl" className="w-[50px] h-[50px]" />
                     {settings?.siteName}
                   </Link>
                 }
