@@ -36,7 +36,7 @@ const loginAdmin = async (req, res) => {
 
     res.cookie("adminToken", token, {
       secure: true,
-      sameSite:"None",
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -156,26 +156,77 @@ const getAllAdmins = async (req, res) => {
 };
 
 // ✅ Update Admin Permissions
-const updateAdminPermissions = async (req, res) => {
+const updateAdmin = async (req, res) => {
   try {
     const { adminId } = req.params;
-    const { permissions } = req.body;
+    const { name, email, phone, role, permissions } = req.body;
 
-    if (req.user.role !== "super-admin") {
+    // Only super-admin can update other admins
+    if (req.user.roleName !== "super-admin") {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    const admin = await Admin.findByIdAndUpdate(
+    const updatedAdmin = await Admin.findByIdAndUpdate(
       adminId,
-      { permissions },
-      { new: true }
-    );
+      {
+        ...(name && { name }),
+        ...(email && { email }),
+        ...(phone && { phone }),
+        ...(role && { role }),
+        ...(permissions && { permissions }),
+      },
+      { new: true, runValidators: true }
+    ).populate("role");
+
+    if (!updatedAdmin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.status(200).json({
+      message: "Admin details updated successfully",
+      admin: updatedAdmin,
+    });
+  } catch (err) {
+    console.error("Update admin error:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+const deleteAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Prevent Super Admin from deleting themselves or others
+    const adminToDelete = await Admin.findById(id);
+    if (!adminToDelete) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // You can add a role check to prevent deleting Super Admin
+    if (adminToDelete.roleName === "superadmin") {
+      return res.status(403).json({ message: "Cannot delete Super Admin" });
+    }
+
+    await Admin.findByIdAndDelete(id);
+    return res.status(200).json({ message: "Admin deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting admin:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+const getAdminById = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+
+    const admin = await Admin.findById(adminId)
+      .populate("role") // populate role if it's a reference
+      .select("-password"); // exclude password for security
 
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
 
-    res.status(200).json({ message: "Permissions updated", admin });
+    res.status(200).json({ admin });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -189,5 +240,7 @@ module.exports = {
   getAdminProfile,
   getAllAdmins,
   createAdmin,
-  updateAdminPermissions,
+  updateAdmin,
+  deleteAdmin,
+  getAdminById
 };

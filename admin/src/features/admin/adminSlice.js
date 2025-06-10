@@ -6,6 +6,7 @@ const adminSlice = createSlice({
     users: [],
     sellers: [],
     loading: false,
+    admins: [],
     error: null,
   },
   reducers: {
@@ -25,10 +26,13 @@ const adminSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    getAdmin: (state,action)=>{
+      state.admins = action.payload
+    }
   },
 });
 
 export const selectUsers = (state) => state.admin.users;
 export const selectSellers = (state) => state.admin.sellers;
-export const { setLoading, setUsers, setSellers, setError } = adminSlice.actions;
+export const { setLoading, setUsers, setSellers, setError,getAdmin } = adminSlice.actions;
 export default adminSlice.reducer;

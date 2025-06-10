@@ -13,7 +13,6 @@ const PlaceOrderPage = () => {
   const user = useSelector((state) => state.auth.user); // adjust if user is stored elsewhere
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(items);
 
   const [shippingInfo, setShippingInfo] = useState({
     address: "",

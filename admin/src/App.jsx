@@ -37,6 +37,8 @@ import SiteSettingForm from "./pages/admin/sitesettings/SiteSettingForm";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateAdminForm from "./components/CreateAdmin";
 import CreateRoleForm from "./components/CreateRoleForm";
+import GetAdmin from "./pages/admin/role/GetAdmin";
+import UpdateAdminForm from "./pages/admin/role/UpdateAdminForm";
 
 function App() {
   const dispatch = useDispatch();
@@ -75,6 +77,24 @@ function App() {
             element={
               <ProtectedRoute
                 element={<CreateAdminForm />}
+                requiredPermission="role-management"
+              />
+            }
+          />
+          <Route
+            path="get"
+            element={
+              <ProtectedRoute
+                element={<GetAdmin />}
+                requiredPermission="role-management"
+              />
+            }
+          />
+          <Route
+            path="update/:adminId"
+            element={
+              <ProtectedRoute
+                element={<UpdateAdminForm />}
                 requiredPermission="role-management"
               />
             }
