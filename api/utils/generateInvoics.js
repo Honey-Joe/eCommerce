@@ -1,6 +1,7 @@
 const ejs = require("ejs");
-const pdf = require("html-pdf"); // or use puppeteer for high quality
+const puppeteer = require("puppeteer");
 const path = require("path");
+const fs = require("fs");
 
 const generateInvoicePDF = async (order) => {
   const html = await ejs.renderFile(
@@ -20,13 +21,23 @@ const generateInvoicePDF = async (order) => {
   );
 
   const pdfPath = path.join(__dirname, "../temp", `invoice-${order._id}.pdf`);
-  await new Promise((resolve, reject) => {
-    pdf.create(html).toFile(pdfPath, (err, res) => {
-      if (err) return reject(err);
-      resolve(res);
-    });
+
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"], // Important for production (e.g., serverless)
   });
 
+  const page = await browser.newPage();
+  await page.setContent(html, { waitUntil: "networkidle0" });
+
+  await page.pdf({
+    path: pdfPath,
+    format: "A4",
+    printBackground: true,
+    margin: { top: "20px", bottom: "20px", left: "20px", right: "20px" },
+  });
+
+  await browser.close();
   return pdfPath;
 };
 

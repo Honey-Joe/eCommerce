@@ -3,4 +3,26 @@
 1. Auth
 
 2. Basic Protected Routes
- 
+ 📢 JFSD Batch 11 & MERN Batch 18 - HTML, CSS & TailwindCSS Class Schedule  📢
+
+📅 June 11 (Wed) – Class (8:20 – 9:45 PM)
+📅 June 12 (Thu) – Class (8:20 – 9:45 PM)
+📅 June 13 (Fri) – Class (8:20 – 9:45 PM)
+📅 June 14 (Sat) – Class (8:20 – 9:45 PM)
+📅 June 16 (Mon) – Class (8:20 – 9:45 PM)
+📅 June 17 (Tue) – Class (8:20 – 9:45 PM)
+📅 June 18 (Wed) – Class (8:20 – 9:45 PM)
+📅 June 19 (Thu) – Class (8:20 – 9:45 PM)
+📅 June 21 (Sat) – Class (8:20 – 9:45 PM)
+📅 June 22 (Sun) – Class (8:20 – 9:45 PM)
+📅 June 23 (Mon) – Class (8:20 – 9:45 PM)
+📅 June 24 (Tue) – Class (8:20 – 9:45 PM)
+
+⏰ Time: 8:20 PM – 9:45 PM
+
+🔗 Meeting Link: https://meet.google.com/omt-ugbf-zxc
+
+Let’s build strong frontend foundations! 💻✨
+
+📢 Next schedule will be posted on June 25!
+

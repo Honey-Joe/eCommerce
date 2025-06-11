@@ -42,7 +42,7 @@ const SellerOrder = () => {
       toast.success("OTP sent to buyer's email.");
       setOtpSentToOrder(orderId);
     } catch (err) {
-      console.error("Send OTP Error:", err.message);
+      console.error("Send OTP Error:", err);
       toast.error("Failed to send OTP.");
     }
   };
@@ -62,7 +62,7 @@ const SellerOrder = () => {
       const { data } = await axiosInstance.get("/orders/seller");
       dispatch(getMyOrdersSuccess(data));
     } catch (err) {
-      console.error("Verify OTP Error:", err.message);
+      console.error("Verify OTP Error:", err);
       toast.error(err.response?.data?.message || "OTP verification failed");
     }
   };

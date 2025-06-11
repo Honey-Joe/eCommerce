@@ -177,8 +177,6 @@ exports.verifyOtpAndDeliver = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
-    
-
     const pdfPath = await generateInvoicePDF(order);
 
     // Send email with invoice
@@ -203,5 +201,6 @@ exports.verifyOtpAndDeliver = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to verify OTP", error });
+    console.log(error)
   }
 };
