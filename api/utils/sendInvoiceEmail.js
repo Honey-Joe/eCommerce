@@ -3,17 +3,15 @@ const nodemailer = require("nodemailer");
 const sendInvoiceEmail = async (order, pdfPath) => {
   try {
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: +process.env.SMTP_PORT,
       service:"gmail",
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
     const mailOptions = {
-      from: process.env.FROM_EMAIL,
+      from: process.env.EMAIL_USER,
       to: order.buyerEmail,
       subject: `Invoice for Order ${order._id}`,
       text: "Thank you for your purchase. Please find your invoice attached.",
