@@ -12,6 +12,7 @@
   "author": "Honey Joe",
   "license": "ISC",
   "dependencies": {
+    "@sparticuz/chromium": "^133.0.0",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.6.1",
     "cookie-parser": "^1.4.7",
@@ -27,6 +28,7 @@
     "nodemailer": "^7.0.3",
     "nodemon": "^3.1.10",
     "puppeteer": "^24.10.0",
+    "puppeteer-core": "^24.10.0",
     "slugify": "^1.6.6"
   }
 }
