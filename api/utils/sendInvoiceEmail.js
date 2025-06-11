@@ -1,9 +1,10 @@
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 
-const sendMail = async (order, pdfPath) => {
+const sendMailInvoice = async (order, pdfBuffer) => {
   try {
     const transporter = nodemailer.createTransport({
-      service:"gmail",
+      // Your email transport configuration
+      service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -12,23 +13,21 @@ const sendMail = async (order, pdfPath) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: order.buyerEmail,
-      subject: `Invoice for Order ${order._id}`,
-      text: "Thank you for your purchase. Please find your invoice attached.",
-      attachments: [
-        {
-          filename: `invoice-${order._id}.pdf`,
-          path: pdfPath,
-        },
-      ],
+      to: order.user.email,
+      subject: `Your Order Invoice #${order._id}`,
+      html: `<p>Thank you for your order. Please find your invoice attached.</p>`,
+      attachments: [{
+        filename: `invoice-${order._id}.pdf`,
+        content: pdfBuffer,
+        contentType: 'application/pdf'
+      }]
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent:", info.messageId);
+    await transporter.sendMail(mailOptions);
   } catch (error) {
-    console.error("Email sending failed:", error);
-    throw error; // so it bubbles up and hits your try/catch
+    console.error("Error sending email:", error);
+    throw error; // Let the controller handle it
   }
 };
 
-module.exports = sendMail;
+module.exports = sendMailInvoice

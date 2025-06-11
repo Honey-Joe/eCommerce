@@ -177,12 +177,14 @@ exports.verifyOtpAndDeliver = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
+    // Update order status
     order.isDelivered = true;
     order.deliveredAt = Date.now();
     order.otp = undefined;
     order.otpExpiresAt = undefined;
-
     await order.save();
+
+    // Mark products as sold
     for (const item of order.orderItems) {
       const product = await Product.findById(item.product._id);
       if (product) {
@@ -190,18 +192,16 @@ exports.verifyOtpAndDeliver = async (req, res) => {
         await product.save();
       }
     }
-    const pdfPath = await generateInvoicePDF(order);
 
-    // Send email with invoice
-    await sendMailInvoice(order, pdfPath);
+    // Generate PDF as buffer (no temp file)
+    const pdfBuffer = await generateInvoicePDF(order);
 
-    // Delete temp PDF file
-    fs.unlinkSync(pdfPath);
+    // Send email with invoice attachment directly from buffer
+    await sendMailInvoice(order, pdfBuffer);
     
     res.json({ message: "Order marked as delivered", order });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to verify OTP", error });
-    console.log(error)
+    console.error("Failed to verify OTP:", error);
+    res.status(500).json({ message: "Failed to verify OTP", error: error.message });
   }
 };
