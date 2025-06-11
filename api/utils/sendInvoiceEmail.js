@@ -13,7 +13,7 @@ const sendMailInvoice = async (order, pdfBuffer) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: order.user.email,
+      to: order.buyerEmail,
       subject: `Your Order Invoice #${order._id}`,
       html: `<p>Thank you for your order. Please find your invoice attached.</p>`,
       attachments: [{
