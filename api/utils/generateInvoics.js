@@ -4,12 +4,19 @@ const path = require("path");
 const fs = require("fs");
 
 const generateInvoicePDF = async (order) => {
+
+  const formattedDate = new Intl.DateTimeFormat("en-IN", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+}).format(new Date(order.deliveredAt || Date.now()));
+
   const html = await ejs.renderFile(
     path.join(__dirname, "../templates/invoice.ejs"),
     {
       invoiceNumber: order._id,
       customerName: order.buyerName,
-      date: new Date(order.deliveredAt).toLocaleDateString(),
+      date: formattedDate,
       items: order.orderItems.map((item) => ({
         name: item.name,
         qty: item.quantity,
