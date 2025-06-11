@@ -1,35 +1,16 @@
 {
   "version": 2,
-  "name": "ecommerce-intern",
+  "name": "ecommerce-inten",
   "builds": [
-    {
-      "src": "index.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb",
-        "includeFiles": [
-          "templates/**",
-          "node_modules/@sparticuz/chromium/**",
-          "node_modules/puppeteer-core/**"
-        ]
+      {
+          "src": "index.js",
+          "use": "@vercel/node"
       }
-    }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/index.js",
-      "methods": ["GET", "POST"],
-      "headers": {
-        "Content-Type": "application/pdf"
+      {
+          "src": "/(.*)",
+          "dest": "/index.js"
       }
-    }
-  ],
-  "functions": {
-    "api/*.js": {
-      "memory": 3008,
-      "maxDuration": 30,
-      "runtime": "nodejs18.x"
-    }
-  }
+  ]
 }
