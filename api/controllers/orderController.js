@@ -3,7 +3,7 @@ const Product = require("../models/Product");
 const User = require("../models/User");
 const generateInvoicePDF = require("../utils/generateInvoics");
 const sendMail = require("../utils/sendEmail");
-const sendInvoiceEmail = require("../utils/sendInvoiceEmail");
+const sendMailInvoice = require("../utils/sendInvoiceEmail");
 const fs = require("fs");
 
 
@@ -193,7 +193,7 @@ exports.verifyOtpAndDeliver = async (req, res) => {
     const pdfPath = await generateInvoicePDF(order);
 
     // Send email with invoice
-    await sendInvoiceEmail(order, pdfPath);
+    await sendMailInvoice(order, pdfPath);
 
     // Delete temp PDF file
     fs.unlinkSync(pdfPath);

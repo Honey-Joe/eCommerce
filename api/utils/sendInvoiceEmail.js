@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const sendInvoiceEmail = async (order, pdfPath) => {
+const sendMail = async (order, pdfPath) => {
   try {
     const transporter = nodemailer.createTransport({
       service:"gmail",
@@ -31,4 +31,4 @@ const sendInvoiceEmail = async (order, pdfPath) => {
   }
 };
 
-module.exports = sendInvoiceEmail;
+module.exports = sendMail;
